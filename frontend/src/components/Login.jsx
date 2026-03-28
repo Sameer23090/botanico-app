@@ -78,6 +78,12 @@ export default function Login({ onLogin }) {
             <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.3)' }}>Don't have an account?</span>
             <Link to="/register" style={{ fontSize: 13, color: 'var(--jade)', textDecoration: 'none', fontWeight: 500 }}>Create account →</Link>
           </div>
+
+          <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+            <Link to="/admin" style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', textDecoration: 'none', fontWeight: 500, transition: 'color 0.2s' }}>
+              Admin Personnel Portal
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

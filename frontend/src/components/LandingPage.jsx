@@ -162,8 +162,11 @@ export default function LandingPage() {
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.02em',
         }}>Botanico</div>
-        <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.25)', fontFamily: "var(--font-body)" }}>
-          © 2026 Botanico. Made with 💚 for plant lovers.
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <Link to="/admin" style={{ fontSize: 12, color: 'var(--jade)', textDecoration: 'none', fontWeight: 600, letterSpacing: '0.05em' }}>ADMIN PORTAL</Link>
+          <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.25)', fontFamily: "var(--font-body)" }}>
+            © 2026 Botanico. Made with 💚 for plant lovers.
+          </div>
         </div>
       </footer>
     </div>

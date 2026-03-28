@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, ShieldAlert, ArrowLeft } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -56,25 +57,27 @@ export default function AdminLogin() {
 
         <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Admin Email</label>
-            <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>✉️</span>
+            <label className="label-text">Admin Email</label>
+            <div style={{ position: 'relative' }}>
               <input
                 id="admin-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@botanico.app"
+                placeholder="master@botanico.live"
                 required
-                style={styles.input}
+                className="input-field"
+                style={{ paddingRight: 48 }}
               />
+              <span style={{ position: 'absolute', right: 16, bottom: 16, color: 'rgba(240,253,244,0.2)', pointerEvents: 'none' }}>
+                <Mail size={16} />
+              </span>
             </div>
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
-            <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>🔒</span>
+            <label className="label-text">Password</label>
+            <div style={{ position: 'relative' }}>
               <input
                 id="admin-password"
                 type="password"
@@ -82,35 +85,37 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                style={styles.input}
+                className="input-field"
+                style={{ paddingRight: 48 }}
               />
+              <span style={{ position: 'absolute', right: 16, bottom: 16, color: 'rgba(240,253,244,0.2)', pointerEvents: 'none' }}>
+                <Lock size={16} />
+              </span>
             </div>
           </div>
 
           {error && (
             <div style={styles.error}>
-              <span>⚠️</span> {error}
+              <ShieldAlert size={16} /> {error}
             </div>
           )}
 
-          <button id="admin-login-btn" type="submit" disabled={loading} style={styles.btn}>
-            {loading ? (
-              <span style={styles.spinner}>⟳ Authenticating...</span>
-            ) : (
-              '🔐 Access Admin Panel'
-            )}
+          <button id="admin-login-btn" type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '16px', fontSize: 16, borderRadius: 14, marginTop: 12 }}>
+            {loading ? 'Authenticating...' : 'Access Admin Panel'}
           </button>
         </form>
 
         <div style={styles.hint}>
           <div style={styles.hintBox}>
-            <p style={styles.hintTitle}>📋 Default Credentials</p>
+            <p style={styles.hintTitle}>Default Credentials</p>
             <p style={styles.hintText}>Email: <strong>master@botanico.live</strong></p>
             <p style={styles.hintText}>Password: <strong>BotanicoMaster!2026</strong></p>
           </div>
         </div>
 
-        <a href="/login" style={styles.backLink}>← Back to Student Login</a>
+        <Link to="/login" style={styles.backLink}>
+          <ArrowLeft size={12} style={{ marginRight: 6 }} /> Back to Student Login
+        </Link>
       </div>
     </div>
   );
@@ -197,61 +202,34 @@ const styles = {
     margin: '12px 0 28px',
     opacity: 0.7,
   },
-  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '20px' },
   inputGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
-  label: { color: 'var(--pearl)', fontSize: '12px', fontWeight: 600, letterSpacing: '0.5px' },
-  inputWrapper: { position: 'relative', display: 'flex', alignItems: 'center' },
-  inputIcon: { position: 'absolute', left: '14px', fontSize: '14px', zIndex: 1 },
-  input: {
-    width: '100%',
-    padding: '13px 16px 13px 42px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '12px',
-    color: 'var(--pearl)',
-    fontFamily: 'var(--font-body)',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-    boxSizing: 'border-box',
-  },
   error: {
     display: 'flex', gap: '8px', alignItems: 'center',
-    background: 'rgba(255,50,50,0.1)',
-    border: '1px solid rgba(255,50,50,0.3)',
-    borderRadius: '8px',
-    padding: '10px 14px',
-    color: '#ff6b6b',
-    fontSize: '13px',
-  },
-  btn: {
-    marginTop: '8px',
-    padding: '14px',
-    background: 'linear-gradient(135deg, var(--jade), var(--emerald))',
-    border: 'none',
+    background: 'rgba(239,68,68,0.1)',
+    border: '1px solid rgba(239,68,68,0.25)',
     borderRadius: '12px',
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: 700,
-    transition: 'all 0.2s',
-    boxShadow: '0 4px 20px rgba(34,197,94,0.3)',
+    padding: '12px 16px',
+    color: '#fca5a5',
+    fontSize: '13px',
+    marginTop: '4px',
   },
-  spinner: { display: 'inline-block', animation: 'spin 1s linear infinite' },
   hint: { marginTop: '24px' },
   hintBox: {
     background: 'rgba(34,197,94,0.05)',
     border: '1px solid rgba(34,197,94,0.15)',
     borderRadius: '12px',
-    padding: '14px 16px',
+    padding: '16px',
   },
-  hintTitle: { margin: '0 0 8px', color: 'var(--jade)', fontSize: '12px', fontWeight: 700 },
-  hintText: { margin: '2px 0', color: 'rgba(255,255,255,0.5)', fontSize: '12px' },
+  hintTitle: { margin: '0 0 8px', color: 'var(--jade)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' },
+  hintText: { margin: '4px 0', color: 'rgba(255,255,255,0.6)', fontSize: '13px' },
   backLink: {
-    display: 'block',
-    textAlign: 'center',
-    marginTop: '20px',
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: '28px',
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: '13px',
     textDecoration: 'none',
     transition: 'color 0.2s',
   },
