@@ -17,16 +17,17 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(async () => {
     try {
         const User = require('./models/User');
-        const existing = await User.findOne({ email: 'admin@botanico.app' });
+        const adminEmail = 'master@botanico.live';
+        const existing = await User.findOne({ email: adminEmail });
         if (!existing) {
             await User.create({
-                name: 'Botanico Admin',
-                email: 'admin@botanico.app',
-                passwordHash: 'Admin@Botanico2024',
+                name: 'System Director',
+                email: adminEmail,
+                passwordHash: 'BotanicoMaster!2026',
                 role: 'admin',
-                location: 'Admin Office',
+                location: 'Headquarters',
             });
-            console.log('✅ Auto-seeded admin user (admin@botanico.app)');
+            console.log(`✅ Auto-seeded new live admin user (${adminEmail})`);
         }
     } catch (err) {
         console.error('Failed to auto-seed admin:', err);

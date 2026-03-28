@@ -8,9 +8,9 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 
 const ADMIN_CREDENTIALS = {
-  name: 'Botanico Admin',
-  email: 'admin@botanico.app',
-  password: 'Admin@Botanico2024',
+  name: 'System Director',
+  email: 'master@botanico.live',
+  password: 'BotanicoMaster!2026',
   role: 'admin',
 };
 

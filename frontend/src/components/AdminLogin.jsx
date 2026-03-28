@@ -105,8 +105,8 @@ export default function AdminLogin() {
         <div style={styles.hint}>
           <div style={styles.hintBox}>
             <p style={styles.hintTitle}>📋 Default Credentials</p>
-            <p style={styles.hintText}>Email: <strong>admin@botanico.app</strong></p>
-            <p style={styles.hintText}>Password: <strong>Admin@Botanico2024</strong></p>
+            <p style={styles.hintText}>Email: <strong>master@botanico.live</strong></p>
+            <p style={styles.hintText}>Password: <strong>BotanicoMaster!2026</strong></p>
           </div>
         </div>
 
