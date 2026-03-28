@@ -27,7 +27,7 @@ export default function LandingPage() {
     <div style={{ background: 'var(--night)', minHeight: '100vh', overflowX: 'hidden' }}>
 
       {/* ── NAV ── */}
-      <nav style={{
+      <nav className="mobile-nav" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         padding: '20px 48px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -102,7 +102,7 @@ export default function LandingPage() {
             marginBottom: 20, opacity: 0.7,
           }}>Scientific Plant Intelligence</p>
 
-          <h1 className="anim-slide-up-2" style={{
+          <h1 className="anim-slide-up-2 hero-title" style={{
             fontFamily: "var(--font-serif)",
             fontSize: 'clamp(72px, 13vw, 148px)',
             fontWeight: 700, lineHeight: 0.88,
@@ -111,7 +111,7 @@ export default function LandingPage() {
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
           }}>Botanico</h1>
 
-          <p className="anim-slide-up-3" style={{
+          <p className="anim-slide-up-3 hero-subtitle" style={{
             fontFamily: "var(--font-body)",
             fontSize: 'clamp(14px, 1.8vw, 17px)', fontWeight: 300,
             color: 'rgba(240,253,244,0.55)', marginTop: 22, letterSpacing: '0.02em',
@@ -149,11 +149,12 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer style={{
+      <footer className="mobile-col mobile-center-text" style={{
         background: 'rgba(10,15,13,0.9)',
         padding: '28px 48px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         borderTop: '1px solid rgba(255,255,255,0.05)',
+        gap: '16px'
       }}>
         <div style={{
           fontFamily: "var(--font-serif)",
@@ -162,9 +163,9 @@ export default function LandingPage() {
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.02em',
         }}>Botanico</div>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+        <div className="mobile-col mobile-center-text" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           <Link to="/admin" style={{ fontSize: 12, color: 'var(--jade)', textDecoration: 'none', fontWeight: 600, letterSpacing: '0.05em' }}>ADMIN PORTAL</Link>
-          <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.25)', fontFamily: "var(--font-body)" }}>
+          <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.25)', fontFamily: "var(--font-body)", textAlign: 'center' }}>
             © 2026 Botanico. Made with 💚 for plant lovers.
           </div>
         </div>

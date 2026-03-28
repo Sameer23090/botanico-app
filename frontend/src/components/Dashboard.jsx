@@ -78,7 +78,7 @@ export default function Dashboard({ user, onLogout }) {
         <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative', zIndex: 1 }}>
 
             {/* Nav */}
-            <nav style={DARK_NAV}>
+            <nav className="mobile-nav" style={DARK_NAV}>
                 <div style={{
                     fontFamily: "var(--font-serif)",
                     fontSize: 22, fontWeight: 700,
@@ -124,7 +124,7 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
 
                 {/* Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 44 }}>
+                <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 44 }}>
                     {STATS.map((s, i) => (
                         <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.09, type: 'spring', stiffness: 160 }} className="stat-card">
                             <div className="stat-icon">{s.icon}</div>

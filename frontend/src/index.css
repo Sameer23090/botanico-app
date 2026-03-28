@@ -1073,3 +1073,33 @@
   background: rgba(34,197,94,0.25);
   color: var(--pearl);
 }
+
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVENESS (<= 768px)
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Disable Liquid Cursor on touch devices to prevent lag and touch blocking */
+  .liquid-cursor-inner, .liquid-cursor-outer { display: none !important; }
+
+  /* Reset layout constraints and make sidebars act as top nav */
+  .mobile-col { flex-direction: column !important; }
+  .mobile-sidebar { 
+    width: 100% !important; 
+    height: auto !important; 
+    border-right: none !important; 
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important; 
+    padding-bottom: 16px !important; 
+  }
+
+  /* Padding adjustments to maximize mobile screen real-estate */
+  .mobile-main { padding: 16px !important; }
+  .mobile-nav { padding: 0 20px !important; }
+  .mobile-grid { grid-template-columns: 1fr !important; }
+  .mobile-center-text { text-align: center !important; justify-content: center !important; flex-wrap: wrap; }
+  
+  .card { padding: 32px 24px !important; }
+
+  /* Typography downscaling */
+  .hero-title { font-size: 38px !important; line-height: 1.1 !important; }
+  .hero-subtitle { font-size: 14px !important; }
+}

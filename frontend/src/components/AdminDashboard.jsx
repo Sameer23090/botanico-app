@@ -163,10 +163,10 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--night)', fontFamily: "var(--font-body)", color: 'var(--pearl)' }}>
+    <div className="mobile-col" style={{ display: 'flex', minHeight: '100vh', background: 'var(--night)', fontFamily: "var(--font-body)", color: 'var(--pearl)' }}>
 
       {/* ── Sidebar ── */}
-      <aside style={{ width: 220, flexShrink: 0, background: 'rgba(10,15,13,0.95)', borderRight: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', padding: '0 0 24px' }}>
+      <aside className="mobile-sidebar" style={{ width: 220, flexShrink: 0, background: 'rgba(10,15,13,0.95)', borderRight: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', padding: '0 0 24px' }}>
         {/* Logo */}
         <div style={{ padding: '28px 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
       {/* ── Main ── */}
       <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
         {/* Top bar */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(10,15,13,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="mobile-nav" style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(10,15,13,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {loading && <div style={{ width: 16, height: 16, border: '2px solid rgba(34,197,94,0.2)', borderTop: '2px solid var(--jade)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div style={{ padding: '28px 32px' }}>
+        <div className="mobile-main" style={{ padding: '28px 32px' }}>
 
           {/* ══ LIVE MONITOR ══ */}
           {tab === 'monitor' && overview && (
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* KPI Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
+              <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
                 <KpiCard icon="👥" label="Total Growers" value={overview.stats.totalUsers} color="var(--mist)"
                   sub="Registered users" />
                 <KpiCard icon="🌿" label="Plants Growing" value={overview.stats.totalPlants} color="var(--jade)"
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                   color="var(--amber)" sub="Active plants" />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 {/* Grower breakdown */}
                 <Section title="👥 Growers by Role">
                   <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
