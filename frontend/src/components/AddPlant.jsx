@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { plantsAPI } from '../api';
 
 export default function AddPlant() {
@@ -36,26 +36,43 @@ export default function AddPlant() {
     const f = (k) => ({ value: form[k], onChange: e => setForm({ ...form, [k]: e.target.value }) });
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--soil)' }}>
-            <nav style={{ position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', padding: '0 32px', height: 64, background: 'rgba(28,16,6,0.9)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 12 }}>
-                <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}><ArrowLeft size={18} /></Link>
-                <Leaf size={18} style={{ color: 'var(--sprout)' }} />
-                <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: 'var(--cream)', fontSize: 16 }}>Add New Plant</span>
+        <div style={{ minHeight: '100vh', background: 'var(--night)' }}>
+            <nav style={{ 
+                position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', 
+                padding: '0 32px', height: 64, background: 'rgba(10,15,13,0.92)', 
+                backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', 
+                borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 12 
+            }}>
+                <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}>
+                    <ArrowLeft size={18} />
+                </Link>
+                <span style={{ 
+                    fontFamily: "var(--font-serif)", fontWeight: 700, 
+                    color: 'var(--pearl)', fontSize: 17, letterSpacing: '-0.01em' 
+                }}>
+                    Add New Plant
+                </span>
             </nav>
 
             <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px' }}>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '36px 40px' }}>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 140 }} className="card" style={{ padding: '36px 40px' }}>
                     {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5', borderRadius: 12, padding: '12px 16px', fontSize: 14, marginBottom: 20 }}>{error}</div>}
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
                         <div>
-                            <h2 className="form-section-title">🌿 Basic Information</h2>
+                            <h2 style={{
+                                fontFamily: "var(--font-serif)",
+                                fontSize: 20, fontWeight: 700,
+                                color: 'var(--pearl)',
+                                marginBottom: 16,
+                                letterSpacing: '-0.01em',
+                            }}>Basic Information</h2>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-text">Common Name *</label>
                                     <input className="input-field" placeholder="e.g. Tomato" required {...f('commonName')} />
                                 </div>
                                 <div>
-                                    <label className="label-scientific">Scientific Name</label>
+                                    <label className="label-text" style={{ fontStyle: 'normal' }}>Scientific Name</label>
                                     <input className="input-field" placeholder="e.g. Solanum lycopersicum" {...f('scientificName')} />
                                 </div>
                                 <div>
@@ -88,7 +105,13 @@ export default function AddPlant() {
                         </div>
 
                         <div>
-                            <h2 className="form-section-title">🌱 Growing Conditions</h2>
+                            <h2 style={{
+                                fontFamily: "var(--font-serif)",
+                                fontSize: 20, fontWeight: 700,
+                                color: 'var(--pearl)',
+                                marginBottom: 16,
+                                letterSpacing: '-0.01em',
+                            }}>Growing Conditions</h2>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-text">Location</label>
@@ -121,12 +144,10 @@ export default function AddPlant() {
                             <textarea className="textarea-field" rows={3} placeholder="Describe your plant..." {...f('description')} />
                         </div>
 
-
-
                         <div style={{ display: 'flex', gap: 16 }}>
                             <Link to="/dashboard" className="btn-secondary" style={{ flex: 1, textAlign: 'center', borderRadius: 50, padding: '13px' }}>Cancel</Link>
                             <button type="submit" className="btn-primary" style={{ flex: 1, borderRadius: 50 }} disabled={loading}>
-                                {loading ? 'Adding Plant...' : '🌱 Add Plant'}
+                                {loading ? 'Adding Plant...' : 'Add Plant'}
                             </button>
                         </div>
                     </form>

@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { isAuthenticated, getAuthToken } from './api';
+import { isAuthenticated } from './api';
 import AmbientAnimations from './components/AmbientAnimations';
+import LiquidCursor from './components/LiquidCursor';
 
 // Import components
 import LandingPage from './components/LandingPage';
@@ -29,7 +30,6 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Check if user is logged in
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -49,7 +49,8 @@ function App() {
 
   return (
     <Router>
-      <div style={{ minHeight: '100vh', background: 'var(--soil)', position: 'relative' }}>
+      <LiquidCursor />
+      <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative' }}>
         <AmbientAnimations />
         <Routes>
           {/* Public routes */}

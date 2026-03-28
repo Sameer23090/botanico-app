@@ -29,7 +29,7 @@ const timeAgo = (d) => {
 };
 
 const HEALTH_COLORS = {
-  excellent: '#00e676', good: '#4facfe', fair: '#ffd740', poor: '#ff9800', critical: '#ff1744'
+  excellent: 'var(--jade)', good: 'var(--mist)', fair: 'var(--gold)', poor: 'var(--amber)', critical: '#ef4444'
 };
 const HEALTH_LABELS = { excellent: '🟢', good: '🔵', fair: '🟡', poor: '🟠', critical: '🔴' };
 
@@ -45,7 +45,7 @@ const KpiCard = ({ icon, label, value, sub, color, trend }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
       <div style={{ fontSize: 28, lineHeight: 1 }}>{icon}</div>
       {trend !== undefined && (
-        <span style={{ fontSize: 11, color: trend >= 0 ? '#00e676' : '#ff5252', background: trend >= 0 ? 'rgba(0,230,118,0.1)' : 'rgba(255,82,82,0.1)', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>
+        <span style={{ fontSize: 11, color: trend >= 0 ? 'var(--jade)' : '#ef4444', background: trend >= 0 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>
           {trend >= 0 ? '↑' : '↓'} Today
         </span>
       )}
@@ -59,17 +59,17 @@ const KpiCard = ({ icon, label, value, sub, color, trend }) => (
 const HealthPill = ({ status }) => {
   const c = HEALTH_COLORS[status] || '#888';
   return status ? (
-    <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: c + '22', color: c, border: `1px solid ${c}44` }}>
+    <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: `color-mix(in srgb, ${c} 20%, transparent)`, color: c, border: `1px solid color-mix(in srgb, ${c} 40%, transparent)` }}>
       {HEALTH_LABELS[status]} {status}
     </span>
   ) : <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>—</span>;
 };
 
 const RolePill = ({ role }) => {
-  const colors = { admin: '#ff6b35', faculty: '#4facfe', student: '#00e676' };
+  const colors = { admin: '#f97316', faculty: 'var(--mist)', student: 'var(--jade)' };
   const c = colors[role] || '#888';
   return (
-    <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: c + '20', color: c, border: `1px solid ${c}44`, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+    <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: `color-mix(in srgb, ${c} 20%, transparent)`, color: c, border: `1px solid color-mix(in srgb, ${c} 40%, transparent)`, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
       {role}
     </span>
   );
@@ -163,23 +163,22 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#04080f', fontFamily: "'Inter', 'DM Sans', sans-serif", color: 'rgba(255,255,255,0.85)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--night)', fontFamily: "var(--font-body)", color: 'var(--pearl)' }}>
 
       {/* ── Sidebar ── */}
-      <aside style={{ width: 220, flexShrink: 0, background: 'rgba(0,0,0,0.7)', borderRight: '1px solid rgba(0,230,118,0.1)', display: 'flex', flexDirection: 'column', padding: '0 0 24px' }}>
+      <aside style={{ width: 220, flexShrink: 0, background: 'rgba(10,15,13,0.95)', borderRight: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', padding: '0 0 24px' }}>
         {/* Logo */}
         <div style={{ padding: '28px 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #00e676, #00bcd4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, boxShadow: '0 0 16px rgba(0,230,118,0.4)' }}>🌿</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16, background: 'linear-gradient(135deg,#00e676,#4facfe)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Botanico</div>
-              <div style={{ fontSize: 9, color: 'rgba(0,230,118,0.5)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Admin Control</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 24, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>Botanico</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--jade)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Admin Control</div>
             </div>
           </div>
           {/* Status indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'rgba(0,230,118,0.06)', borderRadius: 8, border: '1px solid rgba(0,230,118,0.1)' }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#00e676', boxShadow: '0 0 6px #00e676', animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: 11, color: 'rgba(0,230,118,0.7)', fontWeight: 500 }}>System Live</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'rgba(34,197,94,0.06)', borderRadius: 8, border: '1px solid rgba(34,197,94,0.1)' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--jade)', boxShadow: '0 0 6px var(--jade)', animation: 'pulse 2s infinite' }} />
+            <span style={{ fontSize: 11, color: 'var(--jade)', fontWeight: 500 }}>System Live</span>
           </div>
         </div>
 
@@ -189,9 +188,9 @@ export default function AdminDashboard() {
             <button key={t.id} onClick={() => { setTab(t.id); setSelectedUser(null); setUserPlants(null); setSelectedPlant(null); setPlantUpdates(null); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', fontSize: 14, transition: 'all 0.15s',
-                background: tab === t.id ? 'linear-gradient(135deg, rgba(0,230,118,0.15), rgba(79,172,254,0.1))' : 'transparent',
-                color: tab === t.id ? '#00e676' : 'rgba(255,255,255,0.45)',
-                borderLeft: tab === t.id ? '2px solid #00e676' : '2px solid transparent',
+                background: tab === t.id ? 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))' : 'transparent',
+                color: tab === t.id ? 'var(--jade)' : 'rgba(255,255,255,0.45)',
+                borderLeft: tab === t.id ? '2px solid var(--jade)' : '2px solid transparent',
                 fontWeight: tab === t.id ? 600 : 400,
               }}>
               <span style={{ fontSize: 16 }}>{t.icon}</span> {t.label}
@@ -205,7 +204,7 @@ export default function AdminDashboard() {
             <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2 }}>👑 {adminUser.name || 'Admin'}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{adminUser.email || ''}</div>
           </div>
-          <button onClick={logout} style={{ width: '100%', padding: '9px', border: '1px solid rgba(255,80,80,0.25)', borderRadius: 8, background: 'rgba(255,80,80,0.06)', color: '#ff6b6b', fontSize: 13, cursor: 'pointer' }}>
+          <button onClick={logout} style={{ width: '100%', padding: '9px', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, background: 'rgba(239,68,68,0.06)', color: '#ef4444', fontSize: 13, cursor: 'pointer' }}>
             🚪 Sign Out
           </button>
         </div>
@@ -214,14 +213,14 @@ export default function AdminDashboard() {
       {/* ── Main ── */}
       <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
         {/* Top bar */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(4,8,15,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(10,15,13,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {loading && <div style={{ width: 16, height: 16, border: '2px solid rgba(0,230,118,0.2)', borderTop: '2px solid #00e676', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+            {loading && <div style={{ width: 16, height: 16, border: '2px solid rgba(34,197,94,0.2)', borderTop: '2px solid var(--jade)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
               {loading ? 'Fetching latest data...' : `Last refreshed: ${new Date().toLocaleTimeString()}`}
             </span>
           </div>
-          <button onClick={() => load(tab === 'monitor' ? 'monitor-refresh' : tab)} style={{ padding: '6px 14px', border: '1px solid rgba(0,230,118,0.25)', borderRadius: 8, background: 'rgba(0,230,118,0.06)', color: '#00e676', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={() => load(tab === 'monitor' ? 'monitor-refresh' : tab)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
             ↻ Refresh
           </button>
         </div>
@@ -232,20 +231,20 @@ export default function AdminDashboard() {
           {tab === 'monitor' && overview && (
             <div>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 4 }}>📡 Live Monitor</h1>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', marginBottom: 4 }}>📡 Live Monitor</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>Real-time overview of all growing activity across the platform</p>
               </div>
 
               {/* KPI Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
-                <KpiCard icon="👥" label="Total Growers" value={overview.stats.totalUsers} color="#4facfe"
+                <KpiCard icon="👥" label="Total Growers" value={overview.stats.totalUsers} color="var(--mist)"
                   sub="Registered users" />
-                <KpiCard icon="🌿" label="Plants Growing" value={overview.stats.totalPlants} color="#00e676"
+                <KpiCard icon="🌿" label="Plants Growing" value={overview.stats.totalPlants} color="var(--jade)"
                   sub="Across all users" trend={1} />
-                <KpiCard icon="📋" label="Log Entries" value={overview.stats.totalUpdates} color="#ffd740"
+                <KpiCard icon="📋" label="Log Entries" value={overview.stats.totalUpdates} color="var(--gold)"
                   sub="Total observations" trend={1} />
                 <KpiCard icon="⚡" label="Active Now" value={overview.plantsByStatus?.find(p => p._id === 'active')?.count || 0}
-                  color="#e040fb" sub="Active plants" />
+                  color="var(--amber)" sub="Active plants" />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -253,7 +252,7 @@ export default function AdminDashboard() {
                 <Section title="👥 Growers by Role">
                   <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {overview.usersByRole.map(r => {
-                      const colors = { admin: '#ff6b35', faculty: '#4facfe', student: '#00e676' };
+                      const colors = { admin: '#f97316', faculty: 'var(--mist)', student: 'var(--jade)' };
                       const c = colors[r._id] || '#888';
                       const pct = overview.stats.totalUsers ? Math.round((r.count / overview.stats.totalUsers) * 100) : 0;
                       return (
@@ -273,7 +272,7 @@ export default function AdminDashboard() {
                 <Section title="🌿 Plant Status">
                   <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {overview.plantsByStatus.map(p => {
-                      const colors = { active: '#00e676', harvested: '#ffd740', dormant: '#4facfe', deleted: '#ff5252' };
+                      const colors = { active: 'var(--jade)', harvested: 'var(--gold)', dormant: 'var(--mist)', deleted: '#ef4444' };
                       const c = colors[p._id] || '#888';
                       const pct = overview.stats.totalPlants ? Math.round((p.count / overview.stats.totalPlants) * 100) : 0;
                       return (
@@ -301,12 +300,12 @@ export default function AdminDashboard() {
                           display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 20px',
                           borderBottom: i < 7 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                         }}>
-                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: HEALTH_COLORS[u.healthStatus] || '#4facfe', marginTop: 4, flexShrink: 0, boxShadow: `0 0 6px ${HEALTH_COLORS[u.healthStatus] || '#4facfe'}` }} />
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: HEALTH_COLORS[u.healthStatus] || 'var(--mist)', marginTop: 4, flexShrink: 0, boxShadow: `0 0 6px ${HEALTH_COLORS[u.healthStatus] || 'var(--mist)'}` }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               <strong style={{ color: '#fff' }}>{u.userId?.name || 'Unknown'}</strong>
                               <span style={{ color: 'rgba(255,255,255,0.35)' }}> logged on </span>
-                              <strong style={{ color: '#00e676' }}>{u.plantId?.commonName || 'a plant'}</strong>
+                              <strong style={{ color: 'var(--jade)' }}>{u.plantId?.commonName || 'a plant'}</strong>
                             </div>
                             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
                               <HealthPill status={u.healthStatus} />
@@ -328,13 +327,13 @@ export default function AdminDashboard() {
                           display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px',
                           borderBottom: i < 7 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                         }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,rgba(0,230,118,0.15),rgba(79,172,254,0.1))', border: '1px solid rgba(0,230,118,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌱</div>
+                          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌱</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.commonName}</div>
                             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>by {p.userId?.name || '—'} · {timeAgo(p.createdAt)}</div>
                           </div>
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{ fontSize: 12, color: '#ffd740', fontWeight: 700 }}>Day {p.daysSincePlanting ?? '?'}</div>
+                            <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700 }}>Day {p.daysSincePlanting ?? '?'}</div>
                             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{p.plantType || '—'}</div>
                           </div>
                         </div>
@@ -374,7 +373,7 @@ export default function AdminDashboard() {
           {tab === 'growers' && !selectedUser && (
             <div>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 4 }}>👥 Growers Registry</h1>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', marginBottom: 4 }}>👥 Growers Registry</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>{users.length} registered users — manage roles and view their plants</p>
               </div>
               <Section title="All Growers">
@@ -391,7 +390,7 @@ export default function AdminDashboard() {
                       <tr key={u.id || u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                         <td style={{ padding: '14px 20px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(0,230,118,0.2),rgba(79,172,254,0.15))', border: '1px solid rgba(0,230,118,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>
                               {u.name?.[0]?.toUpperCase() || '?'}
                             </div>
                             <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</span>
@@ -407,11 +406,11 @@ export default function AdminDashboard() {
                           </select>
                         </td>
                         <td style={{ padding: '14px 20px', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(0,230,118,0.12)', color: '#00e676', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{u.plantCount}</span>
+                          <span style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--jade)', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{u.plantCount}</span>
                         </td>
                         <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
                         <td style={{ padding: '14px 20px' }}>
-                          <button onClick={() => viewUserPlants(u)} style={{ padding: '6px 14px', border: '1px solid rgba(0,230,118,0.25)', borderRadius: 8, background: 'rgba(0,230,118,0.06)', color: '#00e676', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                          <button onClick={() => viewUserPlants(u)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                             🌱 View Plants
                           </button>
                         </td>
@@ -430,15 +429,15 @@ export default function AdminDashboard() {
                 ← Back to Growers
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(0,230,118,0.25),rgba(79,172,254,0.2))', border: '1px solid rgba(0,230,118,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, color: '#00e676' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(34,197,94,0.25),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, color: 'var(--jade)' }}>
                   {selectedUser.name?.[0]?.toUpperCase()}
                 </div>
                 <div>
-                  <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: 0 }}>{selectedUser.name}'s Plants</h1>
+                  <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>{selectedUser.name}'s Plants</h1>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 4 }}>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{selectedUser.email}</span>
                     <RolePill role={selectedUser.role} />
-                    <span style={{ fontSize: 12, color: '#00e676', fontWeight: 600 }}>{userPlants.plants?.length || 0} plant{userPlants.plants?.length !== 1 ? 's' : ''}</span>
+                    <span style={{ fontSize: 12, color: 'var(--jade)', fontWeight: 600 }}>{userPlants.plants?.length || 0} plant{userPlants.plants?.length !== 1 ? 's' : ''}</span>
                   </div>
                 </div>
               </div>
@@ -447,18 +446,18 @@ export default function AdminDashboard() {
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14 }}>
                   {userPlants.plants.map(p => (
-                    <div key={p.id || p._id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px', cursor: 'pointer', transition: 'all 0.15s', borderTop: '2px solid rgba(0,230,118,0.2)' }}
+                    <div key={p.id || p._id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px', cursor: 'pointer', transition: 'all 0.15s', borderTop: '2px solid rgba(34,197,94,0.2)' }}
                       onClick={() => viewPlantUpdates(p)}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{p.commonName}</span>
-                        <span style={{ background: p.status === 'active' ? 'rgba(0,230,118,0.15)' : 'rgba(255,215,64,0.1)', color: p.status === 'active' ? '#00e676' : '#ffd740', padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700 }}>{p.status}</span>
+                        <span style={{ background: p.status === 'active' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.1)', color: p.status === 'active' ? 'var(--jade)' : 'var(--gold)', padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700 }}>{p.status}</span>
                       </div>
                       {p.scientificName && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic', marginBottom: 10 }}>{p.scientificName}</div>}
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
                         <span>📅 {fmt(p.plantingDate)}</span>
-                        <span style={{ color: '#ffd740', fontWeight: 700 }}>Day {p.daysSincePlanting ?? '?'}</span>
+                        <span style={{ color: 'var(--gold)', fontWeight: 700 }}>Day {p.daysSincePlanting ?? '?'}</span>
                       </div>
-                      <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(0,230,118,0.06)', borderRadius: 6, textAlign: 'center', fontSize: 11, color: '#00e676', fontWeight: 600 }}>
+                      <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(34,197,94,0.06)', borderRadius: 6, textAlign: 'center', fontSize: 11, color: 'var(--jade)', fontWeight: 600 }}>
                         📋 View Log Entries →
                       </div>
                     </div>
@@ -475,7 +474,7 @@ export default function AdminDashboard() {
                 ← Back to Plants
               </button>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — Log</h1>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — Log</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} entries recorded</p>
               </div>
               {!plantUpdates.updates?.length ? (
@@ -486,7 +485,7 @@ export default function AdminDashboard() {
                     <div key={u.id || u._id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '18px 20px', borderLeft: `3px solid ${HEALTH_COLORS[u.healthStatus] || '#333'}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                          <span style={{ background: 'rgba(0,230,118,0.15)', color: '#00e676', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>Day {u.dayNumber}</span>
+                          <span style={{ background: 'rgba(34,197,94,0.15)', color: 'var(--jade)', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>Day {u.dayNumber}</span>
                           {u.title && <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{u.title}</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -499,7 +498,7 @@ export default function AdminDashboard() {
                         {u.temperatureCelsius && <span>🌡 {u.temperatureCelsius}°C</span>}
                         {u.soilMoisture && <span>💧 {u.soilMoisture}</span>}
                         {u.floweringStage && <span>🌸 {u.floweringStage}</span>}
-                        {u.pestIssues && <span style={{ color: '#ff5252' }}>⚠️ {u.pestIssues}</span>}
+                        {u.pestIssues && <span style={{ color: '#ef4444' }}>⚠️ {u.pestIssues}</span>}
                       </div>
                     </div>
                   ))}
@@ -512,7 +511,7 @@ export default function AdminDashboard() {
           {tab === 'plants' && !selectedPlant && (
             <div>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 4 }}>🌿 Plant Registry</h1>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', marginBottom: 4 }}>🌿 Plant Registry</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>{plants.length} plants across all growers</p>
               </div>
               <Section title="All Plants">
@@ -537,16 +536,16 @@ export default function AdminDashboard() {
                           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{p.userId?.email || ''}</div>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <span style={{ background: p.status === 'active' ? 'rgba(0,230,118,0.15)' : 'rgba(255,215,64,0.1)', color: p.status === 'active' ? '#00e676' : '#ffd740', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>
+                          <span style={{ background: p.status === 'active' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.1)', color: p.status === 'active' ? 'var(--jade)' : 'var(--gold)', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>
                             {p.status}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center', color: '#ffd740', fontWeight: 700, fontSize: 13 }}>
+                        <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--gold)', fontWeight: 700, fontSize: 13 }}>
                           {p.daysSincePlanting ?? '?'}
                         </td>
                         <td style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(p.plantingDate)}</td>
                         <td style={{ padding: '12px 16px' }}>
-                          <button onClick={() => viewPlantUpdates(p)} style={{ padding: '5px 12px', border: '1px solid rgba(0,230,118,0.2)', borderRadius: 6, background: 'rgba(0,230,118,0.06)', color: '#00e676', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+                          <button onClick={() => viewPlantUpdates(p)} style={{ padding: '5px 12px', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 6, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
                             📋 Logs
                           </button>
                         </td>
