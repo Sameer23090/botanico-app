@@ -21,6 +21,31 @@ export default function AddUpdate() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [gpsText, setGpsText] = useState('📍 Auto-detect plant location');
+    const [gpsCoords, setGpsCoords] = useState('TAP');
+    const [capturedCoords, setCapturedCoords] = useState(null);
+
+    const captureGPS = () => {
+        setGpsText('Locating...');
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    setGpsText('Location captured');
+                    setGpsCoords(`${lat}, ${lng}`);
+                    setCapturedCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                },
+                () => {
+                    setGpsText('Location failed');
+                    setGpsCoords('ERR');
+                }
+            );
+        } else {
+            setGpsText('Not supported');
+            setGpsCoords('ERR');
+        }
+    };
 
     const f = (k) => ({ value: form[k], onChange: e => setForm({ ...form, [k]: e.target.value }) });
 
@@ -29,25 +54,13 @@ export default function AddUpdate() {
         setLoading(true);
         setError('');
 
-        let coords = null;
-        try {
-            if ("geolocation" in navigator) {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-                });
-                coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            }
-        } catch (err) {
-            console.warn("Geolocation failed", err);
-        }
-
         // Send only non-empty fields as JSON
         const payload = { plantId: id };
         Object.entries(form).forEach(([k, v]) => {
             if (v !== '' && v !== null && v !== undefined) payload[k] = v;
         });
-        if (coords) {
-            payload.coordinates = coords;
+        if (capturedCoords) {
+            payload.coordinates = capturedCoords;
         }
         try {
             await api.post('/updates', payload);
@@ -182,6 +195,20 @@ export default function AddUpdate() {
                         <div>
                             <label className="label-text">⚠️ Pest / Disease Notes (optional)</label>
                             <textarea className="textarea-field" rows={2} placeholder="Any bugs, yellowing, wilting, disease signs?" {...f('pestIssues')} />
+                        </div>
+
+                        {/* GPS badge */}
+                        <div onClick={captureGPS} style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '12px 16px',
+                            background: 'rgba(34,197,94,0.06)',
+                            border: '1px solid rgba(34,197,94,0.15)',
+                            borderRadius: 12,
+                            cursor: 'pointer', transition: 'all 0.3s',
+                        }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--jade)', boxShadow: '0 0 8px var(--jade)' }} />
+                            <span style={{ fontSize: 13, color: 'var(--jade)', fontWeight: 500 }}>{gpsText}</span>
+                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: 'rgba(34,197,94,0.5)' }}>{gpsCoords}</small>
                         </div>
 
                         {/* Actions */}
