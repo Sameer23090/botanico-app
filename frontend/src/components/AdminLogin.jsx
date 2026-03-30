@@ -105,14 +105,6 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <div style={styles.hint}>
-          <div style={styles.hintBox}>
-            <p style={styles.hintTitle}>Default Credentials</p>
-            <p style={styles.hintText}>Email: <strong>master@botanico.live</strong></p>
-            <p style={styles.hintText}>Password: <strong>BotanicoMaster!2026</strong></p>
-          </div>
-        </div>
-
         <Link to="/login" style={styles.backLink}>
           <ArrowLeft size={12} style={{ marginRight: 6 }} /> Back to Student Login
         </Link>

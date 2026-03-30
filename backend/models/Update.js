@@ -63,6 +63,10 @@ const updateSchema = new mongoose.Schema(
         },
 
         notes: { type: String, default: null },
+        coordinates: {
+            lat: { type: Number, default: null },
+            lng: { type: Number, default: null }
+        },
     },
     {
         timestamps: true,

@@ -28,6 +28,10 @@ const plantSchema = new mongoose.Schema(
         },
         firstPhotoUrl: { type: String, default: null },
         location: { type: String, trim: true, default: null },
+        coordinates: {
+            lat: { type: Number, default: null },
+            lng: { type: Number, default: null }
+        },
         soilType: { type: String, trim: true, default: null },
         sunlightExposure: { type: String, trim: true, default: null },
         plantingMethod: { type: String, trim: true, default: null },

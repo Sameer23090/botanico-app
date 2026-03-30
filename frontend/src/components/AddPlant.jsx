@@ -16,12 +16,50 @@ export default function AddPlant() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const plantPresets = {
+        '': { scientific: '', family: '' },
+        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae' },
+        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae' },
+        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae' },
+        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae' },
+        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae' },
+        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae' },
+        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae' }
+    };
+
+    const handlePresetChange = (e) => {
+        const val = e.target.value;
+        setForm({
+            ...form,
+            commonName: val,
+            scientificName: plantPresets[val]?.scientific || '',
+            family: plantPresets[val]?.family || ''
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        
+        let coords = null;
+        try {
+            if ("geolocation" in navigator) {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                });
+                coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            }
+        } catch (err) {
+            console.warn("Geolocation failed", err);
+        }
+
         const formData = new FormData();
         Object.entries(form).forEach(([k, v]) => v && formData.append(k, v));
+        if (coords) {
+            formData.append('coordinates[lat]', coords.lat);
+            formData.append('coordinates[lng]', coords.lng);
+        }
         try {
             const res = await plantsAPI.create(formData);
             const plantId = res.data.plant?.id || res.data.plant?._id || res.data.id;
@@ -69,15 +107,24 @@ export default function AddPlant() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-text">Common Name *</label>
-                                    <input className="input-field" placeholder="e.g. Tomato" required {...f('commonName')} />
+                                    <select className="select-field" required value={form.commonName} onChange={handlePresetChange}>
+                                        <option value="">Select a plant</option>
+                                        {Object.keys(plantPresets).filter(k=>k).map(k => <option key={k} value={k}>{k}</option>)}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="label-text" style={{ fontStyle: 'normal' }}>Scientific Name</label>
-                                    <input className="input-field" placeholder="e.g. Solanum lycopersicum" {...f('scientificName')} />
+                                    <select className="select-field" value={form.scientificName} onChange={e => setForm({...form, scientificName: e.target.value})}>
+                                        <option value="">Select</option>
+                                        {Object.values(plantPresets).filter(v=>v.scientific).map(v => <option key={v.scientific} value={v.scientific}>{v.scientific}</option>)}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="label-text">Family</label>
-                                    <input className="input-field" placeholder="e.g. Solanaceae" {...f('family')} />
+                                    <select className="select-field" value={form.family} onChange={e => setForm({...form, family: e.target.value})}>
+                                        <option value="">Select</option>
+                                        {Object.values(plantPresets).filter(v=>v.family).map(v => <option key={v.family} value={v.family}>{v.family}</option>)}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="label-text">Plant Type</label>

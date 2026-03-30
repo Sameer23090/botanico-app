@@ -17,6 +17,13 @@ export default function Register({ onRegister }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        
+        const emailLower = form.email.trim().toLowerCase();
+        if (!emailLower.endsWith('@gmail.com') && !emailLower.endsWith('@outlook.com') && !emailLower.endsWith('@yahoo.com')) {
+            setError('Please use a trusted email provider (@gmail.com, @outlook.com, or @yahoo.com).');
+            return;
+        }
+
         setLoading(true);
         try {
             const res = await fetch(`${API_BASE}/auth/register`, {

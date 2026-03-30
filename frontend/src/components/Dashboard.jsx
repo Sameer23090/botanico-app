@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, LogOut, TrendingUp, Leaf, Calendar, Sprout } from 'lucide-react';
+import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar } from 'lucide-react';
 import { plantsAPI } from '../api';
-import { getPlantImage, GENERIC_PLANT_IMAGE } from '../utils/plantImages';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -15,36 +14,7 @@ const DARK_NAV = {
     boxShadow: '0 1px 0 rgba(34,197,94,0.06)',
 };
 
-// Plant card image with smart fallback
-function PlantCardImage({ plant }) {
-    const [imgSrc, setImgSrc] = useState(() => {
-        if (plant.firstPhotoUrl) return plant.firstPhotoUrl;
-        return getPlantImage(plant.commonName) || GENERIC_PLANT_IMAGE;
-    });
-    const [errored, setErrored] = useState(false);
 
-    const handleError = () => {
-        if (!errored) {
-            setErrored(true);
-            setImgSrc(GENERIC_PLANT_IMAGE);
-        }
-    };
-
-    return (
-        <img
-            src={imgSrc}
-            alt={plant.commonName}
-            onError={handleError}
-            style={{
-                width: '100%', height: '100%',
-                objectFit: 'cover',
-                transition: 'transform 0.6s cubic-bezier(.22,.68,0,1.1)',
-            }}
-            onMouseEnter={e => e.target.style.transform = 'scale(1.07)'}
-            onMouseLeave={e => e.target.style.transform = 'scale(1)'}
-        />
-    );
-}
 
 export default function Dashboard({ user, onLogout }) {
     const navigate = useNavigate();
@@ -174,21 +144,6 @@ export default function Dashboard({ user, onLogout }) {
                                 transition={{ delay: i * 0.06, type: 'spring', stiffness: 140 }}
                             >
                                 <Link to={`/plant/${plant.id}`} className="card-botanical" style={{ display: 'block', textDecoration: 'none' }}>
-                                    {/* Image */}
-                                    <div style={{
-                                        aspectRatio: '16/10',
-                                        overflow: 'hidden',
-                                        background: 'linear-gradient(135deg, var(--forest), var(--grove))',
-                                        position: 'relative',
-                                    }}>
-                                        <PlantCardImage plant={plant} />
-                                        {/* Gradient overlay */}
-                                        <div style={{
-                                            position: 'absolute', inset: 0,
-                                            background: 'linear-gradient(to top, rgba(10,15,13,0.6) 0%, transparent 50%)',
-                                        }} />
-                                    </div>
-
                                     {/* Info */}
                                     <div style={{ padding: '16px 18px' }}>
                                         <h3 style={{
@@ -211,7 +166,7 @@ export default function Dashboard({ user, onLogout }) {
                                         )}
                                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                                             <span className="badge badge-botanical">
-                                                <Calendar size={9} />&nbsp;{new Date(plant.plantingDate).toLocaleDateString()}
+                                                {new Date(plant.plantingDate).toLocaleDateString()}
                                             </span>
                                             {plant.plantType && <span className="badge badge-info">{plant.plantType}</span>}
                                             <span className="badge badge-success">{plant.status}</span>

@@ -1,33 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Calendar, TrendingUp, Trash2, Thermometer } from 'lucide-react';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp } from 'lucide-react';
 import { plantsAPI, updatesAPI } from '../api';
-import { getPlantImage, GENERIC_PLANT_IMAGE } from '../utils/plantImages';
 
-function PlantHeroImage({ plant }) {
-    const [imgSrc, setImgSrc] = useState(() => {
-        if (plant.firstPhotoUrl) return plant.firstPhotoUrl;
-        return getPlantImage(plant.commonName) || GENERIC_PLANT_IMAGE;
-    });
-    const [errored, setErrored] = useState(false);
 
-    const handleError = () => {
-        if (!errored) {
-            setErrored(true);
-            setImgSrc(GENERIC_PLANT_IMAGE);
-        }
-    };
-
-    return (
-        <img
-            src={imgSrc}
-            alt={plant.commonName}
-            onError={handleError}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-    );
-}
 
 export default function PlantDetail() {
     const { id } = useParams();
@@ -132,26 +109,6 @@ export default function PlantDetail() {
                     style={{ marginBottom: 32, overflow: 'hidden' }}
                 >
                     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-                        {/* Plant image */}
-                        <div style={{
-                            width: 280,
-                            minHeight: 240,
-                            background: 'linear-gradient(135deg, var(--forest), var(--grove))',
-                            flexShrink: 0,
-                            overflow: 'hidden',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            position: 'relative',
-                        }}>
-                            <PlantHeroImage plant={plant} />
-                            {/* Subtle vignette */}
-                            <div style={{
-                                position: 'absolute', inset: 0,
-                                background: 'linear-gradient(to right, transparent 70%, rgba(10,15,13,0.4) 100%)',
-                            }} />
-                        </div>
-
                         {/* Info */}
                         <div style={{ padding: '28px 30px', flex: 1 }}>
                             <h1 style={{
@@ -262,7 +219,7 @@ export default function PlantDetail() {
                                         </h3>
                                         <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
                                             <span className="badge badge-botanical">
-                                                <Calendar size={9} />&nbsp;{new Date(u.entryDate).toLocaleDateString()}
+                                                {new Date(u.entryDate).toLocaleDateString()}
                                             </span>
                                             {u.healthStatus && <span className="badge badge-success">{u.healthStatus}</span>}
                                             {u.floweringStage && <span className="badge badge-info">{u.floweringStage}</span>}
@@ -285,10 +242,10 @@ export default function PlantDetail() {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, fontSize: 12 }}>
                                     {u.temperatureCelsius && (
                                         <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(240,253,244,0.4)' }}>
-                                            <Thermometer size={12} style={{ color: 'var(--jade)' }} />{u.temperatureCelsius}°C
+                                            {u.temperatureCelsius}°C
                                         </span>
                                     )}
-                                    {u.soilMoisture && <span style={{ color: 'rgba(240,253,244,0.4)' }}>💧 {u.soilMoisture}</span>}
+                                    {u.soilMoisture && <span style={{ color: 'rgba(240,253,244,0.4)' }}>{u.soilMoisture} Moisture</span>}
                                     {u.pestIssues && <span style={{ color: '#fca5a5' }}>⚠️ {u.pestIssues}</span>}
                                 </div>
                             </motion.div>

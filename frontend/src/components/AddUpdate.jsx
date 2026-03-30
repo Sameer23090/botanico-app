@@ -28,11 +28,27 @@ export default function AddUpdate() {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        let coords = null;
+        try {
+            if ("geolocation" in navigator) {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                });
+                coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            }
+        } catch (err) {
+            console.warn("Geolocation failed", err);
+        }
+
         // Send only non-empty fields as JSON
         const payload = { plantId: id };
         Object.entries(form).forEach(([k, v]) => {
             if (v !== '' && v !== null && v !== undefined) payload[k] = v;
         });
+        if (coords) {
+            payload.coordinates = coords;
+        }
         try {
             await api.post('/updates', payload);
             navigate(`/plant/${id}`);
@@ -67,7 +83,7 @@ export default function AddUpdate() {
 
                         {/* Date & Health — required */}
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>📅 When & How</h3>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>When & How</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
                                     <label className="label-text">Entry Date *</label>
@@ -88,7 +104,7 @@ export default function AddUpdate() {
 
                         {/* Title & Observations */}
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>📝 Observations</h3>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Observations</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                                 <div>
                                     <label className="label-text">Entry Title</label>
@@ -103,7 +119,7 @@ export default function AddUpdate() {
 
                         {/* Growth Stage */}
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>🌱 Growth Stage</h3>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Growth Stage</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
                                     <label className="label-text">Plant Stage</label>
@@ -143,7 +159,7 @@ export default function AddUpdate() {
 
                         {/* Environment */}
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>🌡️ Environment</h3>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Environment</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
                                     <label className="label-text">Temperature (°C)</label>

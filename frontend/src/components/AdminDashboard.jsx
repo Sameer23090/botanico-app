@@ -346,25 +346,27 @@ export default function AdminDashboard() {
 
               {/* Recent users table */}
               <Section title="🆕 Recently Joined Growers">
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr>
-                      {['Name', 'Email', 'Role', 'Joined'].map(h => (
-                        <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {overview.recentUsers.map((u, i) => (
-                      <tr key={u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.1s' }}>
-                        <td style={{ padding: '12px 20px', fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</td>
-                        <td style={{ padding: '12px 20px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{u.email}</td>
-                        <td style={{ padding: '12px 20px' }}><RolePill role={u.role} /></td>
-                        <td style={{ padding: '12px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                    <thead>
+                      <tr>
+                        {['Name', 'Email', 'Role', 'Joined'].map(h => (
+                          <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {overview.recentUsers.map((u, i) => (
+                        <tr key={u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.1s' }}>
+                          <td style={{ padding: '12px 20px', fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</td>
+                          <td style={{ padding: '12px 20px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{u.email}</td>
+                          <td style={{ padding: '12px 20px' }}><RolePill role={u.role} /></td>
+                          <td style={{ padding: '12px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </Section>
             </div>
           )}
@@ -377,47 +379,49 @@ export default function AdminDashboard() {
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>{users.length} registered users — manage roles and view their plants</p>
               </div>
               <Section title="All Growers">
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr>
-                      {['Grower', 'Email', 'Role', 'Plants', 'Joined', ''].map(h => (
-                        <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map(u => (
-                      <tr key={u.id || u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                        <td style={{ padding: '14px 20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>
-                              {u.name?.[0]?.toUpperCase() || '?'}
-                            </div>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</span>
-                          </div>
-                        </td>
-                        <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{u.email}</td>
-                        <td style={{ padding: '14px 20px' }}>
-                          <select value={u.role} onChange={e => updateRole(u.id || u._id, e.target.value)}
-                            style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, color: '#fff', fontSize: 12, cursor: 'pointer' }}>
-                            <option value="student">Student</option>
-                            <option value="faculty">Faculty</option>
-                            <option value="admin">Admin</option>
-                          </select>
-                        </td>
-                        <td style={{ padding: '14px 20px', textAlign: 'center' }}>
-                          <span style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--jade)', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{u.plantCount}</span>
-                        </td>
-                        <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
-                        <td style={{ padding: '14px 20px' }}>
-                          <button onClick={() => viewUserPlants(u)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                            🌱 View Plants
-                          </button>
-                        </td>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
+                    <thead>
+                      <tr>
+                        {['Grower', 'Email', 'Role', 'Plants', 'Joined', ''].map(h => (
+                          <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {users.map(u => (
+                        <tr key={u.id || u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          <td style={{ padding: '14px 20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>
+                                {u.name?.[0]?.toUpperCase() || '?'}
+                              </div>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{u.email}</td>
+                          <td style={{ padding: '14px 20px' }}>
+                            <select value={u.role} onChange={e => updateRole(u.id || u._id, e.target.value)}
+                              style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, color: '#fff', fontSize: 12, cursor: 'pointer' }}>
+                              <option value="student">Student</option>
+                              <option value="faculty">Faculty</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </td>
+                          <td style={{ padding: '14px 20px', textAlign: 'center' }}>
+                            <span style={{ background: 'rgba(34,197,94,0.12)', color: 'var(--jade)', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{u.plantCount}</span>
+                          </td>
+                          <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
+                          <td style={{ padding: '14px 20px' }}>
+                            <button onClick={() => viewUserPlants(u)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                              🌱 View Plants
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </Section>
             </div>
           )}
@@ -476,6 +480,11 @@ export default function AdminDashboard() {
               <div style={{ marginBottom: 24 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — Log</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} entries recorded</p>
+                {selectedPlant.coordinates?.lat && selectedPlant.coordinates?.lng && (
+                  <a href={`https://maps.google.com/?q=${selectedPlant.coordinates.lat},${selectedPlant.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
+                    📍 View Plant Exact Location on Maps
+                  </a>
+                )}
               </div>
               {!plantUpdates.updates?.length ? (
                 <div style={{ padding: '60px', textAlign: 'center', fontSize: 32 }}>📝 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', marginTop: 12 }}>No log entries yet</div></div>
@@ -515,44 +524,46 @@ export default function AdminDashboard() {
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>{plants.length} plants across all growers</p>
               </div>
               <Section title="All Plants">
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr>
-                      {['Plant', 'Type', 'Owner', 'Status', 'Day', 'Planted', 'Logs'].map(h => (
-                        <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {plants.map(p => (
-                      <tr key={p.id || p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.1s' }}>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{p.commonName}</div>
-                          {p.scientificName && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>{p.scientificName}</div>}
-                        </td>
-                        <td style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{p.plantType || '—'}</td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{p.userId?.name || '—'}</div>
-                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{p.userId?.email || ''}</div>
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ background: p.status === 'active' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.1)', color: p.status === 'active' ? 'var(--jade)' : 'var(--gold)', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>
-                            {p.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--gold)', fontWeight: 700, fontSize: 13 }}>
-                          {p.daysSincePlanting ?? '?'}
-                        </td>
-                        <td style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(p.plantingDate)}</td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <button onClick={() => viewPlantUpdates(p)} style={{ padding: '5px 12px', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 6, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-                            📋 Logs
-                          </button>
-                        </td>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
+                    <thead>
+                      <tr>
+                        {['Plant', 'Type', 'Owner', 'Status', 'Day', 'Planted', 'Logs'].map(h => (
+                          <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {plants.map(p => (
+                        <tr key={p.id || p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.1s' }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{p.commonName}</div>
+                            {p.scientificName && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>{p.scientificName}</div>}
+                          </td>
+                          <td style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{p.plantType || '—'}</td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{p.userId?.name || '—'}</div>
+                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{p.userId?.email || ''}</div>
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span style={{ background: p.status === 'active' ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.1)', color: p.status === 'active' ? 'var(--jade)' : 'var(--gold)', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, textTransform: 'capitalize' }}>
+                              {p.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--gold)', fontWeight: 700, fontSize: 13 }}>
+                            {p.daysSincePlanting ?? '?'}
+                          </td>
+                          <td style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(p.plantingDate)}</td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <button onClick={() => viewPlantUpdates(p)} style={{ padding: '5px 12px', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 6, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                              📋 Logs
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 {plants.length === 0 && <div style={{ padding: '60px', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 14 }}>No plants in the registry yet</div>}
               </Section>
             </div>

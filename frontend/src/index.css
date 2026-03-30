@@ -85,16 +85,7 @@
     z-index: 0;
   }
 
-  /* Noise grain */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9997;
-    opacity: 0.25;
-  }
+  /* Noise grain removed for efficiency */
 }
 
 /* ══════════════════════════════════════
@@ -112,8 +103,8 @@
 }
 
 .liquid-cursor-inner {
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
   background: radial-gradient(circle at 35% 35%,
     rgba(255,255,255,0.95) 0%,
     rgba(134,239,172,0.9) 30%,
@@ -138,8 +129,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 42px;
-  height: 42px;
+  width: 24px;
+  height: 24px;
   pointer-events: none;
   z-index: 99998;
   transform: translate(-50%, -50%);
@@ -162,8 +153,8 @@
 
 /* Cursor states */
 .liquid-cursor-inner.is-hovering {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(134,239,172,1) 60%);
   box-shadow:
     0 0 0 2px rgba(134,239,172,0.9),
@@ -178,8 +169,8 @@
 }
 
 .liquid-cursor-outer.is-hovering {
-  width: 56px;
-  height: 56px;
+  width: 32px;
+  height: 32px;
   border-color: rgba(134,239,172,0.5);
   background: rgba(34,197,94,0.07);
   box-shadow: 0 0 0 4px rgba(34,197,94,0.08), inset 0 0 20px rgba(34,197,94,0.06);
@@ -192,18 +183,7 @@
   border-color: rgba(134,239,172,0.8);
 }
 
-/* Liquid morphing animation */
-@keyframes liquidMorph {
-  0%, 100% { border-radius: 50%; }
-  20% { border-radius: 45% 55% 60% 40% / 50% 45% 55% 50%; }
-  40% { border-radius: 60% 40% 45% 55% / 40% 60% 50% 55%; }
-  60% { border-radius: 40% 60% 55% 45% / 55% 40% 60% 45%; }
-  80% { border-radius: 55% 45% 40% 60% / 45% 55% 40% 60%; }
-}
-
-.liquid-cursor-outer {
-  animation: liquidMorph 4s ease-in-out infinite;
-}
+/* Liquid morphing animation removed for efficiency */
 
 /* ══════════════════════════════════════
    COMPONENTS
