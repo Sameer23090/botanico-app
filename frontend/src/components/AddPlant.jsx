@@ -17,14 +17,14 @@ export default function AddPlant() {
     const [error, setError] = useState('');
 
     const plantPresets = {
-        '': { scientific: '', family: '' },
-        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae' },
-        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae' },
-        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae' },
-        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae' },
-        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae' },
-        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae' },
-        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae' }
+        '': { scientific: '', family: '', type: '', habit: '' },
+        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree' },
+        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree' },
+        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree' },
+        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree' },
+        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree' },
+        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial' },
+        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree' }
     };
 
     const handlePresetChange = (e) => {
@@ -33,7 +33,9 @@ export default function AddPlant() {
             ...form,
             commonName: val,
             scientificName: plantPresets[val]?.scientific || '',
-            family: plantPresets[val]?.family || ''
+            family: plantPresets[val]?.family || '',
+            plantType: plantPresets[val]?.type || '',
+            growthHabit: plantPresets[val]?.habit || ''
         });
     };
 

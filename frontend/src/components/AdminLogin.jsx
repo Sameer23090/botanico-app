@@ -105,8 +105,8 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <Link to="/login" style={styles.backLink}>
-          <ArrowLeft size={12} style={{ marginRight: 6 }} /> Back to Student Login
+        <Link to="/" style={styles.backLink}>
+          <ArrowLeft size={12} style={{ marginRight: 6 }} /> Back to Home Page
         </Link>
       </div>
     </div>

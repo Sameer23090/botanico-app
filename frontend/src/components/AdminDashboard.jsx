@@ -504,10 +504,15 @@ export default function AdminDashboard() {
                       </div>
                       {u.observations && <p style={{ margin: '0 0 10px', color: 'rgba(255,255,255,0.6)', fontSize: 13, lineHeight: 1.6 }}>{u.observations}</p>}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-                        {u.temperatureCelsius && <span>🌡 {u.temperatureCelsius}°C</span>}
-                        {u.soilMoisture && <span>💧 {u.soilMoisture}</span>}
-                        {u.floweringStage && <span>🌸 {u.floweringStage}</span>}
+                        {u.temperatureCelsius && <span>{u.temperatureCelsius}°C</span>}
+                        {u.soilMoisture && <span>{u.soilMoisture} Moisture</span>}
+                        {u.floweringStage && <span>{u.floweringStage}</span>}
                         {u.pestIssues && <span style={{ color: '#ef4444' }}>⚠️ {u.pestIssues}</span>}
+                        {u.coordinates?.lat && u.coordinates?.lng && (
+                          <a href={`https://maps.google.com/?q=${u.coordinates.lat},${u.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ color: 'var(--jade)', textDecoration: 'none', borderBottom: '1px solid var(--jade)' }}>
+                            📍 View Logged Location on Maps
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}
