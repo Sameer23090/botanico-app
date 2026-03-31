@@ -51,6 +51,11 @@ export default function AddUpdate() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!capturedCoords) {
+            setError('Please capture the current location (GPS) first.');
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         setError('');
 
@@ -201,14 +206,14 @@ export default function AddUpdate() {
                         <div onClick={captureGPS} style={{
                             display: 'flex', alignItems: 'center', gap: 10,
                             padding: '12px 16px',
-                            background: 'rgba(34,197,94,0.06)',
-                            border: '1px solid rgba(34,197,94,0.15)',
+                            background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
+                            border: capturedCoords ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.15)',
                             borderRadius: 12,
                             cursor: 'pointer', transition: 'all 0.3s',
                         }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--jade)', boxShadow: '0 0 8px var(--jade)' }} />
-                            <span style={{ fontSize: 13, color: 'var(--jade)', fontWeight: 500 }}>{gpsText}</span>
-                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: 'rgba(34,197,94,0.5)' }}>{gpsCoords}</small>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444', boxShadow: capturedCoords ? '0 0 8px var(--jade)' : '0 0 8px #ef4444' }} />
+                            <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP TO CAPTURE CURRENT LOCATION (REQUIRED)'}</span>
+                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
                         </div>
 
                         {/* Actions */}

@@ -43,13 +43,25 @@ export default function AddPlant() {
 
     const plantPresets = {
         '': { scientific: '', family: '', type: '', habit: '' },
-        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree' },
-        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree' },
-        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree' },
-        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree' },
+        'Amla (Indian Gooseberry)': { scientific: 'Phyllanthus emblica', family: 'Phyllanthaceae', type: 'Fruit', habit: 'Tree' },
+        'Ashoka Tree': { scientific: 'Saraca asoca', family: 'Fabaceae', type: 'Tree', habit: 'Tree' },
+        'Banyan Tree (Vat)': { scientific: 'Ficus benghalensis', family: 'Moraceae', type: 'Tree', habit: 'Tree' },
+        'Curry Leaf': { scientific: 'Murraya koenigii', family: 'Rutaceae', type: 'Herb', habit: 'Shrub' },
+        'Guava': { scientific: 'Psidium guajava', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree' },
+        'Hibiscus (Gudhal)': { scientific: 'Hibiscus rosa-sinensis', family: 'Malvaceae', type: 'Flower', habit: 'Shrub' },
         'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree' },
+        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree' },
+        'Jasmine (Mogra)': { scientific: 'Jasminum sambac', family: 'Oleaceae', type: 'Flower', habit: 'Shrub' },
+        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree' },
+        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree' },
+        'Marigold (Genda)': { scientific: 'Tagetes erecta', family: 'Asteraceae', type: 'Flower', habit: 'Annual' },
+        'Moringa (Drumstick)': { scientific: 'Moringa oleifera', family: 'Moringaceae', type: 'Vegetable', habit: 'Tree' },
+        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree' },
+        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree' },
+        'Peepal Tree': { scientific: 'Ficus religiosa', family: 'Moraceae', type: 'Tree', habit: 'Tree' },
         'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial' },
-        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree' }
+        'Pomegranate': { scientific: 'Punica granatum', family: 'Lythraceae', type: 'Fruit', habit: 'Shrub' },
+        'Tulsi (Holy Basil)': { scientific: 'Ocimum tenuiflorum', family: 'Lamiaceae', type: 'Herb', habit: 'Shrub' }
     };
 
     const handlePresetChange = (e) => {
@@ -66,6 +78,11 @@ export default function AddPlant() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!capturedCoords) {
+            setError('Please capture the plant location (GPS) first.');
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         setError('');
         
@@ -122,24 +139,42 @@ export default function AddPlant() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-text">Common Name *</label>
-                                    <select className="select-field" required value={form.commonName} onChange={handlePresetChange}>
-                                        <option value="">Select a plant</option>
-                                        {Object.keys(plantPresets).filter(k=>k).map(k => <option key={k} value={k}>{k}</option>)}
-                                    </select>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <select className="select-field" style={{ marginBottom: 0 }} value={Object.keys(plantPresets).includes(form.commonName) ? form.commonName : "CUSTOM"} onChange={handlePresetChange}>
+                                            <option value="">Select a plant</option>
+                                            {Object.keys(plantPresets).filter(k=>k).map(k => <option key={k} value={k}>{k}</option>)}
+                                            <option value="CUSTOM">-- Other (Type below) --</option>
+                                        </select>
+                                        {(!Object.keys(plantPresets).includes(form.commonName) || form.commonName === "CUSTOM") && (
+                                            <input className="input-field" placeholder="Enter plant name" required value={form.commonName === "CUSTOM" ? "" : form.commonName} onChange={e => setForm({...form, commonName: e.target.value})} />
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="label-text" style={{ fontStyle: 'normal' }}>Scientific Name</label>
-                                    <select className="select-field" value={form.scientificName} onChange={e => setForm({...form, scientificName: e.target.value})}>
-                                        <option value="">Select</option>
-                                        {Object.values(plantPresets).filter(v=>v.scientific).map(v => <option key={v.scientific} value={v.scientific}>{v.scientific}</option>)}
-                                    </select>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <select className="select-field" style={{ marginBottom: 0 }} value={Object.values(plantPresets).some(v=>v.scientific === form.scientificName) ? form.scientificName : "CUSTOM"} onChange={e => setForm({...form, scientificName: e.target.value})}>
+                                            <option value="">Select</option>
+                                            {[...new Set(Object.values(plantPresets).map(v=>v.scientific).filter(Boolean))].sort().map(s => <option key={s} value={s}>{s}</option>)}
+                                            <option value="CUSTOM">-- Other (Type below) --</option>
+                                        </select>
+                                        {(!Object.values(plantPresets).some(v=>v.scientific === form.scientificName) || form.scientificName === "CUSTOM") && (
+                                            <input className="input-field" placeholder="Enter scientific name" value={form.scientificName === "CUSTOM" ? "" : form.scientificName} onChange={e => setForm({...form, scientificName: e.target.value})} />
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="label-text">Family</label>
-                                    <select className="select-field" value={form.family} onChange={e => setForm({...form, family: e.target.value})}>
-                                        <option value="">Select</option>
-                                        {Object.values(plantPresets).filter(v=>v.family).map(v => <option key={v.family} value={v.family}>{v.family}</option>)}
-                                    </select>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <select className="select-field" style={{ marginBottom: 0 }} value={Object.values(plantPresets).some(v=>v.family === form.family) ? form.family : "CUSTOM"} onChange={e => setForm({...form, family: e.target.value})}>
+                                            <option value="">Select</option>
+                                            {[...new Set(Object.values(plantPresets).map(v=>v.family).filter(Boolean))].sort().map(f => <option key={f} value={f}>{f}</option>)}
+                                            <option value="CUSTOM">-- Other (Type below) --</option>
+                                        </select>
+                                        {(!Object.values(plantPresets).some(v=>v.family === form.family) || form.family === "CUSTOM") && (
+                                            <input className="input-field" placeholder="Enter family" value={form.family === "CUSTOM" ? "" : form.family} onChange={e => setForm({...form, family: e.target.value})} />
+                                        )}
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="label-text">Plant Type</label>
@@ -206,18 +241,17 @@ export default function AddPlant() {
                             <textarea className="textarea-field" rows={3} placeholder="Describe your plant..." {...f('description')} />
                         </div>
 
-                        {/* GPS badge */}
                         <div onClick={captureGPS} style={{
                             display: 'flex', alignItems: 'center', gap: 10,
                             padding: '12px 16px',
-                            background: 'rgba(34,197,94,0.06)',
-                            border: '1px solid rgba(34,197,94,0.15)',
+                            background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
+                            border: capturedCoords ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.15)',
                             borderRadius: 12,
                             cursor: 'pointer', transition: 'all 0.3s',
                         }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--jade)', boxShadow: '0 0 8px var(--jade)' }} />
-                            <span style={{ fontSize: 13, color: 'var(--jade)', fontWeight: 500 }}>{gpsText}</span>
-                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: 'rgba(34,197,94,0.5)' }}>{gpsCoords}</small>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444', boxShadow: capturedCoords ? '0 0 8px var(--jade)' : '0 0 8px #ef4444' }} />
+                            <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP TO CAPTURE LOCATION (REQUIRED)'}</span>
+                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
                         </div>
 
                         <div style={{ display: 'flex', gap: 16 }}>
