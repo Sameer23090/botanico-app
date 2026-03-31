@@ -480,11 +480,17 @@ export default function AdminDashboard() {
               <div style={{ marginBottom: 24 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — Log</h1>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} entries recorded</p>
-                {selectedPlant.coordinates?.lat && selectedPlant.coordinates?.lng && (
-                  <a href={`https://maps.google.com/?q=${selectedPlant.coordinates.lat},${selectedPlant.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
-                    📍 View Plant Exact Location on Maps
-                  </a>
-                )}
+                <div>
+                  {selectedPlant.coordinates?.lat && selectedPlant.coordinates?.lng ? (
+                    <a href={`https://maps.google.com/?q=${selectedPlant.coordinates.lat},${selectedPlant.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
+                      📍 View Plant Exact Location on Maps
+                    </a>
+                  ) : (
+                    <div style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(239,68,68,0.05)', color: '#fca5a5', fontSize: 11, borderRadius: 6, border: '1px solid rgba(239,68,68,0.15)' }}>
+                      📍 Location not captured by user
+                    </div>
+                  )}
+                </div>
               </div>
               {!plantUpdates.updates?.length ? (
                 <div style={{ padding: '60px', textAlign: 'center', fontSize: 32 }}>📝 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', marginTop: 12 }}>No log entries yet</div></div>
