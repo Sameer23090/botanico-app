@@ -156,7 +156,7 @@ router.post('/', authMiddleware, uploadOrJson, updateValidation, async (req, res
 });
 
 // ─── PUT /api/updates/:id ────────────────────────────────────────────────────
-router.put('/:id', authMiddleware, upload.array('photos', 5), async (req, res) => {
+router.put('/:id', authMiddleware, uploadOrJson, async (req, res) => {
   try {
     const update = await Update.findById(req.params.id).populate('plantId', 'userId');
     if (!update) {
@@ -209,6 +209,20 @@ router.put('/:id', authMiddleware, upload.array('photos', 5), async (req, res) =
       } else {
         update.careActions = careActions;
       }
+    }
+    
+    // Update coordinates
+    if (req.body.coordinates) {
+      if (typeof req.body.coordinates === 'object') {
+        update.coordinates = req.body.coordinates;
+      } else if (typeof req.body.coordinates === 'string') {
+         try { update.coordinates = JSON.parse(req.body.coordinates); } catch {}
+      }
+    } else if (req.body['coordinates[lat]'] && req.body['coordinates[lng]']) {
+      update.coordinates = {
+        lat: Number(req.body['coordinates[lat]']),
+        lng: Number(req.body['coordinates[lng]'])
+      };
     }
 
     await update.save();
