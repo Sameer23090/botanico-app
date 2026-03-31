@@ -14,6 +14,7 @@ import PlantDetail from './components/PlantDetail';
 import AddUpdate from './components/AddUpdate';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
+import EditUpdate from './components/EditUpdate';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -83,6 +84,11 @@ function App() {
           <Route path="/plant/:id/add-update" element={
             <ProtectedRoute>
               <AddUpdate />
+            </ProtectedRoute>
+          } />
+          <Route path="/plant/:plantId/update/:updateId/edit" element={
+            <ProtectedRoute>
+              <EditUpdate />
             </ProtectedRoute>
           } />
 

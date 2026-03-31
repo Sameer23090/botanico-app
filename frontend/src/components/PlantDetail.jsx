@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp } from 'lucide-react';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2 } from 'lucide-react';
 import { plantsAPI, updatesAPI } from '../api';
 
 
@@ -225,12 +225,23 @@ export default function PlantDetail() {
                                             {u.floweringStage && <span className="badge badge-info">{u.floweringStage}</span>}
                                         </div>
                                     </div>
-                                    <span style={{
-                                        fontFamily: "var(--font-serif)",
-                                        fontSize: 30, fontWeight: 700,
-                                        color: 'rgba(34,197,94,0.12)',
-                                        letterSpacing: '-0.02em',
-                                    }}>D{u.dayNumber}</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                                        <span style={{
+                                            fontFamily: "var(--font-serif)",
+                                            fontSize: 30, fontWeight: 700,
+                                            color: 'rgba(34,197,94,0.12)',
+                                            letterSpacing: '-0.02em',
+                                            lineHeight: 1,
+                                        }}>D{u.dayNumber}</span>
+                                        <Link 
+                                            to={`/plant/${id}/update/${u.id || u._id}/edit`} 
+                                            className="btn-ghost" 
+                                            style={{ padding: '6px', borderRadius: '50%', color: 'var(--jade)', opacity: 0.6 }}
+                                            title="Edit Entry"
+                                        >
+                                            <Edit2 size={14} />
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 {u.observations && (
