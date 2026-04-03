@@ -29,29 +29,7 @@ const signToken = (user) => {
   );
 };
 
-// ─── OAuth Routes ────────────────────────────────────────────────────────────
-
-// Google
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`, session: false }),
-  (req, res) => {
-    const token = signToken(req.user);
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
-  }
-);
-
-// Microsoft
-router.get('/microsoft', passport.authenticate('microsoft', { prompt: 'select_account' }));
-
-router.get('/microsoft/callback', 
-  passport.authenticate('microsoft', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`, session: false }),
-  (req, res) => {
-    const token = signToken(req.user);
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
-  }
-);
+// OAuth Routes removed as requested
 
 // ─── Local Auth Routes ───────────────────────────────────────────────────────
 
