@@ -1,21 +1,27 @@
 const { google } = require('googleapis');
 const { Readable } = require('stream');
 
-// Initialize Google Drive API with Service Account
-const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON),
-  scopes: ['https://www.googleapis.com/auth/drive.file']
-});
+let auth = null;
+let drive = null;
 
-const drive = google.drive({ version: 'v3', auth });
+try {
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON) {
+    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON);
+    auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/drive.file']
+    });
+    drive = google.drive({ version: 'v3', auth });
+    console.log("✅ Google Drive Service initialized successfully.");
+  } else {
+    console.warn("⚠️ Google Drive credentials missing. Drive upload features will be disabled.");
+  }
+} catch (error) {
+  console.error("❌ Failed to initialize Google Drive Service:", error.message);
+}
 
-/**
- * Ensures a directory exists in Google Drive, creates it if not.
- * @param {string} name - Folder name
- * @param {string} parentId - Parent folder ID
- * @returns {Promise<string>} - Folder ID
- */
 const getOrCreateFolder = async (name, parentId) => {
+  if (!drive) throw new Error('Google Drive service is not configured.');
   try {
     const response = await drive.files.list({
       q: `name = '${name}' and '${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
@@ -27,7 +33,6 @@ const getOrCreateFolder = async (name, parentId) => {
       return response.data.files[0].id;
     }
 
-    // Create folder
     const folderMetadata = {
       name: name,
       mimeType: 'application/vnd.google-apps.folder',
@@ -46,15 +51,8 @@ const getOrCreateFolder = async (name, parentId) => {
   }
 };
 
-/**
- * Uploads a buffer to Google Drive
- * @param {Buffer} buffer - File buffer
- * @param {string} filename - Filename on Drive
- * @param {string} folderId - Destination folder ID
- * @param {string} mimeType - MIME type
- * @returns {Promise<Object>} - Drive file ID and public URL
- */
 const uploadToDrive = async (buffer, filename, folderId, mimeType = 'image/webp') => {
+  if (!drive) throw new Error('Google Drive service is not configured.');
   try {
     const fileMetadata = {
       name: filename,
@@ -72,7 +70,6 @@ const uploadToDrive = async (buffer, filename, folderId, mimeType = 'image/webp'
       fields: 'id'
     });
 
-    // Make file public (readable by anyone)
     await drive.permissions.create({
       fileId: file.data.id,
       requestBody: {
