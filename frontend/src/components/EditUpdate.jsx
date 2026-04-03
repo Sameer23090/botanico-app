@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud } from 'lucide-react';
 import api, { updatesAPI } from '../api';
+import { useTranslation } from 'react-i18next';
 
 export default function EditUpdate() {
     const { plantId, updateId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [form, setForm] = useState({
         entryDate: '',
         title: '',
@@ -17,6 +19,13 @@ export default function EditUpdate() {
         temperatureCelsius: '',
         soilMoisture: '',
         pestIssues: '',
+        environmentCondition: 'Other',
+        fertilizerUsed: false,
+        fertilizerName: '',
+        fertilizerType: 'Other',
+        dosage: '',
+        applicationMethod: 'Other',
+        fertilizerNotes: ''
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -40,6 +49,13 @@ export default function EditUpdate() {
                     temperatureCelsius: data.temperatureCelsius || '',
                     soilMoisture: data.soilMoisture || '',
                     pestIssues: data.pestIssues || '',
+                    environmentCondition: data.environmentCondition || 'Other',
+                    fertilizerUsed: data.fertilizerUsed || false,
+                    fertilizerName: data.fertilizerName || '',
+                    fertilizerType: data.fertilizerType || 'Other',
+                    dosage: data.dosage || '',
+                    applicationMethod: data.applicationMethod || 'Other',
+                    fertilizerNotes: data.fertilizerNotes || '',
                 });
                 if (data.coordinates) {
                     setCapturedCoords(data.coordinates);
@@ -94,18 +110,7 @@ export default function EditUpdate() {
         }
 
         try {
-            const formData = new FormData();
-            Object.entries(payload).forEach(([k, v]) => {
-                if (typeof v === 'object' && v !== null) {
-                    Object.entries(v).forEach(([subK, subV]) => {
-                        formData.append(`${k}[${subK}]`, subV);
-                    });
-                } else if (v !== '' && v !== null) {
-                    formData.append(k, v);
-                }
-            });
-
-            await updatesAPI.update(updateId, formData);
+            await updatesAPI.update(updateId, payload);
             navigate(`/plant/${plantId}`);
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to update entry.');
@@ -139,10 +144,10 @@ export default function EditUpdate() {
 
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>When & How</h3>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 14 }}>{t('care_log.entry_date')}</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
-                                    <label className="label-text">Entry Date *</label>
+                                    <label className="label-text">{t('care_log.entry_date')} *</label>
                                     <input type="date" className="input-field" required {...f('entryDate')} />
                                 </div>
                                 <div>
@@ -159,42 +164,33 @@ export default function EditUpdate() {
                         </div>
 
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Observations</h3>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 14 }}>{t('care_log.observations')}</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                                 <div>
-                                    <label className="label-text">Entry Title</label>
-                                    <input className="input-field" placeholder="e.g. First blooms appeared!" {...f('title')} />
+                                    <label className="label-text">{t('care_log.title')}</label>
+                                    <input className="input-field" placeholder="e.g. Activity Title" {...f('title')} />
                                 </div>
                                 <div>
-                                    <label className="label-text">What did you observe?</label>
-                                    <textarea className="textarea-field" rows={4} placeholder="Describe the plant's current state..." {...f('observations')} />
+                                    <label className="label-text">{t('care_log.observations')}</label>
+                                    <textarea className="textarea-field" rows={3} placeholder={t('care_log.placeholder_notes')} {...f('observations')} />
                                 </div>
                             </div>
                         </div>
 
+                        {/* Growth Stages */}
                         <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Growth Stage</h3>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 14 }}>Growth Stages</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
-                                    <label className="label-text">Plant Stage</label>
+                                    <label className="label-text">Flowering Stage</label>
                                     <select className="select-field" {...f('floweringStage')}>
                                         <option value="">— Select stage —</option>
-                                        <optgroup label="Early Growth">
-                                            <option>Germination</option>
-                                            <option>Seedling</option>
-                                            <option>Rooting / Establishing</option>
-                                        </optgroup>
-                                        <optgroup label="Vegetative">
-                                            <option>Vegetative</option>
-                                            <option>Leaf-only Growth</option>
-                                            <option>Dormant</option>
-                                        </optgroup>
-                                        <optgroup label="Reproductive">
-                                            <option>Budding</option>
-                                            <option>Blooming</option>
-                                            <option>Pollinating</option>
-                                            <option>Senescent / Wilting</option>
-                                        </optgroup>
+                                        <option>Germination</option>
+                                        <option>Seedling</option>
+                                        <option>Vegetative</option>
+                                        <option>Budding</option>
+                                        <option>Blooming</option>
+                                        <option>Dormant</option>
                                     </select>
                                 </div>
                                 <div>
@@ -204,22 +200,31 @@ export default function EditUpdate() {
                                         <option>Fruit Set</option>
                                         <option>Development</option>
                                         <option>Ripening</option>
-                                        <option>Mature / Harvest Ready</option>
-                                        <option>Post-Harvest</option>
+                                        <option>Mature</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-
-                        <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: 'var(--cream)', marginBottom: 14 }}>Environment</h3>
+                        <div style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                                <Cloud size={18} className="text-jade" />
+                                <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', margin: 0 }}>{t('care_log.conditions')}</h3>
+                            </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                                <div>
-                                    <label className="label-text">Temperature (°C)</label>
-                                    <input type="number" step="0.1" className="input-field" placeholder="e.g. 25.0" {...f('temperatureCelsius')} />
+                                <div className="md:col-span-2">
+                                    <label className="label-text">{t('add_plant.environment_condition')}</label>
+                                    <select className="select-field" {...f('environmentCondition')}>
+                                        {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
+                                            <option key={c} value={t(`env_conditions.${c}`)}>{t(`env_conditions.${c}`)}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div>
-                                    <label className="label-text">Soil Moisture</label>
+                                    <label className="label-text">Temp (°C)</label>
+                                    <input type="number" step="0.1" className="input-field" {...f('temperatureCelsius')} />
+                                </div>
+                                <div>
+                                    <label className="label-text">Moisture</label>
                                     <select className="select-field" {...f('soilMoisture')}>
                                         <option value="">— Select —</option>
                                         <option value="dry">Dry</option>
@@ -229,6 +234,50 @@ export default function EditUpdate() {
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Fertilizer Section */}
+                        <div style={{ padding: '20px', background: 'rgba(16,185,129,0.05)', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.1)' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.fertilizerUsed ? 20 : 0 }}>
+                                <input type="checkbox" checked={form.fertilizerUsed} onChange={e => setForm({ ...form, fertilizerUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
+                                <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_fertilizer')}</span>
+                                <FlaskConical size={18} className="text-jade" style={{ marginLeft: 'auto' }} />
+                            </label>
+
+                            {form.fertilizerUsed && (
+                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                                        <div>
+                                            <label className="label-text">{t('care_log.fert_name')}</label>
+                                            <input className="input-field" {...f('fertilizerName')} />
+                                        </div>
+                                        <div>
+                                            <label className="label-text">{t('care_log.fert_type')}</label>
+                                            <select className="select-field" {...f('fertilizerType')}>
+                                                {['Organic', 'Chemical', 'Bio-fertilizer', 'NPK', 'Compost', 'Liquid', 'Other'].map(v => (
+                                                    <option key={v} value={v}>{t(`care_log.types.${v}`)}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="label-text">{t('care_log.dosage')}</label>
+                                            <input className="input-field" placeholder="e.g. 5ml" {...f('dosage')} />
+                                        </div>
+                                        <div>
+                                            <label className="label-text">{t('care_log.method')}</label>
+                                            <select className="select-field" {...f('applicationMethod')}>
+                                                {['Soil drench', 'Foliar spray', 'Side dressing', 'Other'].map(v => (
+                                                    <option key={v} value={v}>{t(`care_log.methods.${v}`)}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="label-text">{t('care_log.fert_notes')}</label>
+                                        <textarea className="textarea-field" rows={2} {...f('fertilizerNotes')} />
+                                    </div>
+                                </motion.div>
+                            )}
                         </div>
 
                         <div>
