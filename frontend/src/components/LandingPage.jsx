@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function LandingPage() {
   const particlesRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const container = particlesRef.current;
@@ -41,7 +43,7 @@ export default function LandingPage() {
           background: 'linear-gradient(135deg, var(--pearl) 0%, var(--sage) 60%, var(--gold) 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.02em',
-        }}>Botanico</div>
+        }}>{t('landing.hero_title')}</div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <Link
@@ -57,14 +59,14 @@ export default function LandingPage() {
               transition: 'all 0.25s',
               backdropFilter: 'blur(8px)',
             }}>
-            Sign In
-          </Link>
+              {t('landing.sign_in')}
+            </Link>
           <Link
             to="/register"
             id="nav-register-btn"
             className="btn-primary"
             style={{ padding: '9px 22px', fontSize: 13 }}>
-            Get Started
+            {t('landing.get_started')}
           </Link>
         </div>
       </nav>
@@ -100,7 +102,7 @@ export default function LandingPage() {
             fontSize: 10, letterSpacing: '0.42em',
             color: 'var(--mist)', textTransform: 'uppercase',
             marginBottom: 20, opacity: 0.7,
-          }}>Scientific Plant Intelligence</p>
+          }}>{t('landing.scientific_intel')}</p>
 
           <h1 className="anim-slide-up-2 hero-title" style={{
             fontFamily: "var(--font-serif)",
@@ -109,21 +111,21 @@ export default function LandingPage() {
             letterSpacing: '-0.03em',
             background: 'linear-gradient(135deg, var(--pearl) 0%, var(--sage) 45%, var(--gold) 100%)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-          }}>Botanico</h1>
+          }}>{t('landing.hero_title')}</h1>
 
           <p className="anim-slide-up-3 hero-subtitle" style={{
             fontFamily: "var(--font-body)",
             fontSize: 'clamp(14px, 1.8vw, 17px)', fontWeight: 300,
             color: 'rgba(240,253,244,0.55)', marginTop: 22, letterSpacing: '0.02em',
             maxWidth: 420, margin: '20px auto 0',
-          }}>Grow a plant. Track its journey. Share the science.</p>
+          }}>{t('landing.hero_subtitle')}</p>
 
           <div className="anim-slide-up-4" style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 40, flexWrap: 'wrap' }}>
             <Link to="/register" id="hero-register-btn" className="btn-primary" style={{ padding: '15px 36px', fontSize: 15 }}>
-              Start Growing Free
+              {t('landing.start_growing')}
             </Link>
             <Link to="/login" id="hero-login-btn" className="btn-secondary" style={{ padding: '14px 36px', fontSize: 15 }}>
-              Sign In
+              {t('landing.sign_in')}
             </Link>
           </div>
         </div>
@@ -162,11 +164,11 @@ export default function LandingPage() {
           background: 'linear-gradient(135deg, var(--pearl), var(--sage))',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: '-0.02em',
-        }}>Botanico</div>
+        }}>{t('landing.hero_title')}</div>
         <div className="mobile-col mobile-center-text" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/admin" style={{ fontSize: 12, color: 'var(--jade)', textDecoration: 'none', fontWeight: 600, letterSpacing: '0.05em' }}>ADMIN PORTAL</Link>
+          <Link to="/admin" style={{ fontSize: 12, color: 'var(--jade)', textDecoration: 'none', fontWeight: 600, letterSpacing: '0.05em' }}>{t('landing.admin_portal')}</Link>
           <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.25)', fontFamily: "var(--font-body)", textAlign: 'center' }}>
-            © 2026 Botanico. Made with 💚 for plant lovers.
+            © 2026 {t('landing.hero_title')}. {t('landing.footer_msg')}
           </div>
         </div>
       </footer>

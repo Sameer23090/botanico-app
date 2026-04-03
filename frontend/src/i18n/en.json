@@ -1,5 +1,15 @@
 {
   "app_title": "Botanico",
+  "landing": {
+    "hero_title": "Botanico",
+    "hero_subtitle": "Grow a plant. Track its journey. Share the science.",
+    "start_growing": "Start Growing Free",
+    "get_started": "Get Started",
+    "sign_in": "Sign In",
+    "scientific_intel": "Scientific Plant Intelligence",
+    "admin_portal": "ADMIN PORTAL",
+    "footer_msg": "Made with 💚 for plant lovers."
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "add_plant": "Add Plant",
@@ -8,16 +18,35 @@
   },
   "login": {
     "title": "Log In to Botanico",
+    "welcome_back": "Welcome back, Grower",
+    "sign_in_msg": "Sign in to your garden dashboard",
     "submit": "Log In",
     "or": "or",
     "continue_google": "Continue with Google",
     "continue_microsoft": "Continue with Microsoft",
+    "google": "Google",
+    "microsoft": "Microsoft",
     "email": "Email Address",
-    "password": "Password"
+    "password": "Password",
+    "no_account": "Don't have an account?",
+    "create_account": "Create account →",
+    "login_failed": "Login failed. Please try again.",
+    "oauth_failed": "OAuth login failed. Please try again or use email/password."
   },
   "register": {
-    "title": "Create Your Account",
-    "submit": "Create Account"
+    "title": "Create Account",
+    "subtitle": "New Grower",
+    "description": "Create your grower profile — start tracking today",
+    "full_name": "Full Name",
+    "email": "Email Address",
+    "password": "Password",
+    "gps_detect": "📍 Auto-detect my garden location",
+    "gps_captured": "Location captured",
+    "gps_demo": "Location set (demo)",
+    "gps_locating": "Locating...",
+    "submit": "Create My Garden Profile",
+    "submitting": "Creating profile...",
+    "already_growing": "Already growing? Sign in →"
   },
   "add_plant": {
     "title": "Add New Plant",

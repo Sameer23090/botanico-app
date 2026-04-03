@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { authAPI, setAuthToken } from '../api';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -42,15 +41,11 @@ export default function Login({ onLogin }) {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--night)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative' }}>
       
-      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 100 }}>
-        <LanguageSwitcher />
-      </div>
-
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ width: '100%', maxWidth: 460, position: 'relative', zIndex: 1 }}>
 
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>Botanico</div>
-          <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: '0.3em', color: 'var(--jade)', textTransform: 'uppercase', opacity: 0.7 }}>Welcome back, Grower</p>
+          <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>{t('landing.hero_title')}</div>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: '0.3em', color: 'var(--jade)', textTransform: 'uppercase', opacity: 0.7 }}>{t('login.welcome_back')}</p>
         </div>
 
         <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 6, marginBottom: 28, border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -60,7 +55,7 @@ export default function Login({ onLogin }) {
 
         <div className="card" style={{ padding: '44px 40px' }}>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, fontWeight: 700, color: 'var(--pearl)', marginBottom: 4, letterSpacing: '-0.02em' }}>{t('login.title')}</h2>
-          <p style={{ fontSize: 14, color: 'rgba(240,253,244,0.45)', marginBottom: 32, fontWeight: 300 }}>Sign in to your garden dashboard</p>
+          <p style={{ fontSize: 14, color: 'rgba(240,253,244,0.45)', marginBottom: 32, fontWeight: 300 }}>{t('login.sign_in_msg')}</p>
 
           {error && (
             <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5', borderRadius: 12, padding: '12px 16px', fontSize: 14, marginBottom: 20 }}>{error}</div>
@@ -98,17 +93,17 @@ export default function Login({ onLogin }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <button onClick={() => handleOAuth('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', fontSize: 13, borderRadius: 12 }}>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="G" />
-              Google
+              {t('login.google')}
             </button>
             <button onClick={() => handleOAuth('microsoft')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', fontSize: 13, borderRadius: 12 }}>
               <img src="https://authjs.dev/img/providers/microsoft.svg" width="18" alt="M" />
-              Microsoft
+              {t('login.microsoft')}
             </button>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, flexWrap: 'wrap', gap: 8 }}>
-            <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.3)' }}>Don't have an account?</span>
-            <Link to="/register" style={{ fontSize: 13, color: 'var(--jade)', textDecoration: 'none', fontWeight: 500 }}>Create account →</Link>
+            <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.3)' }}>{t('login.no_account')}</span>
+            <Link to="/register" style={{ fontSize: 13, color: 'var(--jade)', textDecoration: 'none', fontWeight: 500 }}>{t('login.create_account')}</Link>
           </div>
         </div>
       </motion.div>

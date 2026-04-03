@@ -44,6 +44,8 @@ function OAuthCallback() {
   return <div className="min-h-screen flex items-center justify-center text-emerald-400">Authenticating...</div>;
 }
 
+import LanguageSwitcher from './components/LanguageSwitcher';
+
 function App() {
   const [user, setUser] = useState(null);
 
@@ -70,6 +72,11 @@ function App() {
       <Router>
         <LiquidCursor />
         <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative' }}>
+          {/* Global Language Switcher */}
+          <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 9999 }}>
+            <LanguageSwitcher />
+          </div>
+          
           <AmbientAnimations />
           <Routes>
             {/* Public routes */}
