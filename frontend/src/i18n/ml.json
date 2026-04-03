@@ -1,0 +1,87 @@
+{
+  "app_title": "ബൊട്ടാനിക്കോ",
+  "navigation": {
+    "dashboard": "ഡാഷ്‌ബോർഡ്",
+    "add_plant": "ചെടി ചേർക്കുക",
+    "settings": "ക്രമീകരണങ്ങൾ",
+    "logout": "പുറത്തുകടക്കുക"
+  },
+  "login": {
+    "title": "ബൊട്ടാനിക്കോയിലേക്ക് പ്രവേശിക്കുക",
+    "submit": "ലോഗിൻ ചെയ്യുക",
+    "or": "അല്ലെങ്കിൽ",
+    "continue_google": "ഗൂഗിൾ വഴി തുടരുക",
+    "continue_microsoft": "മൈക്രോസോഫ്റ്റ് വഴി തുടരുക",
+    "email": "ഇമെയിൽ വിലാസം",
+    "password": "പാസ്‌വേഡ്"
+  },
+  "register": {
+    "title": "നിങ്ങളുടെ അക്കൗണ്ട് സൃഷ്ടിക്കുക",
+    "submit": "അക്കൗണ്ട് സൃഷ്ടിക്കുക"
+  },
+  "add_plant": {
+    "title": "പുതിയ ചെടി ചേർക്കുക",
+    "common_name": "പൊതുനാമം",
+    "scientific_name": "ശാസ്ത്രീയ നാമം",
+    "planting_date": "നട്ട തീയതി",
+    "planting_season": "നടീൽ സീസൺ",
+    "environment_condition": "പരിസ്ഥിതി അവസ്ഥ",
+    "description": "വിവരണം",
+    "submit": "സേവ് ചെയ്യുക",
+    "cancel": "റദ്ദാക്കുക",
+    "placeholder_common": "ഉദാ: തക്കാളി",
+    "placeholder_scientific": "ഉദാ: സോളനം ലൈകോപെർസിക്കം (Solanum lycopersicum)",
+    "seasons": {
+      "Spring": "വസന്തകാലം",
+      "Summer": "വേനൽക്കാലം",
+      "Monsoon": "മഴക്കാലം",
+      "Autumn": "ശരത്കാലം",
+      "Winter": "ശീതകാലം",
+      "Year-round": "വർഷം മുഴുവനും",
+      "Unknown": "അറിയില്ല"
+    }
+  },
+  "care_log": {
+    "title": "പരിചരണക്കുറിപ്പ് ചേർക്കുക",
+    "entry_date": "നടപടിയുടെ തീയതി",
+    "action": "ചെയ്ത നടപടി",
+    "observations": "നിരീക്ഷണങ്ങൾ",
+    "conditions": "നിലവിലെ സാഹചര്യങ്ങൾ",
+    "using_fertilizer": "വളം ഉപയോഗിക്കുന്നുണ്ടോ?",
+    "fert_name": "വളത്തിന്റെ പേര്",
+    "fert_type": "വളത്തിന്റെ തരം",
+    "dosage": "അളവ്",
+    "method": "പ്രയോഗിക്കുന്ന രീതി",
+    "fert_notes": "വളത്തെക്കുറിച്ചുള്ള കുറിപ്പുകൾ",
+    "submit": "പരിചരണം രേഖപ്പെടുത്തുക",
+    "placeholder_notes": "വിശദാംശങ്ങൾ ഇവിടെ നൽകുക...",
+    "types": {
+      "Organic": "ജൈവ വളം",
+      "Chemical": "രാസവളം",
+      "Bio-fertilizer": "ബയോ-ഫെർട്ടിലൈസർ",
+      "NPK": "എൻ.പി.കെ (NPK)",
+      "Compost": "കമ്പോസ്റ്റ്",
+      "Liquid": "ദ്രാവക വളം",
+      "Other": "മറ്റുള്ളവ"
+    },
+    "methods": {
+      "Soil drench": "മണ്ണിൽ ഒഴിക്കുന്ന രീതി",
+      "Foliar spray": "ഇലകളിൽ തളിക്കുന്ന രീതി",
+      "Side dressing": "വശങ്ങളിലായി നൽകുന്ന രീതി",
+      "Other": "മറ്റുള്ളവ"
+    }
+  },
+  "env_conditions": {
+    "full_sun": "പൂർണ്ണ വെയിൽ (6+ മണിക്കൂർ)",
+    "partial_sun": "ഭാഗിക വെയിൽ (3-6 മണിക്കൂർ)",
+    "partial_shade": "ഭാഗിക തണൽ",
+    "full_shade": "പൂർണ്ണ തണൽ",
+    "indoor_bright": "ഇൻഡോർ - തെളിച്ചമുള്ള പ്രകാശം",
+    "indoor_low": "ഇൻഡോർ - കുറഞ്ഞ പ്രകാശം",
+    "greenhouse": "ഗ്രീൻഹൗസ്",
+    "humid": "ഈർപ്പമുള്ള പ്രദേശം",
+    "arid": "വരണ്ട പ്രദേശം",
+    "coastal": "തീരപ്രദേശം",
+    "other": "മറ്റുള്ളവ"
+  }
+}

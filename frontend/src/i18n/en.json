@@ -1,0 +1,87 @@
+{
+  "app_title": "Botanico",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "add_plant": "Add Plant",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Log In to Botanico",
+    "submit": "Log In",
+    "or": "or",
+    "continue_google": "Continue with Google",
+    "continue_microsoft": "Continue with Microsoft",
+    "email": "Email Address",
+    "password": "Password"
+  },
+  "register": {
+    "title": "Create Your Account",
+    "submit": "Create Account"
+  },
+  "add_plant": {
+    "title": "Add New Plant",
+    "common_name": "Common Name",
+    "scientific_name": "Scientific Name",
+    "planting_date": "Planting Date",
+    "planting_season": "Planting Season",
+    "environment_condition": "Environment Condition",
+    "description": "Description",
+    "submit": "Save Plant",
+    "cancel": "Cancel",
+    "placeholder_common": "e.g. Tomato",
+    "placeholder_scientific": "e.g. Solanum lycopersicum",
+    "seasons": {
+      "Spring": "Spring",
+      "Summer": "Summer",
+      "Monsoon": "Monsoon",
+      "Autumn": "Autumn",
+      "Winter": "Winter",
+      "Year-round": "Year-round",
+      "Unknown": "Unknown"
+    }
+  },
+  "care_log": {
+    "title": "Add Care Log",
+    "entry_date": "Date of Activity",
+    "action": "Activity Performed",
+    "observations": "Observations",
+    "conditions": "Current Conditions",
+    "using_fertilizer": "Using Fertilizer?",
+    "fert_name": "Fertilizer Name",
+    "fert_type": "Fertilizer Type",
+    "dosage": "Quantity / Dosage",
+    "method": "Application Method",
+    "fert_notes": "Notes about fertilizer",
+    "submit": "Log Care",
+    "placeholder_notes": "Enter details here...",
+    "types": {
+      "Organic": "Organic",
+      "Chemical": "Chemical",
+      "Bio-fertilizer": "Bio-fertilizer",
+      "NPK": "NPK",
+      "Compost": "Compost",
+      "Liquid": "Liquid",
+      "Other": "Other"
+    },
+    "methods": {
+      "Soil drench": "Soil drench",
+      "Foliar spray": "Foliar spray",
+      "Side dressing": "Side dressing",
+      "Other": "Other"
+    }
+  },
+  "env_conditions": {
+    "full_sun": "Full Sun (6+ hours direct sunlight)",
+    "partial_sun": "Partial Sun (3–6 hours)",
+    "partial_shade": "Partial Shade",
+    "full_shade": "Full Shade",
+    "indoor_bright": "Indoor – Bright indirect light",
+    "indoor_low": "Indoor – Low light",
+    "greenhouse": "Greenhouse",
+    "humid": "Humid / Tropical",
+    "arid": "Arid / Dry",
+    "coastal": "Coastal / Windy",
+    "other": "Other"
+  }
+}

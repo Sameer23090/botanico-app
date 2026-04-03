@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
 const userSchema = new mongoose.Schema(
     {
@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema(
             trim: true,
             maxlength: [255, 'Name cannot exceed 255 characters'],
         },
+        displayId: {
+            type: String,
+            unique: true,
+            default: () => `usr_${uuidv4()}`
+        },
         email: {
             type: String,
             required: [true, 'Email is required'],
@@ -17,9 +22,22 @@ const userSchema = new mongoose.Schema(
             trim: true,
             match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
         },
+        avatarUrl: {
+            type: String,
+            default: null
+        },
+        provider: {
+            type: String,
+            default: 'local'
+        },
+        preferredLanguage: {
+            type: String,
+            default: 'en',
+            enum: ['en', 'ta', 'ml', 'te']
+        },
         passwordHash: {
             type: String,
-            required: true,
+            required: function() { return this.provider === 'local'; },
         },
         location: {
             type: String,
@@ -32,24 +50,24 @@ const userSchema = new mongoose.Schema(
         },
     },
     {
-        timestamps: true, // Automatically adds createdAt and updatedAt
+        timestamps: true,
     }
 );
 
-// Hash password before saving
+// hashing password before saving (optional for passwordless users)
+const bcrypt = require('bcryptjs');
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('passwordHash')) return next();
+    if (!this.isModified('passwordHash') || !this.passwordHash) return next();
     const salt = await bcrypt.genSalt(10);
     this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
     next();
 });
 
-// Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword) {
+    if (!this.passwordHash) return false;
     return bcrypt.compare(candidatePassword, this.passwordHash);
 };
 
-// Remove sensitive fields from JSON output
 userSchema.methods.toJSON = function () {
     const obj = this.toObject();
     delete obj.passwordHash;

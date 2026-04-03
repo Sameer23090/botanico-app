@@ -1,0 +1,87 @@
+{
+  "app_title": "బొటానికో",
+  "navigation": {
+    "dashboard": "డాష్‌బోర్డ్",
+    "add_plant": "మొక్కను జోడించు",
+    "settings": "సెట్టింగ్స్",
+    "logout": "లాగౌట్"
+  },
+  "login": {
+    "title": "బొటానికోలోకి లాగిన్ అవ్వండి",
+    "submit": "లాగిన్",
+    "or": "లేదా",
+    "continue_google": "గూగుల్‌తో కొనసాగండి",
+    "continue_microsoft": "మైక్రోసాఫ్ట్‌తో కొనసాగండి",
+    "email": "ఈమెయిల్ అడ్రస్",
+    "password": "పాస్‌వర్డ్"
+  },
+  "register": {
+    "title": "మీ ఖాతాను సృష్టించుకోండి",
+    "submit": "ఖాతాను సృష్టించండి"
+  },
+  "add_plant": {
+    "title": "కొత్త మొక్కను జోడించు",
+    "common_name": "సాధారణ పేరు",
+    "scientific_name": "శాస్త్రీయ నామం",
+    "planting_date": "నాటిన తేదీ",
+    "planting_season": "నాటే కాలం",
+    "environment_condition": "పర్యావరణ పరిస్థితి",
+    "description": "వివరణ",
+    "submit": "మొక్కను సేవ్ చేయి",
+    "cancel": "రద్దు చేయి",
+    "placeholder_common": "ఉదా: టమోటా",
+    "placeholder_scientific": "ఉదా: సోలనం లైకోపెర్సికమ్ (Solanum lycopersicum)",
+    "seasons": {
+      "Spring": "వసంతకాలం",
+      "Summer": "వేసవికాలం",
+      "Monsoon": "వర్షాకాలం",
+      "Autumn": "శరదృతువు",
+      "Winter": "శీతాకాలం",
+      "Year-round": "సంవత్సరం అంతా",
+      "Unknown": "తెలియదు"
+    }
+  },
+  "care_log": {
+    "title": "సంరక్షణ ప్రతిని జోడించు",
+    "entry_date": "పని చేసిన తేదీ",
+    "action": "చేసిన పని",
+    "observations": "పరిశీలనలు",
+    "conditions": "ప్రస్తుత పరిస్థితులు",
+    "using_fertilizer": "ఎరువు ఉపయోగించారా?",
+    "fert_name": "ఎరువు పేరు",
+    "fert_type": "ఎరువు రకం",
+    "dosage": "మోతాదు",
+    "method": "ప్రయోగించే పద్ధతి",
+    "fert_notes": "ఎరువు గురించి గమనికలు",
+    "submit": "సంరక్షణను నమోదు చేయి",
+    "placeholder_notes": "వివరాలను ఇక్కడ నమోదు చేయండి...",
+    "types": {
+      "Organic": "సేంద్రీయ ఎరువు",
+      "Chemical": "రసాయన ఎరువు",
+      "Bio-fertilizer": "జీవ ఎరువు",
+      "NPK": "ఎన్.పి.కె (NPK)",
+      "Compost": "కంపోస్ట్",
+      "Liquid": "ద్రవ ఎరువు",
+      "Other": "ఇతరాలు"
+    },
+    "methods": {
+      "Soil drench": "మట్టిలో పోసే పద్ధతి",
+      "Foliar spray": "ఆకులపై చల్లే పద్ధతి",
+      "Side dressing": "మొక్క పక్కన వేసే పద్ధతి",
+      "Other": "ఇతరాలు"
+    }
+  },
+  "env_conditions": {
+    "full_sun": "పూర్తి ఎండ (6+ గంటల ప్రత్యక్ష సూర్యరశ్మి)",
+    "partial_sun": "పాక్షిక ఎండ (3-6 గంటలు)",
+    "partial_shade": "పాక్షిక నీడ",
+    "full_shade": "పూర్తి నీడ",
+    "indoor_bright": "ఇండోర్ - ప్రకాశవంతమైన నీడ",
+    "indoor_low": "ఇండోర్ - తక్కువ కాంతి",
+    "greenhouse": "గ్రీన్ హౌస్",
+    "humid": "తేమ / ఉష్ణమండల",
+    "arid": "ఎడారి / పొడి ప్రాంతం",
+    "coastal": "తీర ప్రాంతం",
+    "other": "ఇతరాలు"
+  }
+}

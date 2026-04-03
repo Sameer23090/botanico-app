@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -22,7 +20,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle response errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,7 +32,6 @@ api.interceptors.response.use(
   }
 );
 
-// Auth APIs
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
@@ -43,43 +39,33 @@ export const authAPI = {
   updateProfile: (data) => api.put('/auth/profile', data),
 };
 
-// Plants APIs
 export const plantsAPI = {
   getAll: () => api.get('/plants'),
   getById: (id) => api.get(`/plants/${id}`),
-  create: (formData) => {
-    return api.post('/plants', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
-  update: (id, formData) => {
-    return api.put(`/plants/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
+  create: (data) => api.post('/plants', data),
+  update: (id, data) => api.put(`/plants/${id}`, data),
   delete: (id) => api.delete(`/plants/${id}`),
   getStats: (id) => api.get(`/plants/${id}/stats`),
 };
 
-// Updates APIs
 export const updatesAPI = {
   getByPlantId: (plantId) => api.get(`/updates/plant/${plantId}`),
   getById: (id) => api.get(`/updates/${id}`),
-  create: (formData) => {
-    return api.post('/updates', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
-  update: (id, formData) => {
-    return api.put(`/updates/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
+  create: (data) => api.post('/updates', data),
+  update: (id, data) => api.put(`/updates/${id}`, data),
   delete: (id) => api.delete(`/updates/${id}`),
   getTimeline: (plantId) => api.get(`/updates/plant/${plantId}/timeline`),
 };
 
-// Helper functions
+// New Upload API
+export const uploadAPI = {
+  uploadImage: (formData) => {
+    return api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  }
+};
+
 export const setAuthToken = (token) => {
   localStorage.setItem('token', token);
 };

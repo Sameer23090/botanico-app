@@ -32,8 +32,8 @@ const updateSchema = new mongoose.Schema(
         stemDiameterMm: { type: Number, default: null },
 
         // Botanical stages
-        floweringStage: { type: String, trim: true, default: null },  // Vegetative, Budding, Blooming, etc.
-        fruitingStage: { type: String, trim: true, default: null },   // Fruit set, Development, Ripening, etc.
+        floweringStage: { type: String, trim: true, default: null },
+        fruitingStage: { type: String, trim: true, default: null },
 
         // Health & Issues
         healthStatus: {
@@ -46,11 +46,34 @@ const updateSchema = new mongoose.Schema(
         diseaseObservations: { type: String, default: null },
         environmentalStress: { type: String, default: null },
 
-        // Care Actions - Array of strings (e.g. ['Watered', 'Fertilized', 'Pruned'])
+        // Care Actions
         careActions: { type: [String], default: [] },
 
-        // Photos - Array of Cloudinary URLs
-        photos: { type: [String], default: [] },
+        // Fertilizer Tracking
+        fertilizerUsed: { type: Boolean, default: false },
+        fertilizerName: { type: String, default: null },
+        fertilizerType: {
+            type: String,
+            enum: ['Organic', 'Chemical', 'Bio-fertilizer', 'NPK', 'Compost', 'Liquid', 'Other', null],
+            default: null
+        },
+        dosage: { type: String, default: null },
+        applicationMethod: {
+            type: String,
+            enum: ['Soil drench', 'Foliar spray', 'Side dressing', 'Other', null],
+            default: null
+        },
+        fertilizerNotes: { type: String, default: null },
+
+        // Photos - Now storing Drive info
+        drivePhotos: [{
+            driveFileId: String,
+            displayUrl: String,
+            originalFilename: String,
+            takenAt: Date,
+            createdAt: { type: Date, default: Date.now },
+            imageType: { type: String, enum: ['thumbnail', 'timeline', 'profile'], default: 'timeline' }
+        }],
 
         // Environmental conditions
         temperatureCelsius: { type: Number, default: null },
@@ -60,6 +83,24 @@ const updateSchema = new mongoose.Schema(
             type: String,
             enum: ['dry', 'moist', 'wet', 'waterlogged', null],
             default: null,
+        },
+        environmentCondition: {
+            type: String,
+            enum: [
+                'Full Sun (6+ hours direct sunlight)',
+                'Partial Sun (3–6 hours)',
+                'Partial Shade',
+                'Full Shade',
+                'Indoor – Bright indirect light',
+                'Indoor – Low light',
+                'Greenhouse',
+                'Humid / Tropical',
+                'Arid / Dry',
+                'Coastal / Windy',
+                'Other',
+                null
+            ],
+            default: null
         },
 
         notes: { type: String, default: null },
@@ -75,7 +116,6 @@ const updateSchema = new mongoose.Schema(
     }
 );
 
-// Clean JSON output
 updateSchema.methods.toJSON = function () {
     const obj = this.toObject({ virtuals: true });
     obj.id = obj._id;

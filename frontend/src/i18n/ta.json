@@ -1,0 +1,87 @@
+{
+  "app_title": "பொட்டானிகோ",
+  "navigation": {
+    "dashboard": "கட்டுப்பாட்டகம்",
+    "add_plant": "செடியைச் சேர்",
+    "settings": "அமைப்புகள்",
+    "logout": "வெளியேறு"
+  },
+  "login": {
+    "title": "பொட்டானிகோவிற்குள் நுழையுங்கள்",
+    "submit": "உள்நுழையவும்",
+    "or": "அல்லது",
+    "continue_google": "கூகிள் மூலம் தொடரவும்",
+    "continue_microsoft": "மைக்ரோசாப்ட் மூலம் தொடரவும்",
+    "email": "மின்னஞ்சல் முகவரி",
+    "password": "கடவுச்சொல்"
+  },
+  "register": {
+    "title": "உங்கள் கணக்கை உருவாக்கவும்",
+    "submit": "கணக்கை உருவாக்கு"
+  },
+  "add_plant": {
+    "title": "புதிய செடியைச் சேர்",
+    "common_name": "பொதுவான பெயர்",
+    "scientific_name": "அறிவியல் பெயர்",
+    "planting_date": "நட்ட தேதி",
+    "planting_season": "நடவு பருவம்",
+    "environment_condition": "சுற்றுச்சூழல் நிலை",
+    "description": "விளக்கம்",
+    "submit": "செடியைச் சேமிக்கவும்",
+    "cancel": "ரத்துசெய்",
+    "placeholder_common": "எ.கா. தக்காளி",
+    "placeholder_scientific": "எ.கா. சோலனம் லைகோபெர்சிகம் (Solanum lycopersicum)",
+    "seasons": {
+      "Spring": "வசந்த காலம்",
+      "Summer": "கோடை காலம்",
+      "Monsoon": "மழைக்காலம்",
+      "Autumn": "இலையுதிர் காலம்",
+      "Winter": "குளிர்காலம்",
+      "Year-round": "வருடம் முழுவதும்",
+      "Unknown": "தெரியாது"
+    }
+  },
+  "care_log": {
+    "title": "பராமரிப்புப் பதிவைச் சேர்க்கவும்",
+    "entry_date": "நடவடிக்கை தேதி",
+    "action": "செய்த நடவடிக்கை",
+    "observations": "அவதானிப்புகள்",
+    "conditions": "தற்போதைய நிலைமைகள்",
+    "using_fertilizer": "உரம் பயன்படுத்துகிறீர்களா?",
+    "fert_name": "உரத்தின் பெயர்",
+    "fert_type": "உர வகை",
+    "dosage": "அளவு / டோஸ்",
+    "method": "பயன்படுத்தும் முறை",
+    "fert_notes": "உரம் பற்றிய குறிப்புகள்",
+    "submit": "பராமரிப்பை பதிவு செய்",
+    "placeholder_notes": "இங்கே விவரங்களை உள்ளிடவும்...",
+    "types": {
+      "Organic": "இயற்கை உரம்",
+      "Chemical": "ரசாயன உரம்",
+      "Bio-fertilizer": "உயிரி உரம்",
+      "NPK": "NPK",
+      "Compost": "மட்கிய உரம்",
+      "Liquid": "திரவ உரம்",
+      "Other": "மற்றவை"
+    },
+    "methods": {
+      "Soil drench": "மண்ணில் ஊற்றுதல்",
+      "Foliar spray": "இலைத் தெளிப்பு",
+      "Side dressing": "பக்கவாட்டு உரமிடுதல்",
+      "Other": "மற்றவை"
+    }
+  },
+  "env_conditions": {
+    "full_sun": "முழு வெயில் (6+ மணிநேரம்)",
+    "partial_sun": "பகுதி வெயில் (3-6 மணிநேரம்)",
+    "partial_shade": "பகுதி நிழல்",
+    "full_shade": "முழு நிழல்",
+    "indoor_bright": "உட்புறம் - பிரகாசமான வெளிச்சம்",
+    "indoor_low": "உட்புறம் - குறைந்த வெளிச்சம்",
+    "greenhouse": "பசுமை இல்லம்",
+    "humid": "ஈரப்பதம் / வெப்பமண்டல",
+    "arid": "வறண்ட / காய்ந்த",
+    "coastal": "கடலோர / காற்று",
+    "other": "மற்றவை"
+  }
+}

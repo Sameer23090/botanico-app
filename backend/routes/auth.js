@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const passport = require('passport');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
@@ -28,7 +29,32 @@ const signToken = (user) => {
   );
 };
 
-// ─── POST /api/auth/register ─────────────────────────────────────────────────
+// ─── OAuth Routes ────────────────────────────────────────────────────────────
+
+// Google
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback', 
+  passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`, session: false }),
+  (req, res) => {
+    const token = signToken(req.user);
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
+  }
+);
+
+// Microsoft
+router.get('/microsoft', passport.authenticate('microsoft', { prompt: 'select_account' }));
+
+router.get('/microsoft/callback', 
+  passport.authenticate('microsoft', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`, session: false }),
+  (req, res) => {
+    const token = signToken(req.user);
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
+  }
+);
+
+// ─── Local Auth Routes ───────────────────────────────────────────────────────
+
 router.post('/register', registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -38,18 +64,17 @@ router.post('/register', registerValidation, async (req, res) => {
 
     const { name, email, password, location } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Create user (password will be hashed by pre-save hook)
     const user = await User.create({
       name,
       email,
-      passwordHash: password, // pre-save hook hashes this
+      passwordHash: password,
       location: location || null,
+      provider: 'local'
     });
 
     const token = signToken(user);
@@ -57,18 +82,14 @@ router.post('/register', registerValidation, async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: user.toJSON(), // passwordHash excluded by toJSON()
+      user: user.toJSON(),
     });
   } catch (error) {
     console.error('Registration error:', error);
-    if (error.code === 11000) {
-      return res.status(400).json({ error: 'Email already registered' });
-    }
     res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-// ─── POST /api/auth/login ────────────────────────────────────────────────────
 router.post('/login', loginValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -78,10 +99,13 @@ router.post('/login', loginValidation, async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user (explicitly select passwordHash since it might be excluded)
     const user = await User.findOne({ email }).select('+passwordHash');
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    if (user.provider !== 'local') {
+      return res.status(400).json({ error: `Please log in using ${user.provider}` });
     }
 
     const isValidPassword = await user.comparePassword(password);
@@ -102,7 +126,6 @@ router.post('/login', loginValidation, async (req, res) => {
   }
 });
 
-// ─── GET /api/auth/me ────────────────────────────────────────────────────────
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -116,16 +139,16 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── PUT /api/auth/profile ───────────────────────────────────────────────────
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { name, location } = req.body;
+    const { name, location, preferredLanguage } = req.body;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
       {
         ...(name && { name }),
         ...(location !== undefined && { location }),
+        ...(preferredLanguage && { preferredLanguage }),
       },
       { new: true, runValidators: true }
     );

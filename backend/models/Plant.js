@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const plantSchema = new mongoose.Schema(
     {
@@ -8,23 +9,51 @@ const plantSchema = new mongoose.Schema(
             required: true,
             index: true,
         },
+        displayId: {
+            type: String,
+            unique: true,
+            default: () => `plt_${uuidv4()}`
+        },
         commonName: {
             type: String,
             required: [true, 'Common name is required'],
             trim: true,
         },
         scientificName: { type: String, trim: true, default: null },
-        family: { type: String, trim: true, default: null },     // e.g. Solanaceae
-        genus: { type: String, trim: true, default: null },      // e.g. Solanum
-        species: { type: String, trim: true, default: null },    // e.g. lycopersicum
+        family: { type: String, trim: true, default: null },
+        genus: { type: String, trim: true, default: null },
+        species: { type: String, trim: true, default: null },
         variety: { type: String, trim: true, default: null },
         plantType: { type: String, trim: true, default: null },
-        growthHabit: { type: String, trim: true, default: null }, // Annual, Perennial, etc.
+        growthHabit: { type: String, trim: true, default: null },
         nativeRegion: { type: String, trim: true, default: null },
         description: { type: String, default: null },
         plantingDate: {
             type: Date,
             required: [true, 'Planting date is required'],
+        },
+        plantingSeason: {
+            type: String,
+            enum: ['Spring', 'Summer', 'Monsoon', 'Autumn', 'Winter', 'Year-round', 'Unknown', null],
+            default: 'Unknown'
+        },
+        environmentCondition: {
+            type: String,
+            enum: [
+                'Full Sun (6+ hours direct sunlight)',
+                'Partial Sun (3–6 hours)',
+                'Partial Shade',
+                'Full Shade',
+                'Indoor – Bright indirect light',
+                'Indoor – Low light',
+                'Greenhouse',
+                'Humid / Tropical',
+                'Arid / Dry',
+                'Coastal / Windy',
+                'Other',
+                null
+            ],
+            default: 'Other'
         },
         firstPhotoUrl: { type: String, default: null },
         location: { type: String, trim: true, default: null },
@@ -36,6 +65,10 @@ const plantSchema = new mongoose.Schema(
         sunlightExposure: { type: String, trim: true, default: null },
         plantingMethod: { type: String, trim: true, default: null },
         expectedHarvestDays: { type: Number, default: null },
+        isPublic: {
+            type: Boolean,
+            default: false
+        },
         status: {
             type: String,
             enum: ['active', 'harvested', 'deleted', 'dormant'],
@@ -50,7 +83,6 @@ const plantSchema = new mongoose.Schema(
     }
 );
 
-// Virtual: days since planting
 plantSchema.virtual('daysSincePlanting').get(function () {
     if (!this.plantingDate) return null;
     const now = new Date();
@@ -58,14 +90,12 @@ plantSchema.virtual('daysSincePlanting').get(function () {
     return Math.floor(diff / (1000 * 60 * 60 * 24));
 });
 
-// Virtual: populate updates (used selectively)
 plantSchema.virtual('updates', {
     ref: 'Update',
     localField: '_id',
     foreignField: 'plantId',
 });
 
-// Clean JSON output
 plantSchema.methods.toJSON = function () {
     const obj = this.toObject({ virtuals: true });
     obj.id = obj._id;

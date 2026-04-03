@@ -39,26 +39,26 @@ export default function AddPlant() {
     };
 
     const plantPresets = {
-        '': { scientific: '', family: '', type: '', habit: '', season: 'Unknown', environment: 'Other' },
-        'Amla (Indian Gooseberry)': { scientific: 'Phyllanthus emblica', family: 'Phyllanthaceae', type: 'Fruit', habit: 'Tree', season: 'Winter', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Ashoka Tree': { scientific: 'Saraca asoca', family: 'Fabaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'Partial Sun (3–6 hours)' },
-        'Banyan Tree (Vat)': { scientific: 'Ficus benghalensis', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Curry Leaf': { scientific: 'Murraya koenigii', family: 'Rutaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Guava': { scientific: 'Psidium guajava', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Autumn', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Hibiscus (Gudhal)': { scientific: 'Hibiscus rosa-sinensis', family: 'Malvaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Monsoon', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Jasmine (Mogra)': { scientific: 'Jasminum sambac', family: 'Oleaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'Partial Sun (3–6 hours)' },
-        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Marigold (Genda)': { scientific: 'Tagetes erecta', family: 'Asteraceae', type: 'Flower', habit: 'Annual', season: 'Winter', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Moringa (Drumstick)': { scientific: 'Moringa oleifera', family: 'Moringaceae', type: 'Vegetable', habit: 'Tree', season: 'Summer', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Peepal Tree': { scientific: 'Ficus religiosa', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial', season: 'Year-round', environment: 'Humid / Tropical' },
-        'Pomegranate': { scientific: 'Punica granatum', family: 'Lythraceae', type: 'Fruit', habit: 'Shrub', season: 'Winter', environment: 'Full Sun (6+ hours direct sunlight)' },
-        'Tulsi (Holy Basil)': { scientific: 'Ocimum tenuiflorum', family: 'Lamiaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'Partial Sun (3–6 hours)' }
+        '': { scientific: '', family: '', type: '', habit: '', season: 'Unknown', environment: 'other' },
+        'Amla (Indian Gooseberry)': { scientific: 'Phyllanthus emblica', family: 'Phyllanthaceae', type: 'Fruit', habit: 'Tree', season: 'Winter', environment: 'full_sun' },
+        'Ashoka Tree': { scientific: 'Saraca asoca', family: 'Fabaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'partial_sun' },
+        'Banyan Tree (Vat)': { scientific: 'Ficus benghalensis', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
+        'Curry Leaf': { scientific: 'Murraya koenigii', family: 'Rutaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'full_sun' },
+        'Guava': { scientific: 'Psidium guajava', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Autumn', environment: 'full_sun' },
+        'Hibiscus (Gudhal)': { scientific: 'Hibiscus rosa-sinensis', family: 'Malvaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'full_sun' },
+        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
+        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Monsoon', environment: 'full_sun' },
+        'Jasmine (Mogra)': { scientific: 'Jasminum sambac', family: 'Oleaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'partial_sun' },
+        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
+        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
+        'Marigold (Genda)': { scientific: 'Tagetes erecta', family: 'Asteraceae', type: 'Flower', habit: 'Annual', season: 'Winter', environment: 'full_sun' },
+        'Moringa (Drumstick)': { scientific: 'Moringa oleifera', family: 'Moringaceae', type: 'Vegetable', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
+        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
+        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
+        'Peepal Tree': { scientific: 'Ficus religiosa', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
+        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial', season: 'Year-round', environment: 'humid' },
+        'Pomegranate': { scientific: 'Punica granatum', family: 'Lythraceae', type: 'Fruit', habit: 'Shrub', season: 'Winter', environment: 'full_sun' },
+        'Tulsi (Holy Basil)': { scientific: 'Ocimum tenuiflorum', family: 'Lamiaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'partial_sun' }
     };
 
     const handlePresetChange = (e) => {
@@ -146,11 +146,11 @@ export default function AddPlant() {
                                         ))}
                                     </select>
                                 </div>
-                                <div>
+                                 <div>
                                     <label className="label-text">{t('add_plant.environment_condition')}</label>
                                     <select className="select-field" {...f('environmentCondition')}>
                                         {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
-                                            <option key={c} value={t(`env_conditions.${c}`)}>{t(`env_conditions.${c}`)}</option>
+                                            <option key={c} value={c}>{t(`env_conditions.${c}`)}</option>
                                         ))}
                                     </select>
                                 </div>

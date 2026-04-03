@@ -3,7 +3,8 @@ const { body, validationResult } = require('express-validator');
 const Plant = require('../models/Plant');
 const Update = require('../models/Update');
 const authMiddleware = require('../middleware/auth');
-const { upload, uploadToCloudinary } = require('../config/cloudinary');
+const User = require('../models/User');
+const { translateFields } = require('../services/translateService');
 
 const router = express.Router();
 
@@ -13,23 +14,24 @@ const plantValidation = [
   body('plantingDate').isISO8601().withMessage('Valid planting date is required'),
 ];
 
+// Helper for UUID mapping in lean results
+const mapDisplayId = (docs) => {
+  return docs.map((d) => {
+    d.id = d._id;
+    delete d._id;
+    delete d.__v;
+    return d;
+  });
+};
+
 // ─── GET /api/plants ─────────────────────────────────────────────────────────
-// Get all plants for the logged-in user
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const plants = await Plant.find({ userId: req.user.id, status: 'active' })
       .sort({ createdAt: -1 })
-      .lean({ virtuals: true });
+      .lean();
 
-    // Map lean results to include id field
-    const mapped = plants.map((p) => {
-      p.id = p._id;
-      delete p._id;
-      delete p.__v;
-      return p;
-    });
-
-    res.json({ plants: mapped });
+    res.json({ plants: mapDisplayId(plants) });
   } catch (error) {
     console.error('Get plants error:', error);
     res.status(500).json({ error: 'Failed to fetch plants' });
@@ -42,13 +44,12 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const plant = await Plant.findOne({
       _id: req.params.id,
       userId: req.user.id,
-    }).lean({ virtuals: true });
+    }).lean();
 
     if (!plant) {
       return res.status(404).json({ error: 'Plant not found' });
     }
 
-    // Get update stats from the updates collection
     const stats = await Update.aggregate([
       { $match: { plantId: plant._id } },
       {
@@ -59,7 +60,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
           avgHeight: { $avg: '$heightCm' },
           maxHeight: { $max: '$heightCm' },
           photoCount: {
-            $sum: { $cond: [{ $gt: [{ $size: { $ifNull: ['$photos', []] } }, 0] }, 1, 0] },
+            $sum: { $cond: [{ $gt: [{ $size: { $ifNull: ['$drivePhotos', []] } }, 0] }, 1, 0] },
           },
         },
       },
@@ -67,57 +68,59 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
     plant.id = plant._id;
     delete plant._id;
-    delete plant.__v;
 
     res.json({
       plant: {
         ...plant,
         stats: stats[0] || { updateCount: 0, lastUpdateDate: null, avgHeight: null },
       },
+      user_id: req.user.id,
+      plant_id: plant.displayId
     });
   } catch (error) {
-    console.error('Get plant error:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ error: 'Invalid plant ID' });
-    }
+    if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid plant ID' });
     res.status(500).json({ error: 'Failed to fetch plant' });
   }
 });
 
 // ─── POST /api/plants ────────────────────────────────────────────────────────
-router.post('/', authMiddleware, upload.single('photo'), plantValidation, async (req, res) => {
+router.post('/', authMiddleware, plantValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const user = await User.findById(req.user.id);
+    const sourceLang = user.preferredLanguage || 'en';
+
+    // Auto-Translate detailed plant info before saving to DB as English
+    const fieldsToTranslate = ['commonName', 'scientificName', 'description', 'variety', 'plantType', 'growthHabit', 'nativeRegion', 'soilType', 'plantingMethod'];
+    const translatedBody = await translateFields(req.body, fieldsToTranslate, sourceLang);
 
     const {
       commonName, scientificName, family, genus, species, variety,
       plantType, growthHabit, nativeRegion, description,
-      plantingDate, location, soilType, sunlightExposure,
-      plantingMethod, expectedHarvestDays,
-    } = req.body;
-
-    // Upload photo if provided
-    let photoUrl = null;
-    if (req.file) {
-      photoUrl = await uploadToCloudinary(req.file.buffer, 'botanico/plants');
-    }
+      plantingDate, plantingSeason, environmentCondition,
+      location, soilType, sunlightExposure,
+      plantingMethod, expectedHarvestDays, isPublic
+    } = translatedBody;
 
     const plant = await Plant.create({
       userId: req.user.id,
       commonName, scientificName, family, genus, species, variety,
       plantType, growthHabit, nativeRegion, description,
       plantingDate: new Date(plantingDate),
-      firstPhotoUrl: photoUrl,
+      plantingSeason, 
+      environmentCondition,
       location, soilType, sunlightExposure, plantingMethod,
       expectedHarvestDays: expectedHarvestDays ? Number(expectedHarvestDays) : null,
+      isPublic: isPublic === 'true' || isPublic === true
     });
 
     res.status(201).json({
       message: 'Plant created successfully',
       plant: plant.toJSON(),
+      user_id: req.user.id,
+      plant_id: plant.displayId 
     });
   } catch (error) {
     console.error('Create plant error:', error);
@@ -126,26 +129,24 @@ router.post('/', authMiddleware, upload.single('photo'), plantValidation, async 
 });
 
 // ─── PUT /api/plants/:id ─────────────────────────────────────────────────────
-router.put('/:id', authMiddleware, upload.single('photo'), async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const plant = await Plant.findOne({ _id: req.params.id, userId: req.user.id });
-    if (!plant) {
-      return res.status(404).json({ error: 'Plant not found' });
-    }
+    if (!plant) return res.status(404).json({ error: 'Plant not found' });
+
+    const user = await User.findById(req.user.id);
+    const sourceLang = user.preferredLanguage || 'en';
+
+    const fieldsToTranslate = ['commonName', 'scientificName', 'description', 'variety', 'plantType', 'growthHabit', 'nativeRegion', 'soilType', 'plantingMethod'];
+    const translatedBody = await translateFields(req.body, fieldsToTranslate, sourceLang);
 
     const {
       commonName, scientificName, family, genus, species, variety,
       plantType, growthHabit, nativeRegion, description,
       location, soilType, sunlightExposure, plantingMethod,
-      expectedHarvestDays, status,
-    } = req.body;
+      expectedHarvestDays, status, plantingSeason, environmentCondition, isPublic
+    } = translatedBody;
 
-    // Upload new photo if provided
-    if (req.file) {
-      plant.firstPhotoUrl = await uploadToCloudinary(req.file.buffer, 'botanico/plants');
-    }
-
-    // Update fields only if provided
     if (commonName !== undefined) plant.commonName = commonName;
     if (scientificName !== undefined) plant.scientificName = scientificName;
     if (family !== undefined) plant.family = family;
@@ -162,24 +163,24 @@ router.put('/:id', authMiddleware, upload.single('photo'), async (req, res) => {
     if (plantingMethod !== undefined) plant.plantingMethod = plantingMethod;
     if (expectedHarvestDays !== undefined) plant.expectedHarvestDays = Number(expectedHarvestDays);
     if (status !== undefined) plant.status = status;
+    if (plantingSeason !== undefined) plant.plantingSeason = plantingSeason;
+    if (environmentCondition !== undefined) plant.environmentCondition = environmentCondition;
+    if (isPublic !== undefined) plant.isPublic = isPublic;
 
     await plant.save();
 
     res.json({
       message: 'Plant updated successfully',
       plant: plant.toJSON(),
+      user_id: req.user.id,
+      plant_id: plant.displayId
     });
   } catch (error) {
-    console.error('Update plant error:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ error: 'Invalid plant ID' });
-    }
+    if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid plant ID' });
     res.status(500).json({ error: 'Failed to update plant' });
   }
 });
 
-// ─── DELETE /api/plants/:id ──────────────────────────────────────────────────
-// Soft delete by setting status to 'deleted'
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const plant = await Plant.findOneAndUpdate(
@@ -187,62 +188,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       { status: 'deleted' },
       { new: true }
     );
-
-    if (!plant) {
-      return res.status(404).json({ error: 'Plant not found' });
-    }
-
+    if (!plant) return res.status(404).json({ error: 'Plant not found' });
     res.json({ message: 'Plant deleted successfully' });
   } catch (error) {
-    console.error('Delete plant error:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ error: 'Invalid plant ID' });
-    }
     res.status(500).json({ error: 'Failed to delete plant' });
-  }
-});
-
-// ─── GET /api/plants/:id/stats ───────────────────────────────────────────────
-router.get('/:id/stats', authMiddleware, async (req, res) => {
-  try {
-    const plant = await Plant.findOne({ _id: req.params.id, userId: req.user.id });
-    if (!plant) {
-      return res.status(404).json({ error: 'Plant not found' });
-    }
-
-    const stats = await Update.aggregate([
-      { $match: { plantId: plant._id } },
-      {
-        $group: {
-          _id: null,
-          totalUpdates: { $sum: 1 },
-          lastUpdate: { $max: '$entryDate' },
-          firstUpdate: { $min: '$entryDate' },
-          avgHeight: { $avg: '$heightCm' },
-          maxHeight: { $max: '$heightCm' },
-          photoCount: {
-            $sum: {
-              $cond: [{ $gt: [{ $size: { $ifNull: ['$photos', []] } }, 0] }, 1, 0],
-            },
-          },
-        },
-      },
-    ]);
-
-    res.json({
-      stats: stats[0] || {
-        totalUpdates: 0,
-        lastUpdate: null,
-        firstUpdate: null,
-        avgHeight: null,
-        maxHeight: null,
-        photoCount: 0,
-      },
-      plantingDate: plant.plantingDate,
-    });
-  } catch (error) {
-    console.error('Get stats error:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });
 

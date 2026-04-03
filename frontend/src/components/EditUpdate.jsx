@@ -215,7 +215,7 @@ export default function EditUpdate() {
                                     <label className="label-text">{t('add_plant.environment_condition')}</label>
                                     <select className="select-field" {...f('environmentCondition')}>
                                         {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
-                                            <option key={c} value={t(`env_conditions.${c}`)}>{t(`env_conditions.${c}`)}</option>
+                                            <option key={c} value={c}>{t(`env_conditions.${c}`)}</option>
                                         ))}
                                     </select>
                                 </div>
