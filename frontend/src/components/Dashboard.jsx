@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { plantsAPI } from '../api';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -14,10 +16,9 @@ const DARK_NAV = {
     boxShadow: '0 1px 0 rgba(34,197,94,0.06)',
 };
 
-
-
 export default function Dashboard({ user, onLogout }) {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [plants, setPlants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -28,20 +29,20 @@ export default function Dashboard({ user, onLogout }) {
                 const res = await plantsAPI.getAll();
                 setPlants(res.data.plants || []);
             } catch (err) {
-                setError('Failed to load plants. Please refresh.');
+                setError(t('dashboard.failed_load'));
             } finally {
                 setLoading(false);
             }
         };
         fetchPlants();
-    }, []);
+    }, [t]);
 
     const handleLogout = () => { onLogout(); navigate('/'); };
 
     const STATS = [
-        { icon: <Sprout size={20} />, label: 'Total Plants', value: plants.length },
-        { icon: <TrendingUp size={20} />, label: 'Active', value: plants.filter(p => p.status === 'active').length },
-        { icon: <Calendar size={20} />, label: 'Days Growing', value: plants.length > 0 ? Math.max(...plants.map(p => p.daysSincePlanting || 0)) : 0 },
+        { icon: <Sprout size={20} />, label: t('dashboard.total_plants'), value: plants.length },
+        { icon: <TrendingUp size={20} />, label: t('dashboard.active'), value: plants.filter(p => p.status === 'active').length },
+        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: plants.length > 0 ? Math.max(...plants.map(p => p.daysSincePlanting || 0)) : 0 },
     ];
 
     return (
@@ -55,13 +56,14 @@ export default function Dashboard({ user, onLogout }) {
                     background: 'linear-gradient(135deg, var(--pearl) 0%, var(--sage) 60%, var(--gold) 100%)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     letterSpacing: '-0.02em',
-                }}>Botanico</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                }}>{t('app_title')}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <LanguageSwitcher />
                     <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.45)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
-                        {user?.name || 'Botanist'} 👋
+                        {user?.name || t('dashboard.botanists')} 👋
                     </span>
                     <button onClick={handleLogout} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-                        <LogOut size={14} /> Logout
+                        <LogOut size={14} /> {t('navigation.logout')}
                     </button>
                 </div>
             </nav>
@@ -78,7 +80,7 @@ export default function Dashboard({ user, onLogout }) {
                             color: 'var(--pearl)',
                             marginBottom: 6,
                             lineHeight: 1.1,
-                        }}>My Plant Journal</h1>
+                        }}>{t('dashboard.title')}</h1>
                         <p style={{
                             fontFamily: "var(--font-mono)",
                             fontSize: 10,
@@ -86,10 +88,10 @@ export default function Dashboard({ user, onLogout }) {
                             color: 'var(--mist)',
                             textTransform: 'uppercase',
                             opacity: 0.7,
-                        }}>{plants.length} plant{plants.length !== 1 ? 's' : ''} tracked</p>
+                        }}>{t('dashboard.tracked_count', { count: plants.length })}</p>
                     </div>
                     <Link to="/add-plant" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                        <Plus size={15} /> Add Plant
+                        <Plus size={15} /> {t('dashboard.add_plant')}
                     </Link>
                 </div>
 
@@ -128,10 +130,10 @@ export default function Dashboard({ user, onLogout }) {
                         }}>
                             <Leaf size={36} style={{ color: 'rgba(34,197,94,0.3)' }} />
                         </div>
-                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>No plants yet</h2>
-                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>Start your botanical journey by adding your first plant.</p>
+                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>{t('dashboard.no_plants')}</h2>
+                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>{t('dashboard.start_journey')}</p>
                         <Link to="/add-plant" className="btn-primary">
-                            <Plus size={15} style={{ marginRight: 8 }} /> Add Your First Plant
+                            <Plus size={15} style={{ marginRight: 8 }} /> {t('dashboard.add_first_plant')}
                         </Link>
                     </motion.div>
                 ) : (
@@ -153,7 +155,7 @@ export default function Dashboard({ user, onLogout }) {
                                             color: 'var(--pearl)',
                                             marginBottom: 2,
                                             letterSpacing: '-0.01em',
-                                        }}>{plant.commonName}</h3>
+                                        }}>{t(`plants.${plant.commonName.split(' (')[0]}`, plant.commonName)}</h3>
                                         {plant.scientificName && (
                                             <p style={{
                                                 fontSize: 12,
@@ -169,7 +171,7 @@ export default function Dashboard({ user, onLogout }) {
                                                 {new Date(plant.plantingDate).toLocaleDateString()}
                                             </span>
                                             {plant.plantType && <span className="badge badge-info">{plant.plantType}</span>}
-                                            <span className="badge badge-success">{plant.status}</span>
+                                            <span className="badge badge-success">{t(`status.${plant.status}`, plant.status)}</span>
                                         </div>
                                     </div>
                                 </Link>

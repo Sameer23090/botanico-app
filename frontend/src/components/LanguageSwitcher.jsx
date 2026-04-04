@@ -8,9 +8,9 @@ const LanguageSwitcher = () => {
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
-    { code: 'ml', name: 'Malayalam', flag: '🇮🇳' },
-    { code: 'te', name: 'Telugu', flag: '🇮🇳' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
   ];
 
   const currentLang = languages.find(l => l.code === language) || languages[0];

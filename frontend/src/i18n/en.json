@@ -33,6 +33,20 @@
     "login_failed": "Login failed. Please try again.",
     "oauth_failed": "OAuth login failed. Please try again or use email/password."
   },
+  "dashboard": {
+    "title": "My Plant Journal",
+    "total_plants": "Total Plants",
+    "active": "Active",
+    "days_growing": "Days Growing",
+    "add_plant": "Add Plant",
+    "no_plants": "No plants yet",
+    "start_journey": "Start your botanical journey by adding your first plant.",
+    "add_first_plant": "Add Your First Plant",
+    "tracked_count": "{{count}} plant tracked",
+    "tracked_count_plural": "{{count}} plants tracked",
+    "botanists": "Botanist",
+    "failed_load": "Failed to load plants. Please refresh."
+  },
   "register": {
     "title": "Create Account",
     "subtitle": "New Grower",
@@ -46,7 +60,9 @@
     "gps_locating": "Locating...",
     "submit": "Create My Garden Profile",
     "submitting": "Creating profile...",
-    "already_growing": "Already growing? Sign in →"
+    "already_growing": "Already growing? Sign in →",
+    "error_trusted_email": "Please use a trusted email provider (@gmail.com, @outlook.com, or @yahoo.com).",
+    "error_failed": "Registration failed. Please check your connection."
   },
   "add_plant": {
     "title": "Add New Plant",
@@ -60,6 +76,8 @@
     "cancel": "Cancel",
     "placeholder_common": "e.g. Tomato",
     "placeholder_scientific": "e.g. Solanum lycopersicum",
+    "select_plant": "Select a plant",
+    "other": "Other (Type below)",
     "seasons": {
       "Spring": "Spring",
       "Summer": "Summer",
@@ -69,6 +87,25 @@
       "Year-round": "Year-round",
       "Unknown": "Unknown"
     }
+  },
+  "env_conditions": {
+    "full_sun": "Full Sun",
+    "partial_sun": "Partial Sun",
+    "partial_shade": "Partial Shade",
+    "full_shade": "Full Shade",
+    "indoor_bright": "Indoor Bright",
+    "indoor_low": "Indoor Low",
+    "greenhouse": "Greenhouse",
+    "humid": "Humid",
+    "arid": "Arid",
+    "coastal": "Coastal",
+    "other": "Other"
+  },
+  "status": {
+    "active": "Active",
+    "harvested": "Harvested",
+    "dormant": "Dormant",
+    "completed": "Completed"
   },
   "care_log": {
     "title": "Add Care Log",
@@ -100,17 +137,22 @@
       "Other": "Other"
     }
   },
-  "env_conditions": {
-    "full_sun": "Full Sun (6+ hours direct sunlight)",
-    "partial_sun": "Partial Sun (3–6 hours)",
-    "partial_shade": "Partial Shade",
-    "full_shade": "Full Shade",
-    "indoor_bright": "Indoor – Bright indirect light",
-    "indoor_low": "Indoor – Low light",
-    "greenhouse": "Greenhouse",
-    "humid": "Humid / Tropical",
-    "arid": "Arid / Dry",
-    "coastal": "Coastal / Windy",
-    "other": "Other"
-  }
-}
+  "plants": {
+    "Amla": "Amla (Indian Gooseberry)",
+    "Ashoka": "Ashoka Tree",
+    "Banyan": "Banyan Tree (Vat)",
+    "Curry Leaf": "Curry Leaf",
+    "Guava": "Guava",
+    "Hibiscus": "Hibiscus (Gudhal)",
+    "Jack fruit": "Jack fruit",
+    "Jamun": "Jamun",
+    "Jasmine": "Jasmine (Mogra)",
+    "Lemon": "Lemon",
+    "Mango": "Mango",
+    "Marigold": "Marigold (Genda)",
+    "Moringa": "Moringa (Drumstick)",
+    "Neem": "Neem",
+    "Pappaya": "Pappaya",
+    "Peepal": "Peepal Tree",
+    "Pine apple": "Pine apple",
+    "Pomegranate": "Pomegranate",

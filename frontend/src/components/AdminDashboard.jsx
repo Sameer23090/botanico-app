@@ -87,6 +87,7 @@ const Section = ({ title, action, children }) => (
 
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tab, setTab] = useState('monitor');
   const [overview, setOverview] = useState(null);
@@ -157,9 +158,9 @@ export default function AdminDashboard() {
 
   // ── Sidebar tabs ─────────────────────────────────────────────────────────────
   const TABS = [
-    { id: 'monitor', icon: '📡', label: 'Live Monitor' },
-    { id: 'growers',  icon: '👥', label: 'Growers' },
-    { id: 'plants',   icon: '🌿', label: 'Plant Registry' },
+    { id: 'monitor', icon: '📡', label: t('admin.nav.monitor') },
+    { id: 'growers',  icon: '👥', label: t('admin.nav.growers') },
+    { id: 'plants',   icon: '🌿', label: t('admin.nav.plants') },
   ];
 
   return (
@@ -171,14 +172,14 @@ export default function AdminDashboard() {
         <div style={{ padding: '28px 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 24, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>Botanico</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--jade)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Admin Control</div>
+              <div style={{ fontFamily: 'var(--font-serif)', fontWeight: 800, fontSize: 24, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>{t('app_title')}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--jade)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('admin.control_panel')}</div>
             </div>
           </div>
           {/* Status indicator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'rgba(34,197,94,0.06)', borderRadius: 8, border: '1px solid rgba(34,197,94,0.1)' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--jade)', boxShadow: '0 0 6px var(--jade)', animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: 11, color: 'var(--jade)', fontWeight: 500 }}>System Live</span>
+            <span style={{ fontSize: 11, color: 'var(--jade)', fontWeight: 500 }}>{t('admin.system_live')}</span>
           </div>
         </div>
 
@@ -205,7 +206,7 @@ export default function AdminDashboard() {
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{adminUser.email || ''}</div>
           </div>
           <button onClick={logout} style={{ width: '100%', padding: '9px', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, background: 'rgba(239,68,68,0.06)', color: '#ef4444', fontSize: 13, cursor: 'pointer' }}>
-            🚪 Sign Out
+            🚪 {t('admin.sign_out')}
           </button>
         </div>
       </aside>
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
             </span>
           </div>
           <button onClick={() => load(tab === 'monitor' ? 'monitor-refresh' : tab)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
-            ↻ Refresh
+            ↻ {t('admin.refresh')}
           </button>
         </div>
 
@@ -231,20 +232,20 @@ export default function AdminDashboard() {
           {tab === 'monitor' && overview && (
             <div>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', marginBottom: 4 }}>📡 Live Monitor</h1>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>Real-time overview of all growing activity across the platform</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', marginBottom: 4 }}>📡 {t('admin.monitor_title')}</h1>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>{t('admin.monitor_subtitle')}</p>
               </div>
 
               {/* KPI Grid */}
               <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
-                <KpiCard icon="👥" label="Total Growers" value={overview.stats.totalUsers} color="var(--mist)"
-                  sub="Registered users" />
-                <KpiCard icon="🌿" label="Plants Growing" value={overview.stats.totalPlants} color="var(--jade)"
-                  sub="Across all users" trend={1} />
-                <KpiCard icon="📋" label="Log Entries" value={overview.stats.totalUpdates} color="var(--gold)"
-                  sub="Total observations" trend={1} />
-                <KpiCard icon="⚡" label="Active Now" value={overview.plantsByStatus?.find(p => p._id === 'active')?.count || 0}
-                  color="var(--amber)" sub="Active plants" />
+                <KpiCard icon="👥" label={t('admin.total_growers')} value={overview.stats.totalUsers} color="var(--mist)"
+                  sub={t('admin.registered_users')} />
+                <KpiCard icon="🌿" label={t('admin.plants_growing')} value={overview.stats.totalPlants} color="var(--jade)"
+                  sub={t('admin.across_users')} trend={1} />
+                <KpiCard icon="📋" label={t('admin.log_entries')} value={overview.stats.totalUpdates} color="var(--gold)"
+                  sub={t('admin.total_observations')} trend={1} />
+                <KpiCard icon="⚡" label={t('admin.active_now')} value={overview.plantsByStatus?.find(p => p._id === 'active')?.count || 0}
+                  color="var(--amber)" sub={t('admin.active_plants')} />
               </div>
 
               <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -304,7 +305,7 @@ export default function AdminDashboard() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               <strong style={{ color: '#fff' }}>{u.userId?.name || 'Unknown'}</strong>
-                              <span style={{ color: 'rgba(255,255,255,0.35)' }}> logged on </span>
+                              <span style={{ color: 'rgba(255,255,255,0.35)' }}> {t('admin.logged_on')} </span>
                               <strong style={{ color: 'var(--jade)' }}>{u.plantId?.commonName || 'a plant'}</strong>
                             </div>
                             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
@@ -330,10 +331,10 @@ export default function AdminDashboard() {
                           <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05))', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🌱</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.commonName}</div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>by {p.userId?.name || '—'} · {timeAgo(p.createdAt)}</div>
+                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{t('admin.by')} {p.userId?.name || '—'} · {timeAgo(p.createdAt)}</div>
                           </div>
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700 }}>Day {p.daysSincePlanting ?? '?'}</div>
+                            <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700 }}>{t('admin.day')} {p.daysSincePlanting ?? '?'}</div>
                             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{p.plantType || '—'}</div>
                           </div>
                         </div>
@@ -350,7 +351,7 @@ export default function AdminDashboard() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
                     <thead>
                       <tr>
-                        {['Name', 'Email', 'Role', 'Joined'].map(h => (
+                        {[t('admin.tbl.name'), t('admin.tbl.email'), t('admin.tbl.role'), t('admin.tbl.joined')].map(h => (
                           <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
                         ))}
                       </tr>
@@ -383,7 +384,7 @@ export default function AdminDashboard() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                     <thead>
                       <tr>
-                        {['Grower', 'Email', 'Role', 'Plants', 'Joined', ''].map(h => (
+                        {[t('admin.tbl.grower'), t('admin.tbl.email'), t('admin.tbl.role'), t('admin.tbl.plants'), t('admin.tbl.joined'), ''].map(h => (
                           <th key={h} style={{ padding: '10px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
                         ))}
                       </tr>
@@ -414,7 +415,7 @@ export default function AdminDashboard() {
                           <td style={{ padding: '14px 20px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{fmt(u.createdAt)}</td>
                           <td style={{ padding: '14px 20px' }}>
                             <button onClick={() => viewUserPlants(u)} style={{ padding: '6px 14px', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 8, background: 'rgba(34,197,94,0.06)', color: 'var(--jade)', fontSize: 12, cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                              🌱 View Plants
+                              🌱 {t('admin.btn_view_plants')}
                             </button>
                           </td>
                         </tr>
@@ -441,7 +442,7 @@ export default function AdminDashboard() {
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 4 }}>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{selectedUser.email}</span>
                     <RolePill role={selectedUser.role} />
-                    <span style={{ fontSize: 12, color: 'var(--jade)', fontWeight: 600 }}>{userPlants.plants?.length || 0} plant{userPlants.plants?.length !== 1 ? 's' : ''}</span>
+                    <span style={{ fontSize: 12, color: 'var(--jade)', fontWeight: 600 }}>{userPlants.plants?.length || 0} {t('admin.plants_count', { count: userPlants.plants?.length })}</span>
                   </div>
                 </div>
               </div>
@@ -478,8 +479,8 @@ export default function AdminDashboard() {
                 ← Back to Plants
               </button>
               <div style={{ marginBottom: 24 }}>
-                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — Log</h1>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} entries recorded</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, fontFamily: 'var(--font-serif)', color: '#fff', margin: 0 }}>📋 {selectedPlant.commonName} — {t('admin.log')}</h1>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} {t('admin.entries_recorded')}</p>
                 <div>
                   {selectedPlant.coordinates?.lat && selectedPlant.coordinates?.lng ? (
                     <a href={`https://maps.google.com/?q=${selectedPlant.coordinates.lat},${selectedPlant.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
@@ -500,7 +501,7 @@ export default function AdminDashboard() {
                     <div key={u.id || u._id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '18px 20px', borderLeft: `3px solid ${HEALTH_COLORS[u.healthStatus] || '#333'}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                          <span style={{ background: 'rgba(34,197,94,0.15)', color: 'var(--jade)', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>Day {u.dayNumber}</span>
+                          <span style={{ background: 'rgba(34,197,94,0.15)', color: 'var(--jade)', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>{t('admin.day')} {u.dayNumber}</span>
                           {u.title && <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{u.title}</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -516,7 +517,7 @@ export default function AdminDashboard() {
                         {u.pestIssues && <span style={{ color: '#ef4444' }}>⚠️ {u.pestIssues}</span>}
                         {u.coordinates?.lat && u.coordinates?.lng && (
                           <a href={`https://maps.google.com/?q=${u.coordinates.lat},${u.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ color: 'var(--jade)', textDecoration: 'none', borderBottom: '1px solid var(--jade)' }}>
-                            📍 View Logged Location on Maps
+                             📍 {t('admin.view_log_loc')}
                           </a>
                         )}
                       </div>

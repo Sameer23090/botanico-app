@@ -72,10 +72,6 @@ function App() {
       <Router>
         <LiquidCursor />
         <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative' }}>
-          {/* Global Language Switcher */}
-          <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 9999 }}>
-            <LanguageSwitcher />
-          </div>
           
           <AmbientAnimations />
           <Routes>

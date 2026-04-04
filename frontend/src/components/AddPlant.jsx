@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { plantsAPI } from '../api';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function AddPlant() {
     const navigate = useNavigate();
@@ -102,12 +103,15 @@ export default function AddPlant() {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--night)' }}>
             <nav style={{ 
-                position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', 
+                position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '0 32px', height: 64, background: 'rgba(10,15,13,0.92)', 
-                backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 12 
+                backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.06)'
             }}>
-                <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}><ArrowLeft size={18} /></Link>
-                <span style={{ fontFamily: "var(--font-serif)", fontWeight: 700, color: 'var(--pearl)', fontSize: 17 }}>{t('add_plant.title')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}><ArrowLeft size={18} /></Link>
+                    <span style={{ fontFamily: "var(--font-serif)", fontWeight: 700, color: 'var(--pearl)', fontSize: 17 }}>{t('add_plant.title')}</span>
+                </div>
+                <LanguageSwitcher />
             </nav>
 
             <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px' }}>
@@ -121,9 +125,13 @@ export default function AddPlant() {
                                     <label className="label-text">{t('add_plant.common_name')} *</label>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                         <select className="select-field" style={{ marginBottom: 0 }} value={Object.keys(plantPresets).includes(form.commonName) ? form.commonName : "CUSTOM"} onChange={handlePresetChange}>
-                                            <option value="">Select a plant</option>
-                                            {Object.keys(plantPresets).filter(k=>k).map(k => <option key={k} value={k}>{k}</option>)}
-                                            <option value="CUSTOM">-- Other (Type below) --</option>
+                                            <option value="">{t('add_plant.select_plant')}</option>
+                                            {Object.keys(plantPresets).filter(k=>k).map(k => {
+                                                // Extract base name to match translation key
+                                                const baseKey = k.split(' (')[0];
+                                                return <option key={k} value={k}>{t(`plants.${baseKey}`, k)}</option>
+                                            })}
+                                            <option value="CUSTOM">-- {t('add_plant.other')} --</option>
                                         </select>
                                         {(!Object.keys(plantPresets).includes(form.commonName) || form.commonName === "CUSTOM") && (
                                             <input className="input-field" placeholder={t('add_plant.placeholder_common')} required value={form.commonName === "CUSTOM" ? "" : form.commonName} onChange={e => setForm({...form, commonName: e.target.value})} />
@@ -168,7 +176,7 @@ export default function AddPlant() {
                             borderRadius: 12, cursor: 'pointer',
                         }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444' }} />
-                            <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP TO CAPTURE LOCATION'}</span>
+                            <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? `✓ ${t('register.gps_captured')}` : `📍 ${t('register.gps_detect')}`}</span>
                             <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
                         </div>
 

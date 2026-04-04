@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { authAPI, setAuthToken } from '../api';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -17,9 +18,9 @@ export default function Login({ onLogin }) {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('error') === 'oauth_failed') {
-      setError('OAuth login failed. Please try again or use email/password.');
+      setError(t('login.oauth_failed'));
     }
-  }, [location]);
+  }, [location, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +31,7 @@ export default function Login({ onLogin }) {
       onLogin(res.data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      setError(err.response?.data?.error || t('login.login_failed'));
     } finally { setLoading(false); }
   };
 
@@ -41,10 +42,15 @@ export default function Login({ onLogin }) {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--night)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative' }}>
       
+      {/* Language selection restricted to login/register only */}
+      <div style={{ position: 'absolute', top: 24, right: 24, zIndex: 100 }}>
+        <LanguageSwitcher />
+      </div>
+
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ width: '100%', maxWidth: 460, position: 'relative', zIndex: 1 }}>
 
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>{t('landing.hero_title')}</div>
+          <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>{t('app_title')}</div>
           <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: '0.3em', color: 'var(--jade)', textTransform: 'uppercase', opacity: 0.7 }}>{t('login.welcome_back')}</p>
         </div>
 

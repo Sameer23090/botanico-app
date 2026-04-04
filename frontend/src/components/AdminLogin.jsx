@@ -1,10 +1,11 @@
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock, ShieldAlert, ArrowLeft } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function AdminLogin() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -49,15 +50,15 @@ export default function AdminLogin() {
       <div style={styles.card}>
         {/* Logo */}
         <div style={styles.logoArea}>
-          <h1 style={styles.logoText}>Botanico</h1>
-          <div style={styles.adminBadge}>ADMIN PORTAL</div>
+          <h1 style={styles.logoText}>{t('app_title')}</h1>
+          <div style={styles.adminBadge}>{t('admin_login.badge')}</div>
         </div>
 
-        <p style={styles.subtitle}>Restricted access — Authorized personnel only</p>
+        <p style={styles.subtitle}>{t('admin_login.subtitle')}</p>
 
         <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label className="label-text">Admin Email</label>
+            <label className="label-text">{t('admin_login.email_label')}</label>
             <div style={{ position: 'relative' }}>
               <input
                 id="admin-email"
@@ -76,7 +77,7 @@ export default function AdminLogin() {
           </div>
 
           <div style={styles.inputGroup}>
-            <label className="label-text">Password</label>
+            <label className="label-text">{t('admin_login.password_label')}</label>
             <div style={{ position: 'relative' }}>
               <input
                 id="admin-password"
@@ -101,12 +102,12 @@ export default function AdminLogin() {
           )}
 
           <button id="admin-login-btn" type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '16px', fontSize: 16, borderRadius: 14, marginTop: 12 }}>
-            {loading ? 'Authenticating...' : 'Access Admin Panel'}
+            {loading ? t('admin_login.authenticating') : t('admin_login.btn')}
           </button>
         </form>
 
         <Link to="/" style={styles.backLink}>
-          <ArrowLeft size={12} style={{ marginRight: 6 }} /> Back to Home Page
+          <ArrowLeft size={12} style={{ marginRight: 6 }} /> {t('admin_login.back_home')}
         </Link>
       </div>
     </div>

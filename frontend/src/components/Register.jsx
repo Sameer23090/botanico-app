@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -22,7 +23,7 @@ export default function Register({ onRegister }) {
         
         const emailLower = form.email.trim().toLowerCase();
         if (!emailLower.endsWith('@gmail.com') && !emailLower.endsWith('@outlook.com') && !emailLower.endsWith('@yahoo.com')) {
-            setError('Please use a trusted email provider (@gmail.com, @outlook.com, or @yahoo.com).');
+            setError(t('register.error_trusted_email'));
             return;
         }
 
@@ -39,7 +40,7 @@ export default function Register({ onRegister }) {
                 }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Registration failed');
+            if (!res.ok) throw new Error(data.error || t('register.error_failed'));
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -78,11 +79,16 @@ export default function Register({ onRegister }) {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--night)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative' }}>
 
+            {/* Language selection restricted to login/register only */}
+            <div style={{ position: 'absolute', top: 24, right: 24, zIndex: 100 }}>
+                <LanguageSwitcher />
+            </div>
+
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ width: '100%', maxWidth: 480, position: 'relative', zIndex: 1 }}>
 
                 {/* Logo */}
                 <div style={{ textAlign: 'center', marginBottom: 36 }}>
-                    <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>Botanico</div>
+                    <div style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 800, background: 'linear-gradient(135deg, var(--pearl), var(--sage))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6, letterSpacing: '-0.02em' }}>{t('app_title')}</div>
                     <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: '0.3em', color: 'var(--jade)', textTransform: 'uppercase', opacity: 0.7 }}>{t('register.description')}</p>
                 </div>
 
@@ -135,7 +141,7 @@ export default function Register({ onRegister }) {
                                     id="register-password"
                                     type={showPassword ? 'text' : 'password'}
                                     className="input-field"
-                                    placeholder="Min. 6 characters"
+                                    placeholder={t('register.password_placeholder')}
                                     style={{ paddingRight: 48 }}
                                     value={form.password}
                                     onChange={e => setForm({ ...form, password: e.target.value })}
