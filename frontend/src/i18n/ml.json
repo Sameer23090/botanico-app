@@ -71,6 +71,12 @@
     "planting_date": "നട്ട തീയതി",
     "planting_season": "നടീൽ സീസൺ",
     "environment_condition": "പരിസ്ഥിതി അവസ്ഥ",
+    "habitat": "വാസസ്ഥലം",
+    "classification": "വർഗ്ഗീകരണം",
+    "location_manual": "സ്ഥലത്തിന്റെ വിവരങ്ങൾ",
+    "placeholder_location": "ഉദാ: വീടിന്റെ പുറകുവശം",
+    "select_habitat": "വാസസ്ഥലം തിരഞ്ഞെടുക്കുക",
+    "select_classification": "വർഗ്ഗീകരണം തിരഞ്ഞെടുക്കുക",
     "description": "വിവരണം",
     "submit": "സേവ് ചെയ്യുക",
     "cancel": "റദ്ദാക്കുക",
@@ -86,6 +92,25 @@
       "Winter": "ശീതകാലം",
       "Year-round": "വർഷം മുഴുവനും",
       "Unknown": "അറിയില്ല"
+    },
+    "habitats": {
+      "Terrestrial": "ഭൗമ സസ്യം",
+      "Aquatic": "ജല സസ്യം",
+      "Wetland": "ചതുപ്പ് നിലം",
+      "Desert/Arid": "മരുഭൂമി",
+      "Epiphytic": "എപ്പിഫൈറ്റിക്",
+      "Parasitic": "പരാന്നഭോജി",
+      "Mangrove": "കണ്ടൽക്കാട്",
+      "Alpine": "ആൽപൈൻ"
+    },
+    "classifications": {
+      "Bryophytes": "ബ്രയോഫൈറ്റുകൾ",
+      "Pteridophytes": "പ്റ്റെറിഡോഫൈറ്റുകൾ",
+      "Gymnosperms": "ജിംനോസ്പെർമുകൾ",
+      "Angiosperms - Monocots": "ഏകബീജപത്രികൾ",
+      "Angiosperms - Dicots": "ദ്വിബീജപത്രികൾ",
+      "Algae": "പായൽ/ആൽഗ",
+      "Fungi": "കുമിൾ/ഫംഗസ്"
     }
   },
   "env_conditions": {
@@ -99,6 +124,13 @@
     "humid": "ഈർപ്പമുള്ള പ്രദേശം",
     "arid": "വരണ്ട പ്രദേശം",
     "coastal": "തീരപ്രദേശം",
+    "tropical": "ഉഷ്ണമേഖലാ പ്രദേശം (Tropical)",
+    "subtropical": "ഉപ ഉഷ്ണമേഖലാ പ്രദേശം (Sub-tropical)",
+    "temperate": "മിതശീതോഷ്ണ പ്രദേശം (Temperate)",
+    "mediterranean": "മെഡിറ്ററേനിയൻ പ്രദേശം",
+    "highland": "മലമ്പ്രദേശം",
+    "rainforest": "മഴക്കാടുകൾ",
+    "desert": "മരുഭൂമി",
     "other": "മറ്റുള്ളവ"
   },
   "status": {
@@ -119,6 +151,11 @@
     "dosage": "അളവ്",
     "method": "പ്രയോഗിക്കുന്ന രീതി",
     "fert_notes": "വളത്തെക്കുറിച്ചുള്ള കുറിപ്പുകൾ",
+    "using_manure": "ജൈവവളം ഉപയോഗിക്കുന്നുണ്ടോ?",
+    "manure_type": "ജൈവവളത്തിന്റെ തരം",
+    "manure_dosage": "അളവ്",
+    "manure_method": "പ്രയോഗിക്കുന്ന രീതി",
+    "manure_notes": "ജൈവവളത്തെക്കുറിച്ചുള്ള കുറിപ്പുകൾ",
     "submit": "പരിചരണം രേഖപ്പെടുത്തുക",
     "placeholder_notes": "വിശദാംശങ്ങൾ ഇവിടെ നൽകുക...",
     "types": {
@@ -135,12 +172,39 @@
       "Foliar spray": "ഇലകളിൽ തളിക്കുന്ന രീതി",
       "Side dressing": "വശങ്ങളിലായി നൽകുന്ന രീതി",
       "Other": "മറ്റുള്ളവ"
+    },
+    "temp_label": "താപനില (°C)",
+    "moisture_label": "ഈർപ്പം",
+    "select_option": "— തിരഞ്ഞെടുക്കുക —",
+    "moisture_options": {
+      "dry": "ഉണങ്ങിയ",
+      "moist": "ഈർപ്പമുള്ള",
+      "wet": "നനഞ്ഞ",
+      "waterlogged": "വെള്ളം കെട്ടിക്കിടക്കുന്നത്"
+    },
+    "manure_types": {
+      "Cow dung": "ചാണകം",
+      "Poultry": "കോഴിവളം",
+      "Vermicompost": "വെർമി കമ്പോസ്റ്റ്",
+      "Goat/Sheep": "ആട്/ആട് കാഷ്ഠം",
+      "Horse": "കുതിര വളം",
+      "Green manure": "പച്ചിലവളം",
+      "Bone meal": "എല്ലുപൊടി",
+      "Fish meal": "മീൻ വളം",
+      "Other": "മറ്റുള്ളവ"
+    },
+    "manure_methods": {
+      "Soil incorporation": "മണ്ണിൽ ചേർക്കുന്നത്",
+      "Top dressing": "ഉപരിതല വളപ്രയോഗം",
+      "Mulching": "പുതയിടൽ",
+      "Composting": "കമ്പോസ്റ്റിംഗ്",
+      "Other": "മറ്റുള്ളവ"
     }
   },
   "plants": {
     "Amla": "നെല്ലിക്ക",
-    "Ashoka": "അശോകം",
-    "Banyan": "പേരാൽ",
+    "Ashoka Tree": "അശോകം",
+    "Banyan Tree": "പേരാൽ",
     "Curry Leaf": "കറിവേപ്പില",
     "Guava": "പേരയ്ക്ക",
     "Hibiscus": "ചെമ്പരത്തി",
@@ -153,7 +217,7 @@
     "Moringa": "മുരിങ്ങ",
     "Neem": "വേപ്പ്",
     "Pappaya": "പപ്പായ",
-    "Peepal": "അരയാൽ",
+    "Peepal Tree": "അരയാൽ",
     "Pine apple": "കൈതച്ചക്ക",
     "Pomegranate": "മാതളനാരകം",
     "Tulsi": "തുളസി"

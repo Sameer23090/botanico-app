@@ -70,6 +70,12 @@
     "planting_date": "నాటిన తేదీ",
     "planting_season": "నాటే కాలం",
     "environment_condition": "పర్యావరణ పరిస్థితి",
+    "habitat": "నివాసం",
+    "classification": "వర్గీకరణ",
+    "location_manual": "స్థలం వివరాలు",
+    "placeholder_location": "ఉదా: ఇంటి పెరడులో",
+    "select_habitat": "నివాసాన్ని ఎంచుకోండి",
+    "select_classification": "వర్గాన్ని ఎంచుకోండి",
     "description": "వివరణ",
     "submit": "మొక్కను సేవ్ చేయి",
     "cancel": "రద్దు చేయి",
@@ -85,6 +91,25 @@
       "Winter": "శీతాకాలం",
       "Year-round": "సంవత్సరం అంతా",
       "Unknown": "తెలియదు"
+    },
+    "habitats": {
+      "Terrestrial": "భూసంబంధమైన",
+      "Aquatic": "జలచర",
+      "Wetland": "చిత్తడి నేల",
+      "Desert/Arid": "ఎడారి ప్రాంతం",
+      "Epiphytic": "వృక్షోపజీవి",
+      "Parasitic": "పరాన్నజీవి",
+      "Mangrove": "మడ అడవులు",
+      "Alpine": "ఆల్పైన్"
+    },
+    "classifications": {
+      "Bryophytes": "బ్రయోఫైట్స్",
+      "Pteridophytes": "టెరిడోఫైట్స్",
+      "Gymnosperms": "జిమ్నోస్పెర్మ్స్",
+      "Angiosperms - Monocots": "ఏక దళ బీజాలు",
+      "Angiosperms - Dicots": "ద్వి దళ బీజాలు",
+      "Algae": "శైవలాలు",
+      "Fungi": "శిలీంధ్రాలు"
     }
   },
   "care_log": {
@@ -99,6 +124,11 @@
     "dosage": "మోతాదు",
     "method": "ప్రయోగించే పద్ధతి",
     "fert_notes": "ఎరువు గురించి గమనికలు",
+    "using_manure": "సేంద్రియ ఎరువు వాడుతున్నారా?",
+    "manure_type": "ఎరువు రకం",
+    "manure_dosage": "మోతాదు",
+    "manure_method": "విధానం",
+    "manure_notes": "గమనికలు",
     "submit": "సంరక్షణను నమోదు చేయి",
     "placeholder_notes": "వివరాలను ఇక్కడ నమోదు చేయండి...",
     "types": {
@@ -115,6 +145,33 @@
       "Foliar spray": "ఆకులపై చల్లే పద్ధతి",
       "Side dressing": "మొక్క పక్కన వేసే పద్ధతి",
       "Other": "ఇతరాలు"
+    },
+    "temp_label": "ఉష్ణోగ్రత (°C)",
+    "moisture_label": "తేమ",
+    "select_option": "— ఎంచుకోండి —",
+    "moisture_options": {
+      "dry": "పొడి",
+      "moist": "తేమగా",
+      "wet": "తడిగా",
+      "waterlogged": "నీరు నిలిచిన"
+    },
+    "manure_types": {
+      "Cow dung": "ఆవు పేడ",
+      "Poultry": "కోళ్ల ఎరువు",
+      "Vermicompost": "వర్మీకంపోస్ట్",
+      "Goat/Sheep": "మేక/గొర్రె ఎరువు",
+      "Horse": "గుర్రపు ఎరువు",
+      "Green manure": "పచ్చి రొట్ట ఎరువు",
+      "Bone meal": "ఎముకల పొడి",
+      "Fish meal": "చేపల ఎరువు",
+      "Other": "ఇతరాలు"
+    },
+    "manure_methods": {
+      "Soil incorporation": "మట్టిలో కలపడం",
+      "Top dressing": "పై పూత",
+      "Mulching": "మల్చింగ్",
+      "Composting": "కంపోస్టింగ్",
+      "Other": "ఇతరాలు"
     }
   },
   "env_conditions": {
@@ -128,6 +185,13 @@
     "humid": "తేమ / ఉష్ణమண்டల",
     "arid": "ఎడారి / పొడి ప్రాంతం",
     "coastal": "తీర ప్రాంతం",
+    "tropical": "ఉష్ణమండల (Tropical)",
+    "subtropical": "ఉప ఉష్ణమండల (Sub-tropical)",
+    "temperate": "మితశీతోష్ణ (Temperate)",
+    "mediterranean": "మెడిటరేనియన్ ప్రాంతం",
+    "highland": "ఎత్తైన ప్రాంతం",
+    "rainforest": "వర్షాధార అడవులు",
+    "desert": "ఎడారి",
     "other": "ఇతరాలు"
   },
   "status": {
@@ -138,8 +202,8 @@
   },
   "plants": {
     "Amla": "ఉసిరి",
-    "Ashoka": "అశోక చెట్టు",
-    "Banyan": "మర్రి చెట్టు",
+    "Ashoka Tree": "అశోక చెట్టు",
+    "Banyan Tree": "మర్రి చెట్టు",
     "Curry Leaf": "కరివేపాకు",
     "Guava": "జామ",
     "Hibiscus": "మందార",
@@ -152,7 +216,7 @@
     "Moringa": "మునగ",
     "Neem": "వేప",
     "Pappaya": "బొప్పాయి",
-    "Peepal": "రావి చెట్టు",
+    "Peepal Tree": "రావి చెట్టు",
     "Pine apple": "అనాస",
     "Pomegranate": "దానిమ్మ",
     "Tulsi": "తులసి"

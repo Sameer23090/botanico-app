@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud } from 'lucide-react';
@@ -9,6 +9,10 @@ export default function AddUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     const [form, setForm] = useState({
         entryDate: new Date().toISOString().split('T')[0],
         title: '',
@@ -152,126 +156,125 @@ export default function AddUpdate() {
                                 <div className="md:col-span-2">
                                     <label className="label-text">{t('add_plant.environment_condition')}</label>
                                     <select className="select-field" {...f('environmentCondition')}>
-                                        {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
+                                        {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'tropical', 'subtropical', 'temperate', 'mediterranean', 'highland', 'rainforest', 'desert', 'other'].map(c => (
                                             <option key={c} value={c}>{t(`env_conditions.${c}`)}</option>
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="label-text">Temp (°C)</label>
-                                    <input type="number" step="0.1" className="input-field" {...f('temperatureCelsius')} />
-                                </div>
-                                <div>
-                                    <label className="label-text">Moisture</label>
-                                    <select className="select-field" {...f('soilMoisture')}>
-                                        <option value="">— Select —</option>
-                                        <option value="dry">Dry</option>
-                                        <option value="moist">Moist</option>
-                                        <option value="wet">Wet</option>
-                                        <option value="waterlogged">Waterlogged</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                                 <div>
+                                     <label className="label-text">{t('care_log.temp_label')}</label>
+                                     <input type="number" step="0.1" className="input-field" {...f('temperatureCelsius')} />
+                                 </div>
+                                 <div>
+                                     <label className="label-text">{t('care_log.moisture_label')}</label>
+                                     <select className="select-field" {...f('soilMoisture')}>
+                                         <option value="">{t('care_log.select_option')}</option>
+                                         {['dry', 'moist', 'wet', 'waterlogged'].map(v => (
+                                             <option key={v} value={v}>{t(`care_log.moisture_options.${v}`)}</option>
+                                         ))}
+                                     </select>
+                                 </div>
+                             </div>
+                         </div>
 
-                        {/* Fertilizer Section */}
-                        <div style={{ padding: '20px', background: 'rgba(16,185,129,0.05)', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.1)' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.fertilizerUsed ? 20 : 0 }}>
-                                <input type="checkbox" checked={form.fertilizerUsed} onChange={e => setForm({ ...form, fertilizerUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
-                                <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_fertilizer')}</span>
-                                <FlaskConical size={18} className="text-jade" style={{ marginLeft: 'auto' }} />
-                            </label>
+                         {/* Fertilizer Section */}
+                         <div style={{ padding: '20px', background: 'rgba(16,185,129,0.05)', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.1)' }}>
+                             <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.fertilizerUsed ? 20 : 0 }}>
+                                 <input type="checkbox" checked={form.fertilizerUsed} onChange={e => setForm({ ...form, fertilizerUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
+                                 <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_fertilizer')}</span>
+                                 <FlaskConical size={18} className="text-jade" style={{ marginLeft: 'auto' }} />
+                             </label>
 
-                            {form.fertilizerUsed && (
-                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                                        <div>
-                                            <label className="label-text">{t('care_log.fert_name')}</label>
-                                            <input className="input-field" {...f('fertilizerName')} />
-                                        </div>
-                                        <div>
-                                            <label className="label-text">{t('care_log.fert_type')}</label>
-                                            <select className="select-field" {...f('fertilizerType')}>
-                                                {['Organic', 'Chemical', 'Bio-fertilizer', 'NPK', 'Compost', 'Liquid', 'Other'].map(v => (
-                                                    <option key={v} value={v}>{t(`care_log.types.${v}`)}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="label-text">{t('care_log.dosage')}</label>
-                                            <input className="input-field" placeholder="e.g. 5ml" {...f('dosage')} />
-                                        </div>
-                                        <div>
-                                            <label className="label-text">{t('care_log.method')}</label>
-                                            <select className="select-field" {...f('applicationMethod')}>
-                                                {['Soil drench', 'Foliar spray', 'Side dressing', 'Other'].map(v => (
-                                                    <option key={v} value={v}>{t(`care_log.methods.${v}`)}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="label-text">{t('care_log.fert_notes')}</label>
-                                        <textarea className="textarea-field" rows={2} {...f('fertilizerNotes')} />
-                                    </div>
-                                </motion.div>
-                            )}
-                        </div>
+                             {form.fertilizerUsed && (
+                                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                                         <div>
+                                             <label className="label-text">{t('care_log.fert_name')}</label>
+                                             <input className="input-field" {...f('fertilizerName')} />
+                                         </div>
+                                         <div>
+                                             <label className="label-text">{t('care_log.fert_type')}</label>
+                                             <select className="select-field" {...f('fertilizerType')}>
+                                                 {['Organic', 'Chemical', 'Bio-fertilizer', 'NPK', 'Compost', 'Liquid', 'Other'].map(v => (
+                                                     <option key={v} value={v}>{t(`care_log.types.${v}`)}</option>
+                                                 ))}
+                                             </select>
+                                         </div>
+                                         <div>
+                                             <label className="label-text">{t('care_log.dosage')}</label>
+                                             <input className="input-field" placeholder="e.g. 5ml" {...f('dosage')} />
+                                         </div>
+                                         <div>
+                                             <label className="label-text">{t('care_log.method')}</label>
+                                             <select className="select-field" {...f('applicationMethod')}>
+                                                 {['Soil drench', 'Foliar spray', 'Side dressing', 'Other'].map(v => (
+                                                     <option key={v} value={v}>{t(`care_log.methods.${v}`)}</option>
+                                                 ))}
+                                             </select>
+                                         </div>
+                                     </div>
+                                     <div>
+                                         <label className="label-text">{t('care_log.fert_notes')}</label>
+                                         <textarea className="textarea-field" rows={2} {...f('fertilizerNotes')} />
+                                     </div>
+                                 </motion.div>
+                             )}
+                         </div>
 
-                        {/* Manure Section */}
-                        <div style={{ padding: '20px', background: 'rgba(245,158,11,0.05)', borderRadius: '16px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.manureUsed ? 20 : 0 }}>
-                                <input type="checkbox" checked={form.manureUsed} onChange={e => setForm({ ...form, manureUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
-                                <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_manure') || 'Using Manure?'}</span>
-                                <FlaskConical size={18} className="text-gold" style={{ marginLeft: 'auto' }} />
-                            </label>
+                          {/* Manure Section */}
+                         <div style={{ padding: '20px', background: 'rgba(245,158,11,0.05)', borderRadius: '16px', border: '1px solid rgba(245,158,11,0.1)' }}>
+                             <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.manureUsed ? 20 : 0 }}>
+                                 <input type="checkbox" checked={form.manureUsed} onChange={e => setForm({ ...form, manureUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
+                                 <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_manure')}</span>
+                                 <FlaskConical size={18} className="text-gold" style={{ marginLeft: 'auto' }} />
+                             </label>
 
-                            {form.manureUsed && (
-                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                                        <div>
-                                            <label className="label-text">{t('care_log.manure_type') || 'Manure Type'}</label>
-                                            <select className="select-field" {...f('manureType')}>
-                                                {['Cow dung', 'Poultry', 'Vermicompost', 'Goat/Sheep', 'Horse', 'Green manure', 'Bone meal', 'Fish meal', 'Other'].map(v => (
-                                                    <option key={v} value={v}>{v}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="label-text">{t('care_log.manure_dosage') || 'Dosage'}</label>
-                                            <input className="input-field" placeholder="e.g. 2kg" {...f('manureDosage')} />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label className="label-text">{t('care_log.manure_method') || 'Method'}</label>
-                                            <select className="select-field" {...f('manureMethod')}>
-                                                {['Soil incorporation', 'Top dressing', 'Mulching', 'Composting', 'Other'].map(v => (
-                                                    <option key={v} value={v}>{v}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="label-text">{t('care_log.manure_notes') || 'Manure Notes'}</label>
-                                        <textarea className="textarea-field" rows={2} {...f('manureNotes')} />
-                                    </div>
-                                </motion.div>
-                            )}
-                        </div>
+                             {form.manureUsed && (
+                                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                                         <div>
+                                             <label className="label-text">{t('care_log.manure_type')}</label>
+                                             <select className="select-field" {...f('manureType')}>
+                                                 {['Cow dung', 'Poultry', 'Vermicompost', 'Goat/Sheep', 'Horse', 'Green manure', 'Bone meal', 'Fish meal', 'Other'].map(v => (
+                                                     <option key={v} value={v}>{t(`care_log.manure_types.${v}`)}</option>
+                                                 ))}
+                                             </select>
+                                         </div>
+                                         <div>
+                                             <label className="label-text">{t('care_log.manure_dosage')}</label>
+                                             <input className="input-field" placeholder="e.g. 2kg" {...f('manureDosage')} />
+                                         </div>
+                                         <div className="md:col-span-2">
+                                             <label className="label-text">{t('care_log.manure_method')}</label>
+                                             <select className="select-field" {...f('manureMethod')}>
+                                                 {['Soil incorporation', 'Top dressing', 'Mulching', 'Composting', 'Other'].map(v => (
+                                                     <option key={v} value={v}>{t(`care_log.manure_methods.${v}`)}</option>
+                                                 ))}
+                                             </select>
+                                         </div>
+                                     </div>
+                                     <div>
+                                         <label className="label-text">{t('care_log.manure_notes')}</label>
+                                         <textarea className="textarea-field" rows={2} {...f('manureNotes')} />
+                                     </div>
+                                 </motion.div>
+                             )}
+                         </div>
 
-                        <div onClick={captureGPS} style={{
-                            display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px',
-                            background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
-                            border: capturedCoords ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.15)',
-                            borderRadius: 12, cursor: 'pointer',
-                        }}>
-                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444' }} />
-                                <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP FOR AUTOMATIC GPS'}</span>
-                                <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
-                            </div>
+                         <div onClick={captureGPS} style={{
+                             display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px',
+                             background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
+                             border: capturedCoords ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.15)',
+                             borderRadius: 12, cursor: 'pointer',
+                         }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444' }} />
+                                 <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? `✓ ${t('register.gps_captured')}` : `📍 ${t('register.gps_detect')}`}</span>
+                                 <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
+                             </div>
                             <div style={{ marginTop: 10 }}>
-                                <label className="label-text" style={{ fontSize: 9 }}>{t('add_plant.location_manual') || 'Manual Location Details'}</label>
-                                <input className="input-field" style={{ background: 'rgba(0,0,0,0.1)', fontSize: 12 }} placeholder="e.g. Backyard / Second row" {...f('locationText')} onClick={e => e.stopPropagation()} />
+                                <label className="label-text" style={{ fontSize: 9 }}>{t('add_plant.location_manual')}</label>
+                                <input className="input-field" style={{ background: 'rgba(0,0,0,0.1)', fontSize: 12 }} placeholder={t('add_plant.placeholder_location')} {...f('locationText')} onClick={e => e.stopPropagation()} />
                             </div>
                         </div>
 

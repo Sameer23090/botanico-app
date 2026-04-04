@@ -70,6 +70,12 @@
     "planting_date": "நட்ட தேதி",
     "planting_season": "நடவு பருவம்",
     "environment_condition": "சுற்றுச்சூழல் நிலை",
+    "habitat": "வசிப்பிடம்",
+    "classification": "வகைப்பாடு",
+    "location_manual": "இடத்தின் விவரங்கள்",
+    "placeholder_location": "எ.கா. வீட்டின் பின்புறம்",
+    "select_habitat": "வசிப்பிடத்தைத் தேர்ந்தெடுக்கவும்",
+    "select_classification": "வகைப்பாட்டைத் தேர்ந்தெடுக்கவும்",
     "description": "விளக்கம்",
     "submit": "செடியைச் சேமிக்கவும்",
     "cancel": "ரத்துசெய்",
@@ -85,6 +91,25 @@
       "Winter": "குளிர்காலம்",
       "Year-round": "வருடம் முழுவதும்",
       "Unknown": "தெரியாது"
+    },
+    "habitats": {
+      "Terrestrial": "நிலவாழ் தாவரம்",
+      "Aquatic": "நீர்வாழ் தாவரம்",
+      "Wetland": "சதுப்பு நிலம்",
+      "Desert/Arid": "பாலைவனம்",
+      "Epiphytic": "மேலொட்டித் தாவரம்",
+      "Parasitic": "ஒட்டுண்ணி",
+      "Mangrove": "அலையாத்தி காடு",
+      "Alpine": "மலைப்பகுதி"
+    },
+    "classifications": {
+      "Bryophytes": "பிரையோபைட்டுகள்",
+      "Pteridophytes": "டெரிடோபைட்டுகள்",
+      "Gymnosperms": "ஜிம்னோஸ்பெர்ம்கள்",
+      "Angiosperms - Monocots": "ஒரு வித்திலைத் தாவரம்",
+      "Angiosperms - Dicots": "இரு வித்திலைத் தாவரம்",
+      "Algae": "பாசி",
+      "Fungi": "காளான்"
     }
   },
   "care_log": {
@@ -99,6 +124,11 @@
     "dosage": "அளவு / டோஸ்",
     "method": "பயன்படுத்தும் முறை",
     "fert_notes": "உரம் பற்றிய குறிப்புகள்",
+    "using_manure": "இயற்கை உரம் பயன்படுத்துகிறீர்களா?",
+    "manure_type": "இயற்கை உரத்தின் வகை",
+    "manure_dosage": "அளவு",
+    "manure_method": "முறை",
+    "manure_notes": "இயற்கை உரம் பற்றிய குறிப்புகள்",
     "submit": "பராமரிப்பை பதிவு செய்",
     "placeholder_notes": "இங்கே விவரங்களை உள்ளிடவும்...",
     "types": {
@@ -115,6 +145,33 @@
       "Foliar spray": "இலைத் தெளிப்பு",
       "Side dressing": "பக்கவாட்டு உரமிடுதல்",
       "Other": "மற்றவை"
+    },
+    "temp_label": "வெப்ப நிலை (°C)",
+    "moisture_label": "ஈரப்பதம்",
+    "select_option": "— தேர்ந்தெடுக்கவும் —",
+    "moisture_options": {
+      "dry": "காய்ந்த",
+      "moist": "ஈரமான",
+      "wet": "நனைந்த",
+      "waterlogged": "தண்ணீர் தேங்கிய"
+    },
+    "manure_types": {
+      "Cow dung": "மாட்டுச் சாణం",
+      "Poultry": "கோழி உரம்",
+      "Vermicompost": "மண்புழு உரம்",
+      "Goat/Sheep": "ஆடு/செம்மறி ஆடு உரம்",
+      "Horse": "குதிரை உரம்",
+      "Green manure": "பசுந்தாள் உரம்",
+      "Bone meal": "எலும்புத் தூள்",
+      "Fish meal": "மீன் உரம்",
+      "Other": "மற்றவை"
+    },
+    "manure_methods": {
+      "Soil incorporation": "மண்ணுடன் கலத்தல்",
+      "Top dressing": "மேல் உரமிடுதல்",
+      "Mulching": "பல்நோக்கு போர்வை (மண் போர்வை)",
+      "Composting": "மட்கச் செய்தல்",
+      "Other": "மற்றவை"
     }
   },
   "env_conditions": {
@@ -128,6 +185,13 @@
     "humid": "ஈரப்பதம் / வெப்பமண்டல",
     "arid": "வறண்ட / காய்ந்த",
     "coastal": "கடலோர / காற்று",
+    "tropical": "வெப்பமண்டல (Tropical)",
+    "subtropical": "மிதவெப்ப மண்டல (Sub-tropical)",
+    "temperate": "மிதமான வெப்பப்பகுதி (Temperate)",
+    "mediterranean": "மத்தியதரைக்கடல்",
+    "highland": "மலைப்பகுதி",
+    "rainforest": "மழைக்காடுகள்",
+    "desert": "பாலைவனம்",
     "other": "மற்றவை"
   },
   "status": {
@@ -138,8 +202,8 @@
   },
   "plants": {
     "Amla": "நெல்லி",
-    "Ashoka": "அசோக மரம்",
-    "Banyan": "ஆலமரம்",
+    "Ashoka Tree": "அசோக மரம்",
+    "Banyan Tree": "ஆலமரம்",
     "Curry Leaf": "கறிவேப்பிலை",
     "Guava": "கொய்யா",
     "Hibiscus": "செம்பருத்தி",
@@ -152,7 +216,7 @@
     "Moringa": "முருங்கை",
     "Neem": "வேப்பமரம்",
     "Pappaya": "பப்பாளி",
-    "Peepal": "அரச மரம்",
+    "Peepal Tree": "அரச மரம்",
     "Pine apple": "அன்னாசி",
     "Pomegranate": "மாதுளை",
     "Tulsi": "துளசி"

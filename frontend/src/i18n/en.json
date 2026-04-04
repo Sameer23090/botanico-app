@@ -71,6 +71,12 @@
     "planting_date": "Planting Date",
     "planting_season": "Planting Season",
     "environment_condition": "Environment Condition",
+    "habitat": "Habitat",
+    "classification": "Classification Group",
+    "location_manual": "Manual Location Details",
+    "placeholder_location": "e.g. Backyard of the house",
+    "select_habitat": "Select Habitat",
+    "select_classification": "Select Group",
     "description": "Description",
     "submit": "Save Plant",
     "cancel": "Cancel",
@@ -86,6 +92,25 @@
       "Winter": "Winter",
       "Year-round": "Year-round",
       "Unknown": "Unknown"
+    },
+    "habitats": {
+      "Terrestrial": "Terrestrial",
+      "Aquatic": "Aquatic",
+      "Wetland": "Wetland",
+      "Desert/Arid": "Desert/Arid",
+      "Epiphytic": "Epiphytic",
+      "Parasitic": "Parasitic",
+      "Mangrove": "Mangrove",
+      "Alpine": "Alpine"
+    },
+    "classifications": {
+      "Bryophytes": "Bryophytes",
+      "Pteridophytes": "Pteridophytes",
+      "Gymnosperms": "Gymnosperms",
+      "Angiosperms - Monocots": "Angiosperms - Monocots",
+      "Angiosperms - Dicots": "Angiosperms - Dicots",
+      "Algae": "Algae",
+      "Fungi": "Fungi"
     }
   },
   "env_conditions": {
@@ -99,6 +124,13 @@
     "humid": "Humid",
     "arid": "Arid",
     "coastal": "Coastal",
+    "tropical": "Tropical",
+    "subtropical": "Subtropical",
+    "temperate": "Temperate",
+    "mediterranean": "Mediterranean",
+    "highland": "Highland",
+    "rainforest": "Rainforest",
+    "desert": "Desert",
     "other": "Other"
   },
   "status": {
@@ -119,6 +151,11 @@
     "dosage": "Quantity / Dosage",
     "method": "Application Method",
     "fert_notes": "Notes about fertilizer",
+    "using_manure": "Using Manure?",
+    "manure_type": "Manure Type",
+    "manure_dosage": "Dosage",
+    "manure_method": "Method",
+    "manure_notes": "Notes about manure",
     "submit": "Log Care",
     "placeholder_notes": "Enter details here...",
     "types": {
@@ -135,12 +172,39 @@
       "Foliar spray": "Foliar spray",
       "Side dressing": "Side dressing",
       "Other": "Other"
+    },
+    "temp_label": "Temp (°C)",
+    "moisture_label": "Moisture",
+    "select_option": "— Select —",
+    "moisture_options": {
+      "dry": "Dry",
+      "moist": "Moist",
+      "wet": "Wet",
+      "waterlogged": "Waterlogged"
+    },
+    "manure_types": {
+      "Cow dung": "Cow dung",
+      "Poultry": "Poultry",
+      "Vermicompost": "Vermicompost",
+      "Goat/Sheep": "Goat/Sheep",
+      "Horse": "Horse",
+      "Green manure": "Green manure",
+      "Bone meal": "Bone meal",
+      "Fish meal": "Fish meal",
+      "Other": "Other"
+    },
+    "manure_methods": {
+      "Soil incorporation": "Soil incorporation",
+      "Top dressing": "Top dressing",
+      "Mulching": "Mulching",
+      "Composting": "Composting",
+      "Other": "Other"
     }
   },
   "plants": {
     "Amla": "Amla (Indian Gooseberry)",
-    "Ashoka": "Ashoka Tree",
-    "Banyan": "Banyan Tree (Vat)",
+    "Ashoka Tree": "Ashoka Tree",
+    "Banyan Tree": "Banyan Tree (Vat)",
     "Curry Leaf": "Curry Leaf",
     "Guava": "Guava",
     "Hibiscus": "Hibiscus (Gudhal)",
@@ -153,7 +217,7 @@
     "Moringa": "Moringa (Drumstick)",
     "Neem": "Neem",
     "Pappaya": "Pappaya",
-    "Peepal": "Peepal Tree",
+    "Peepal Tree": "Peepal Tree",
     "Pine apple": "Pine apple",
     "Pomegranate": "Pomegranate",
     "Tulsi": "Tulsi (Holy Basil)"

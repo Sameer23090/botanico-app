@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -8,6 +8,10 @@ import { useTranslation } from 'react-i18next';
 export default function AddPlant() {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     const [form, setForm] = useState({
         commonName: '', scientificName: '', family: '', genus: '', species: '',
         variety: '', plantType: '', growthHabit: '', nativeRegion: '',
@@ -156,32 +160,32 @@ export default function AddPlant() {
                                  <div>
                                     <label className="label-text">{t('add_plant.environment_condition')}</label>
                                     <select className="select-field" {...f('environmentCondition')}>
-                                        {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
+                                        {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'tropical', 'subtropical', 'temperate', 'mediterranean', 'highland', 'rainforest', 'desert', 'other'].map(c => (
                                             <option key={c} value={c}>{t(`env_conditions.${c}`)}</option>
                                         ))}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="label-text">{t('add_plant.habitat') || 'Habitat'}</label>
+                                 <div>
+                                    <label className="label-text">{t('add_plant.habitat')}</label>
                                     <select className="select-field" {...f('habitat')}>
-                                        <option value="">{t('add_plant.select_habitat') || 'Select habitat'}</option>
-                                        {['Terrestrial', 'Aquatic', 'Wetland', 'Desert/Arid', 'Epiphytic', 'Parasitic', 'Mangrove', 'Alpine', 'Other'].map(h => (
-                                            <option key={h} value={h}>{h}</option>
+                                        <option value="">{t('add_plant.select_habitat')}</option>
+                                        {['Terrestrial', 'Aquatic', 'Wetland', 'Desert/Arid', 'Epiphytic', 'Parasitic', 'Mangrove', 'Alpine'].map(h => (
+                                            <option key={h} value={h}>{t(`add_plant.habitats.${h}`)}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="label-text">{t('add_plant.classification') || 'Classification Group'}</label>
+                                    <label className="label-text">{t('add_plant.classification')}</label>
                                     <select className="select-field" {...f('classificationGroup')}>
-                                        <option value="">{t('add_plant.select_classification') || 'Select group'}</option>
-                                        {['Bryophytes', 'Pteridophytes', 'Gymnosperms', 'Angiosperms - Monocots', 'Angiosperms - Dicots', 'Algae', 'Fungi', 'Other'].map(g => (
-                                            <option key={g} value={g}>{g}</option>
+                                        <option value="">{t('add_plant.select_classification')}</option>
+                                        {['Bryophytes', 'Pteridophytes', 'Gymnosperms', 'Angiosperms - Monocots', 'Angiosperms - Dicots', 'Algae', 'Fungi'].map(g => (
+                                            <option key={g} value={g}>{t(`add_plant.classifications.${g}`)}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="label-text">{t('add_plant.location_manual') || 'Manual Location Details (e.g. Backyard)'}</label>
-                                    <input className="input-field" placeholder={t('add_plant.placeholder_location') || 'e.g. Backyard of the house'} {...f('locationText')} />
+                                    <label className="label-text">{t('add_plant.location_manual')}</label>
+                                    <input className="input-field" placeholder={t('add_plant.placeholder_location')} {...f('locationText')} />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="label-text">{t('add_plant.description')}</label>
