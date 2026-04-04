@@ -28,6 +28,17 @@ const plantSchema = new mongoose.Schema(
         growthHabit: { type: String, trim: true, default: null },
         nativeRegion: { type: String, trim: true, default: null },
         description: { type: String, default: null },
+        habitat: {
+            type: String,
+            enum: ['Terrestrial', 'Aquatic', 'Wetland', 'Desert/Arid', 'Epiphytic', 'Parasitic', 'Mangrove', 'Alpine', 'Other', null],
+            default: null
+        },
+        classificationGroup: {
+            type: String,
+            enum: ['Bryophytes', 'Pteridophytes', 'Gymnosperms', 'Angiosperms - Monocots', 'Angiosperms - Dicots', 'Algae', 'Fungi', 'Other', null],
+            default: null
+        },
+        locationText: { type: String, trim: true, default: null },
         plantingDate: {
             type: Date,
             required: [true, 'Planting date is required'],

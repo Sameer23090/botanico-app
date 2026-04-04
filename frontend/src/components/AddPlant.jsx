@@ -15,6 +15,7 @@ export default function AddPlant() {
         plantingSeason: 'Unknown',
         environmentCondition: 'Other',
         location: '', soilType: '', sunlightExposure: '', plantingMethod: '',
+        habitat: '', classificationGroup: '', locationText: '',
         status: 'active'
     });
     const [loading, setLoading] = useState(false);
@@ -39,26 +40,26 @@ export default function AddPlant() {
     };
 
     const plantPresets = {
-        '': { scientific: '', family: '', type: '', habit: '', season: 'Unknown', environment: 'other' },
-        'Amla (Indian Gooseberry)': { scientific: 'Phyllanthus emblica', family: 'Phyllanthaceae', type: 'Fruit', habit: 'Tree', season: 'Winter', environment: 'full_sun' },
-        'Ashoka Tree': { scientific: 'Saraca asoca', family: 'Fabaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'partial_sun' },
-        'Banyan Tree (Vat)': { scientific: 'Ficus benghalensis', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
-        'Curry Leaf': { scientific: 'Murraya koenigii', family: 'Rutaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'full_sun' },
-        'Guava': { scientific: 'Psidium guajava', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Autumn', environment: 'full_sun' },
-        'Hibiscus (Gudhal)': { scientific: 'Hibiscus rosa-sinensis', family: 'Malvaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'full_sun' },
-        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
-        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Monsoon', environment: 'full_sun' },
-        'Jasmine (Mogra)': { scientific: 'Jasminum sambac', family: 'Oleaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'partial_sun' },
-        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
-        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
-        'Marigold (Genda)': { scientific: 'Tagetes erecta', family: 'Asteraceae', type: 'Flower', habit: 'Annual', season: 'Winter', environment: 'full_sun' },
-        'Moringa (Drumstick)': { scientific: 'Moringa oleifera', family: 'Moringaceae', type: 'Vegetable', habit: 'Tree', season: 'Summer', environment: 'full_sun' },
-        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
-        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
-        'Peepal Tree': { scientific: 'Ficus religiosa', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun' },
-        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial', season: 'Year-round', environment: 'humid' },
-        'Pomegranate': { scientific: 'Punica granatum', family: 'Lythraceae', type: 'Fruit', habit: 'Shrub', season: 'Winter', environment: 'full_sun' },
-        'Tulsi (Holy Basil)': { scientific: 'Ocimum tenuiflorum', family: 'Lamiaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'partial_sun' }
+        '': { scientific: '', family: '', type: '', habit: '', season: 'Unknown', environment: 'other', hab: '', group: '' },
+        'Amla (Indian Gooseberry)': { scientific: 'Phyllanthus emblica', family: 'Phyllanthaceae', type: 'Fruit', habit: 'Tree', season: 'Winter', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Ashoka Tree': { scientific: 'Saraca asoca', family: 'Fabaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'partial_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Banyan Tree (Vat)': { scientific: 'Ficus benghalensis', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Curry Leaf': { scientific: 'Murraya koenigii', family: 'Rutaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Guava': { scientific: 'Psidium guajava', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Autumn', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Hibiscus (Gudhal)': { scientific: 'Hibiscus rosa-sinensis', family: 'Malvaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Jack fruit': { scientific: 'Artocarpus heterophyllus', family: 'Moraceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Jamun': { scientific: 'Syzygium cumini', family: 'Myrtaceae', type: 'Fruit', habit: 'Tree', season: 'Monsoon', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Jasmine (Mogra)': { scientific: 'Jasminum sambac', family: 'Oleaceae', type: 'Flower', habit: 'Shrub', season: 'Summer', environment: 'partial_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Lemon': { scientific: 'Citrus limon', family: 'Rutaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Mango': { scientific: 'Mangifera indica', family: 'Anacardiaceae', type: 'Fruit', habit: 'Tree', season: 'Summer', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Marigold (Genda)': { scientific: 'Tagetes erecta', family: 'Asteraceae', type: 'Flower', habit: 'Annual', season: 'Winter', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Moringa (Drumstick)': { scientific: 'Moringa oleifera', family: 'Moringaceae', type: 'Vegetable', habit: 'Tree', season: 'Summer', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Neem': { scientific: 'Azadirachta indica', family: 'Meliaceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Pappaya': { scientific: 'Carica papaya', family: 'Caricaceae', type: 'Fruit', habit: 'Tree', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Peepal Tree': { scientific: 'Ficus religiosa', family: 'Moraceae', type: 'Tree', habit: 'Tree', season: 'Year-round', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Pine apple': { scientific: 'Ananas comosus', family: 'Bromeliaceae', type: 'Fruit', habit: 'Perennial', season: 'Year-round', environment: 'humid', hab: 'Terrestrial', group: 'Angiosperms - Monocots' },
+        'Pomegranate': { scientific: 'Punica granatum', family: 'Lythraceae', type: 'Fruit', habit: 'Shrub', season: 'Winter', environment: 'full_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' },
+        'Tulsi (Holy Basil)': { scientific: 'Ocimum tenuiflorum', family: 'Lamiaceae', type: 'Herb', habit: 'Shrub', season: 'Year-round', environment: 'partial_sun', hab: 'Terrestrial', group: 'Angiosperms - Dicots' }
     };
 
     const handlePresetChange = (e) => {
@@ -72,7 +73,9 @@ export default function AddPlant() {
             plantType: preset?.type || '',
             growthHabit: preset?.habit || '',
             plantingSeason: preset?.season || 'Unknown',
-            environmentCondition: preset?.environment || 'Other'
+            environmentCondition: preset?.environment || 'Other',
+            habitat: preset?.hab || '',
+            classificationGroup: preset?.group || ''
         });
     };
 
@@ -159,6 +162,28 @@ export default function AddPlant() {
                                     </select>
                                 </div>
                                 <div>
+                                    <label className="label-text">{t('add_plant.habitat') || 'Habitat'}</label>
+                                    <select className="select-field" {...f('habitat')}>
+                                        <option value="">{t('add_plant.select_habitat') || 'Select habitat'}</option>
+                                        {['Terrestrial', 'Aquatic', 'Wetland', 'Desert/Arid', 'Epiphytic', 'Parasitic', 'Mangrove', 'Alpine', 'Other'].map(h => (
+                                            <option key={h} value={h}>{h}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="label-text">{t('add_plant.classification') || 'Classification Group'}</label>
+                                    <select className="select-field" {...f('classificationGroup')}>
+                                        <option value="">{t('add_plant.select_classification') || 'Select group'}</option>
+                                        {['Bryophytes', 'Pteridophytes', 'Gymnosperms', 'Angiosperms - Monocots', 'Angiosperms - Dicots', 'Algae', 'Fungi', 'Other'].map(g => (
+                                            <option key={g} value={g}>{g}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="label-text">{t('add_plant.location_manual') || 'Manual Location Details (e.g. Backyard)'}</label>
+                                    <input className="input-field" placeholder={t('add_plant.placeholder_location') || 'e.g. Backyard of the house'} {...f('locationText')} />
+                                </div>
+                                <div className="md:col-span-2">
                                     <label className="label-text">{t('add_plant.description')}</label>
                                     <textarea className="textarea-field" rows={2} {...f('description')} />
                                 </div>

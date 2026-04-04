@@ -65,6 +65,21 @@ const updateSchema = new mongoose.Schema(
         },
         fertilizerNotes: { type: String, default: null },
 
+        // Manure Tracking
+        manureUsed: { type: Boolean, default: false },
+        manureType: {
+            type: String,
+            enum: ['Cow dung', 'Poultry', 'Vermicompost', 'Goat/Sheep', 'Horse', 'Green manure', 'Bone meal', 'Fish meal', 'Other', null],
+            default: null
+        },
+        manureDosage: { type: String, default: null },
+        manureMethod: {
+            type: String,
+            enum: ['Soil incorporation', 'Top dressing', 'Mulching', 'Composting', 'Other', null],
+            default: null
+        },
+        manureNotes: { type: String, default: null },
+
         // Photos - Now storing Drive info
         drivePhotos: [{
             driveFileId: String,
@@ -108,6 +123,7 @@ const updateSchema = new mongoose.Schema(
             lat: { type: Number, default: null },
             lng: { type: Number, default: null }
         },
+        locationText: { type: String, trim: true, default: null },
     },
     {
         timestamps: true,

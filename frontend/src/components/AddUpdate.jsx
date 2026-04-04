@@ -26,7 +26,13 @@ export default function AddUpdate() {
         fertilizerType: 'Other',
         dosage: '',
         applicationMethod: 'Other',
-        fertilizerNotes: ''
+        fertilizerNotes: '',
+        manureUsed: false,
+        manureType: 'Other',
+        manureDosage: '',
+        manureMethod: 'Other',
+        manureNotes: '',
+        locationText: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -41,6 +47,16 @@ export default function AddUpdate() {
                     const lng = pos.coords.longitude.toFixed(6);
                     setGpsCoords(`${lat}, ${lng}`);
                     setCapturedCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                    
+                    // Autofill temperature
+                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.current_weather && data.current_weather.temperature) {
+                                setForm(prev => ({ ...prev, temperatureCelsius: data.current_weather.temperature }));
+                            }
+                        })
+                        .catch(err => console.error("Temp fetch error:", err));
                 },
                 () => setGpsCoords('ERR')
             );
@@ -202,15 +218,61 @@ export default function AddUpdate() {
                             )}
                         </div>
 
+                        {/* Manure Section */}
+                        <div style={{ padding: '20px', background: 'rgba(245,158,11,0.05)', borderRadius: '16px', border: '1px solid rgba(245,158,11,0.1)' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', marginBottom: form.manureUsed ? 20 : 0 }}>
+                                <input type="checkbox" checked={form.manureUsed} onChange={e => setForm({ ...form, manureUsed: e.target.checked })} style={{ width: 18, height: 18 }} />
+                                <span style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', fontWeight: 600 }}>{t('care_log.using_manure') || 'Using Manure?'}</span>
+                                <FlaskConical size={18} className="text-gold" style={{ marginLeft: 'auto' }} />
+                            </label>
+
+                            {form.manureUsed && (
+                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                                        <div>
+                                            <label className="label-text">{t('care_log.manure_type') || 'Manure Type'}</label>
+                                            <select className="select-field" {...f('manureType')}>
+                                                {['Cow dung', 'Poultry', 'Vermicompost', 'Goat/Sheep', 'Horse', 'Green manure', 'Bone meal', 'Fish meal', 'Other'].map(v => (
+                                                    <option key={v} value={v}>{v}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="label-text">{t('care_log.manure_dosage') || 'Dosage'}</label>
+                                            <input className="input-field" placeholder="e.g. 2kg" {...f('manureDosage')} />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="label-text">{t('care_log.manure_method') || 'Method'}</label>
+                                            <select className="select-field" {...f('manureMethod')}>
+                                                {['Soil incorporation', 'Top dressing', 'Mulching', 'Composting', 'Other'].map(v => (
+                                                    <option key={v} value={v}>{v}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="label-text">{t('care_log.manure_notes') || 'Manure Notes'}</label>
+                                        <textarea className="textarea-field" rows={2} {...f('manureNotes')} />
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+
                         <div onClick={captureGPS} style={{
-                            display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
+                            display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px',
                             background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
                             border: capturedCoords ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.15)',
                             borderRadius: 12, cursor: 'pointer',
                         }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444' }} />
-                            <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP FOR LOCATION'}</span>
-                            <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
+                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: capturedCoords ? 'var(--jade)' : '#ef4444' }} />
+                                <span style={{ fontSize: 13, color: capturedCoords ? 'var(--jade)' : '#fca5a5', fontWeight: 600 }}>{capturedCoords ? '✓ Location Captured' : '📍 TAP FOR AUTOMATIC GPS'}</span>
+                                <small style={{ marginLeft: 'auto', fontFamily: "var(--font-mono)", fontSize: 10, color: capturedCoords ? 'var(--jade)' : '#ef4444' }}>{gpsCoords}</small>
+                            </div>
+                            <div style={{ marginTop: 10 }}>
+                                <label className="label-text" style={{ fontSize: 9 }}>{t('add_plant.location_manual') || 'Manual Location Details'}</label>
+                                <input className="input-field" style={{ background: 'rgba(0,0,0,0.1)', fontSize: 12 }} placeholder="e.g. Backyard / Second row" {...f('locationText')} onClick={e => e.stopPropagation()} />
+                            </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: 14 }}>

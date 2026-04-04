@@ -47,7 +47,13 @@
 ══════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
-  cursor: none !important;
+  cursor: none;
+}
+
+@media (max-width: 768px) {
+  *, *::before, *::after {
+    cursor: auto !important;
+  }
 }
 
 /* ══════════════════════════════════════
