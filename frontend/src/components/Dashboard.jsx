@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { plantsAPI } from '../api';
-import LanguageSwitcher from './LanguageSwitcher';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -57,8 +56,7 @@ export default function Dashboard({ user, onLogout }) {
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     letterSpacing: '-0.02em',
                 }}>{t('app_title')}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <LanguageSwitcher />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.45)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
                         {user?.name || t('dashboard.botanists')} 👋
                     </span>

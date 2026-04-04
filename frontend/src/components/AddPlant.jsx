@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { plantsAPI } from '../api';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
 
 export default function AddPlant() {
     const navigate = useNavigate();
@@ -103,15 +102,12 @@ export default function AddPlant() {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--night)' }}>
             <nav style={{ 
-                position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center',
                 padding: '0 32px', height: 64, background: 'rgba(10,15,13,0.92)', 
-                backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.06)'
+                backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 12
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}><ArrowLeft size={18} /></Link>
-                    <span style={{ fontFamily: "var(--font-serif)", fontWeight: 700, color: 'var(--pearl)', fontSize: 17 }}>{t('add_plant.title')}</span>
-                </div>
-                <LanguageSwitcher />
+                <Link to="/dashboard" className="btn-ghost" style={{ display: 'flex', padding: '6px 10px' }}><ArrowLeft size={18} /></Link>
+                <span style={{ fontFamily: "var(--font-serif)", fontWeight: 700, color: 'var(--pearl)', fontSize: 17 }}>{t('add_plant.title')}</span>
             </nav>
 
             <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px' }}>

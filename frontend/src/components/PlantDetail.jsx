@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2 } from 'lucide-react';
 import { plantsAPI, updatesAPI } from '../api';
-import LanguageSwitcher from './LanguageSwitcher';
 
 
 
@@ -90,7 +89,6 @@ export default function PlantDetail() {
                     }}>{plant.commonName}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <LanguageSwitcher />
                     <Link to={`/plant/${id}/add-update`} className="btn-primary" style={{ padding: '9px 18px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Plus size={13} /> Log Entry
                     </Link>

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
 
 export default function LandingPage() {
   const particlesRef = useRef(null);
@@ -47,7 +46,6 @@ export default function LandingPage() {
         }}>{t('landing.hero_title')}</div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <LanguageSwitcher />
           <Link
             to="/login"
             id="nav-login-btn"
