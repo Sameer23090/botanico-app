@@ -281,7 +281,7 @@ export default function EditUpdate() {
                         </div>
 
                         <div>
-                            <label className="label-text">⚠️ Pest / Disease Notes (optional)</label>
+                            <label className="label-text">⚠️ {t('care_log.pest_issues')}</label>
                             <textarea className="textarea-field" rows={2} placeholder="Any bugs, yellowing, wilting?" {...f('pestIssues')} />
                         </div>
 

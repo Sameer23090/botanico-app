@@ -66,7 +66,7 @@ router.post('/', authMiddleware, updateValidation, async (req, res) => {
       diseaseObservations, environmentalStress, careActions,
       temperatureCelsius, humidityPercent, soilPh, soilMoisture, notes,
       fertilizerUsed, fertilizerName, fertilizerType, dosage, applicationMethod, fertilizerNotes,
-      environmentCondition, drivePhotos
+      environmentCondition, drivePhotos, coordinates
     } = translatedBody;
 
     const plant = await Plant.findOne({ _id: plantId, userId: req.user.id });
@@ -124,7 +124,8 @@ router.post('/', authMiddleware, updateValidation, async (req, res) => {
       dosage, 
       applicationMethod, 
       fertilizerNotes,
-      environmentCondition
+      environmentCondition,
+      coordinates
     });
 
     res.status(201).json({
@@ -156,12 +157,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const translatedBody = await translateFields(req.body, fieldsToTranslate, sourceLang);
 
     const {
-      title, observations, heightCm, widthCm, leafCount,
+      title, observations, entryDate, heightCm, widthCm, leafCount,
       floweringStage, fruitingStage, healthStatus, stemDiameterMm,
-      rootObservations, pestIssues, diseaseObservations, environmentalStress,
-      careActions, temperatureCelsius, humidityPercent, soilPh, soilMoisture, notes,
-      fertilizerUsed, fertilizerName, fertilizerType, dosage, applicationMethod, fertilizerNotes,
-      environmentCondition, drivePhotos
+      rootObservations, pestIssues, diseaseObservations,
+      environmentalStress, careActions, temperatureCelsius,
+      humidityPercent, soilPh, soilMoisture, notes,
+      fertilizerUsed, fertilizerName, fertilizerType, dosage,
+      applicationMethod, fertilizerNotes, environmentCondition, drivePhotos, coordinates
     } = translatedBody;
 
     if (title !== undefined) update.title = title;
@@ -189,6 +191,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (applicationMethod !== undefined) update.applicationMethod = applicationMethod;
     if (fertilizerNotes !== undefined) update.fertilizerNotes = fertilizerNotes;
     if (environmentCondition !== undefined) update.environmentCondition = environmentCondition;
+    if (coordinates !== undefined) update.coordinates = coordinates;
 
     if (careActions !== undefined) {
       if (typeof careActions === 'string') {

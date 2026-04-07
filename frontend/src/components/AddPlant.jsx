@@ -91,8 +91,7 @@ export default function AddPlant() {
         try {
             const payload = { ...form };
             if (capturedCoords) {
-                payload['coordinates[lat]'] = capturedCoords.lat;
-                payload['coordinates[lng]'] = capturedCoords.lng;
+                payload.coordinates = { lat: capturedCoords.lat, lng: capturedCoords.lng };
             }
             const res = await plantsAPI.create(payload);
             const plantId = res.data.plant?.id || res.data.plant?._id;

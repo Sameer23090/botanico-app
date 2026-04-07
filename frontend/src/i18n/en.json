@@ -8,6 +8,52 @@
     "sign_in": "Sign In",
     "scientific_intel": "Scientific Plant Intelligence",
     "admin_portal": "ADMIN PORTAL",
+    "admin": {
+      "nav": {
+        "monitor": "Monitor",
+        "growers": "Growers",
+        "plants": "Plants"
+      },
+      "control_panel": "Admin Control Panel",
+      "system_live": "System Live",
+      "sign_out": "Sign Out",
+      "refresh": "Refresh",
+      "monitor_title": "Live Network Monitor",
+      "monitor_subtitle": "Real-time statistics across all botanical sites",
+      "total_growers": "Total Growers",
+      "registered_users": "Registered Users",
+      "plants_growing": "Plants Growing",
+      "across_users": "Across all users",
+      "log_entries": "Log Entries",
+      "total_observations": "Total Observations",
+      "active_now": "Active Now",
+      "active_plants": "Active Plants",
+      "logged_on": "logged an update for",
+      "by": "By",
+      "day": "Day",
+      "log": "Log",
+      "entries_recorded": "entries recorded",
+      "view_log_loc": "View Update Location",
+      "btn_view_plants": "View Plants",
+      "plants_count": "Plants",
+      "tbl": {
+        "name": "Name",
+        "email": "Email Address",
+        "role": "Role",
+        "joined": "Joined On",
+        "grower": "Grower",
+        "plants": "Plants"
+      }
+    },
+    "admin_login": {
+      "badge": "Admin Access Required",
+      "subtitle": "System Director Authorization",
+      "email_label": "Administrator Email",
+      "password_label": "System Key / Password",
+      "authenticating": "Verifying Credentials...",
+      "btn": "Authorize Access",
+      "back_home": "Return to Landing Page"
+    },
     "footer_msg": "Made with 💚 for plant lovers."
   },
   "navigation": {
@@ -156,6 +202,7 @@
     "manure_dosage": "Dosage",
     "manure_method": "Method",
     "manure_notes": "Notes about manure",
+    "pest_issues": "Pest / Disease Notes (optional)",
     "submit": "Log Care",
     "placeholder_notes": "Enter details here...",
     "types": {

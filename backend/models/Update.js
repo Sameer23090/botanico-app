@@ -102,20 +102,13 @@ const updateSchema = new mongoose.Schema(
         environmentCondition: {
             type: String,
             enum: [
-                'Full Sun (6+ hours direct sunlight)',
-                'Partial Sun (3–6 hours)',
-                'Partial Shade',
-                'Full Shade',
-                'Indoor – Bright indirect light',
-                'Indoor – Low light',
-                'Greenhouse',
-                'Humid / Tropical',
-                'Arid / Dry',
-                'Coastal / Windy',
-                'Other',
-                null
+                'full_sun', 'partial_sun', 'partial_shade', 'full_shade',
+                'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid',
+                'coastal', 'tropical', 'subtropical', 'temperate', 'mediterranean',
+                'highland', 'rainforest', 'desert', 'other',
+                'Other', null
             ],
-            default: null
+            default: 'other'
         },
 
         notes: { type: String, default: null },

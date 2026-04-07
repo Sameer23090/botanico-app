@@ -101,7 +101,8 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
       plantType, growthHabit, nativeRegion, description,
       plantingDate, plantingSeason, environmentCondition,
       location, soilType, sunlightExposure,
-      plantingMethod, expectedHarvestDays, isPublic
+      plantingMethod, expectedHarvestDays, isPublic,
+      habitat, classificationGroup, locationText, coordinates
     } = translatedBody;
 
     const plant = await Plant.create({
@@ -113,7 +114,8 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
       environmentCondition,
       location, soilType, sunlightExposure, plantingMethod,
       expectedHarvestDays: expectedHarvestDays ? Number(expectedHarvestDays) : null,
-      isPublic: isPublic === 'true' || isPublic === true
+      isPublic: isPublic === 'true' || isPublic === true,
+      habitat, classificationGroup, locationText, coordinates
     });
 
     res.status(201).json({

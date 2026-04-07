@@ -261,6 +261,11 @@ export default function AddUpdate() {
                              )}
                          </div>
 
+                        <div>
+                            <label className="label-text">⚠️ {t('care_log.pest_issues')}</label>
+                            <textarea className="textarea-field" rows={2} placeholder="Any bugs, yellowing, wilting?" {...f('pestIssues')} />
+                        </div>
+
                          <div onClick={captureGPS} style={{
                              display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px',
                              background: capturedCoords ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.06)',
