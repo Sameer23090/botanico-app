@@ -77,7 +77,28 @@
     "no_account": "Don't have an account?",
     "create_account": "Create account →",
     "login_failed": "Login failed. Please try again.",
-    "oauth_failed": "OAuth login failed. Please try again or use email/password."
+    "oauth_failed": "OAuth login failed. Please try again or use email/password.",
+    "forgot_password": "Forgot Password?"
+  },
+  "forgot_password": {
+    "title": "Recover Account",
+    "subtitle": "Reset your security credentials",
+    "description": "Enter your email and we'll send you a secure link to reset your password.",
+    "email_label": "Email Address",
+    "submit": "Send Recovery Link",
+    "back_to_login": "Back to Log In",
+    "success_msg": "Recovery email sent. Please check your inbox (and spam folder)."
+  },
+  "reset_password": {
+    "title": "Create New Password",
+    "subtitle": "Garden Security Update",
+    "description": "Set a new secure password for your Botanico account.",
+    "new_password": "New Password",
+    "confirm_password": "Confirm New Password",
+    "submit": "Save New Password",
+    "success_msg": "Password updated successfully. You can now log in.",
+    "error_match": "Passwords do not match",
+    "error_token": "Invalid or expired token"
   },
   "dashboard": {
     "title": "My Plant Journal",

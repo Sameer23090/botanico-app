@@ -19,6 +19,8 @@ import AddUpdate from './components/AddUpdate';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import EditUpdate from './components/EditUpdate';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -85,6 +87,8 @@ function App() {
             <Route path="/register" element={
               isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Register onRegister={handleLogin} />
             } />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             
             {/* OAuth Callback route */}
             <Route path="/auth-callback" element={<OAuthCallback />} />

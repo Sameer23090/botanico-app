@@ -14,6 +14,8 @@ const plantRoutes = require('./routes/plants');
 const updateRoutes = require('./routes/updates');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/uploadRoutes');
+const marketplaceRoutes = require('./routes/marketplace');
+const reminderRoutes = require('./routes/reminders');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -59,12 +61,20 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Initialise passport
 app.use(passport.initialize());
 
+// Static file serving for feature demo
+const path = require('path');
+app.get('/demo', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '..', 'feature_demo.html'));
+});
+
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/plants', plantRoutes);
 app.use('/api/updates', updateRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/reminders', reminderRoutes);
 
 // Health Check
 app.get('/api/health', (req, res) => {

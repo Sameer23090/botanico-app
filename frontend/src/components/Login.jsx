@@ -76,7 +76,10 @@ export default function Login({ onLogin }) {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label className="label-text">{t('login.password')}</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label className="label-text" style={{ marginBottom: 0 }}>{t('login.password')}</label>
+                <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--jade)', textDecoration: 'none', fontWeight: 500, opacity: 0.8 }}>{t('login.forgot_password')}</Link>
+              </div>
               <div style={{ position: 'relative' }}>
                 <input type={showPassword ? 'text' : 'password'} className="input-field" placeholder="••••••••" style={{ paddingRight: 48 }} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: 14, bottom: 14, background: 'none', border: 'none', color: 'rgba(240,253,244,0.3)', cursor: 'pointer', padding: 0 }}>
