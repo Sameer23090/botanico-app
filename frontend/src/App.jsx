@@ -21,6 +21,7 @@ import AdminDashboard from './components/AdminDashboard';
 import EditUpdate from './components/EditUpdate';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import Marketplace from './components/Marketplace';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -117,6 +118,11 @@ function App() {
             <Route path="/plant/:plantId/update/:updateId/edit" element={
               <ProtectedRoute>
                 <EditUpdate />
+              </ProtectedRoute>
+            } />
+            <Route path="/marketplace" element={
+              <ProtectedRoute>
+                <Marketplace />
               </ProtectedRoute>
             } />
 

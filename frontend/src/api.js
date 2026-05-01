@@ -69,6 +69,16 @@ export const uploadAPI = {
   }
 };
 
+export const marketplaceAPI = {
+  getListings: (params) => api.get('/marketplace', { params }),
+  createListing: (data) => api.post('/marketplace', data),
+  getMyListings: () => api.get('/marketplace/my-listings'),
+};
+
+export const aiAPI = {
+  consult: (plantId) => api.post('/ai/consult', { plantId })
+};
+
 export const setAuthToken = (token) => {
   localStorage.setItem('token', token);
 };

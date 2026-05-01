@@ -1,18 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud } from 'lucide-react';
-import api from '../api';
+import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud, Camera } from 'lucide-react';
+import api, { plantsAPI } from '../api';
 import { useTranslation } from 'react-i18next';
+import ImageUpload from './ImageUpload';
 
 export default function AddUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
+    const [plant, setPlant] = useState(null);
+    const [photos, setPhotos] = useState([]);
+
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []);
+        fetchPlant();
+    }, [id]);
+
+    const fetchPlant = async () => {
+        try {
+            const res = await plantsAPI.getById(id);
+            setPlant(res.data.plant);
+        } catch (err) {
+            console.error("Error fetching plant:", err);
+        }
+    };
+
     const [form, setForm] = useState({
         entryDate: new Date().toISOString().split('T')[0],
         title: '',
@@ -69,6 +84,17 @@ export default function AddUpdate() {
         }
     };
 
+    const handleUploadComplete = (uploadData) => {
+        // Add the new photo metadata to the array
+        setPhotos(prev => [...prev, {
+            driveFileId: uploadData.driveFileId,
+            displayUrl: uploadData.displayUrl,
+            originalFilename: uploadData.originalFilename,
+            takenAt: new Date(),
+            imageType: uploadData.imageType
+        }]);
+    };
+
     const f = (k) => ({ value: form[k], onChange: e => setForm({ ...form, [k]: e.target.value }) });
 
     const handleSubmit = async (e) => {
@@ -80,9 +106,16 @@ export default function AddUpdate() {
         Object.entries(form).forEach(([k, v]) => {
             if (v !== '' && v !== null && v !== undefined) payload[k] = v;
         });
+        
         if (capturedCoords) {
             payload.coordinates = capturedCoords;
         }
+
+        // Include drivePhotos metadata
+        if (photos.length > 0) {
+            payload.drivePhotos = photos;
+        }
+
         try {
             await api.post('/updates', payload);
             navigate(`/plant/${id}`);
@@ -130,6 +163,16 @@ export default function AddUpdate() {
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 14 }}>{t('care_log.visual_evidence') || 'Visual Progress'}</h3>
+                            <ImageUpload 
+                                plantId={id} 
+                                commonName={plant?.commonName} 
+                                scientificName={plant?.scientificName}
+                                onUploadComplete={handleUploadComplete} 
+                            />
                         </div>
 
                         <div>

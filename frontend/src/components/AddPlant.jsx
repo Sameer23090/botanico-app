@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Camera } from 'lucide-react';
 import { plantsAPI } from '../api';
 import { useTranslation } from 'react-i18next';
+import ImageUpload from './ImageUpload';
 
 export default function AddPlant() {
     const navigate = useNavigate();
@@ -20,7 +21,8 @@ export default function AddPlant() {
         environmentCondition: 'Other',
         location: '', soilType: '', sunlightExposure: '', plantingMethod: '',
         habitat: '', classificationGroup: '', locationText: '',
-        status: 'active'
+        status: 'active',
+        firstPhotoUrl: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -41,6 +43,10 @@ export default function AddPlant() {
         } else {
             setGpsCoords('ERR');
         }
+    };
+
+    const handleUploadComplete = (uploadData) => {
+        setForm(prev => ({ ...prev, firstPhotoUrl: uploadData.displayUrl }));
     };
 
     const plantPresets = {
@@ -144,6 +150,23 @@ export default function AddPlant() {
                                     <label className="label-text">{t('add_plant.scientific_name')}</label>
                                     <input className="input-field" placeholder={t('add_plant.placeholder_scientific')} {...f('scientificName')} />
                                 </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 16 }}>{t('add_plant.profile_photo') || 'Plant Profile Photo'}</h3>
+                            <ImageUpload 
+                                plantId="new" 
+                                imageType="profile"
+                                commonName={form.commonName} 
+                                scientificName={form.scientificName}
+                                onUploadComplete={handleUploadComplete} 
+                            />
+                        </div>
+
+                        <div>
+                            <h2 className="section-title" style={{ color: 'var(--pearl)', marginBottom: 16 }}>{t('add_plant.details')}</h2>
+                            <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="label-text">{t('add_plant.planting_date')} *</label>
                                     <input type="date" className="input-field" required {...f('plantingDate')} />

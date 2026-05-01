@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2 } from 'lucide-react';
-import { plantsAPI, updatesAPI } from '../api';
-
-
+import { motion, AnimatePresence } from 'framer-motion';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit } from 'lucide-react';
+import { plantsAPI, updatesAPI, aiAPI } from '../api';
 
 export default function PlantDetail() {
     const { id } = useParams();
@@ -13,6 +11,10 @@ export default function PlantDetail() {
     const [updates, setUpdates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [showQR, setShowQR] = useState(false);
+    const [showAI, setShowAI] = useState(false);
+    const [aiMessage, setAiMessage] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,8 +64,26 @@ export default function PlantDetail() {
 
     if (!plant) return null;
 
+    const consultAI = async () => {
+        setShowAI(true);
+        setIsThinking(true);
+        setAiMessage('');
+        
+        try {
+            const res = await aiAPI.consult(id);
+            setAiMessage(res.data.advice);
+        } catch (err) {
+            setAiMessage(err.response?.data?.error || "Metabolic scanning failed. Ensure the AI Service Key (GEMINI_API_KEY) is properly configured in the environment.");
+        } finally {
+            setIsThinking(false);
+        }
+    };
+
     const plantingDate = new Date(plant.plantingDate);
     const daysSince = plant.daysSincePlanting ?? Math.floor((Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    const plantUrl = `${window.location.origin}/plant/${id}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(plantUrl)}&color=22c55e&bgcolor=0a0f0d`;
 
     const NAV_STYLE = {
         position: 'sticky', top: 0, zIndex: 50,
@@ -78,6 +98,124 @@ export default function PlantDetail() {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative', zIndex: 1 }}>
 
+            {/* QR Modal */}
+            <AnimatePresence>
+                {showQR && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="card"
+                            style={{ maxWidth: 400, width: '100%', padding: '40px 32px', textAlign: 'center' }}
+                        >
+                            <button 
+                                onClick={() => setShowQR(false)} 
+                                style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--mist)', cursor: 'pointer' }}
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: 'var(--pearl)', marginBottom: 8 }}>Plant ID Tag</h2>
+                            <p style={{ color: 'rgba(240,253,244,0.4)', fontSize: 13, marginBottom: 28 }}>Print this QR and attach it to your physical plant to bridge it to the digital record.</p>
+                            
+                            <div style={{ 
+                                background: '#0a0f0d', 
+                                padding: 24, 
+                                borderRadius: 20, 
+                                border: '1px solid var(--jade)', 
+                                display: 'inline-block', 
+                                marginBottom: 28,
+                                boxShadow: '0 0 40px rgba(34,197,94,0.15)'
+                            }}>
+                                <img src={qrUrl} alt="QR Code" style={{ width: 200, height: 200, borderRadius: 8 }} />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                <a href={qrUrl} download={`label_${plant.commonName}.png`} className="btn-primary" style={{ width: '100%' }}>
+                                    <Download size={16} style={{ marginRight: 8 }} /> Download PNG
+                                </a>
+                                <p style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: 'var(--jade)', opacity: 0.6 }}>ID: {id.substring(0,8).toUpperCase()}</p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* AI Botanist Modal */}
+            <AnimatePresence>
+                {showAI && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, zIndex: 101, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(10,15,13,0.95)', backdropFilter: 'blur(12px)' }}
+                    >
+                        <motion.div 
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="card"
+                            style={{ maxWidth: 500, width: '100%', padding: '48px 40px', border: '1px solid var(--jade)', boxShadow: '0 0 50px rgba(34,197,94,0.1)' }}
+                        >
+                            <button onClick={() => setShowAI(false)} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'var(--mist)', cursor: 'pointer' }}><X size={20} /></button>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
+                                <div className="stat-icon" style={{ width: 56, height: 56, background: 'rgba(34,197,94,0.1)', color: 'var(--jade)' }}>
+                                    <BrainCircuit size={28} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: 'var(--pearl)', margin: 0 }}>AI Botanist</h2>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: 'var(--mist)', opacity: 0.6, letterSpacing: '0.15em', margin: 0 }}>BIOMETRIC CONSULTATION</p>
+                                </div>
+                            </div>
+
+                            {isThinking ? (
+                                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                                    <motion.div 
+                                        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                        style={{ fontSize: 14, color: 'var(--jade)', fontFamily: "var(--font-mono)" }}
+                                    >
+                                        SCANNING DATABASE...
+                                    </motion.div>
+                                    <div style={{ width: 200, height: 2, background: 'rgba(255,255,255,0.05)', margin: '12px auto', position: 'relative', overflow: 'hidden' }}>
+                                        <motion.div 
+                                            animate={{ left: ['-100%', '100%'] }}
+                                            transition={{ duration: 1, repeat: Infinity }}
+                                            style={{ position: 'absolute', top: 0, width: '40%', height: '100%', background: 'var(--jade)' }}
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                    <div style={{ 
+                                        padding: 24, 
+                                        background: 'rgba(0,0,0,0.3)', 
+                                        borderRadius: 16, 
+                                        border: '1px solid rgba(34,197,94,0.1)', 
+                                        marginBottom: 32,
+                                        fontFamily: "var(--font-body)",
+                                        fontSize: 15,
+                                        lineHeight: 1.6,
+                                        color: 'rgba(240,253,244,0.85)',
+                                        position: 'relative'
+                                    }}>
+                                        <Sparkles size={16} style={{ position: 'absolute', top: -8, left: 16, color: 'var(--gold)' }} />
+                                        {aiMessage}
+                                    </div>
+                                    <button onClick={() => setShowAI(false)} className="btn-primary" style={{ width: '100%' }}>Acknowledge Guidance</button>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Nav */}
             <nav style={NAV_STYLE}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -89,6 +227,9 @@ export default function PlantDetail() {
                     }}>{plant.commonName}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <button onClick={() => setShowQR(true)} className="btn-ghost" style={{ color: 'var(--mist)', padding: '8px 10px', display: 'flex' }} title="Generate QR Label">
+                        <QrCode size={17} />
+                    </button>
                     <Link to={`/plant/${id}/add-update`} className="btn-primary" style={{ padding: '9px 18px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Plus size={13} /> Log Entry
                     </Link>
@@ -132,6 +273,31 @@ export default function PlantDetail() {
                                 <span className="badge badge-botanical">Day {daysSince}</span>
                                 {plant.plantType && <span className="badge badge-info">{plant.plantType}</span>}
                                 <span className="badge badge-success">{plant.status}</span>
+                                <button onClick={consultAI} className="badge" style={{ background: 'rgba(245,158,11,0.1)', color: 'var(--gold)', border: '1px solid rgba(245,158,11,0.2)', cursor: 'pointer' }}>
+                                    <Sparkles size={11} style={{ marginRight: 4 }} /> AI Botanist
+                                </button>
+                            </div>
+
+                            {/* Vitality Trend */}
+                            <div style={{ marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                    <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: 'var(--mist)', opacity: 0.6, letterSpacing: '0.1em' }}>VITALITY TREND</span>
+                                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jade)' }}>
+                                        {updates.length > 0 ? (updates[0].healthStatus === 'excellent' ? 'Peak Performance' : 'Stable') : 'Establishing...'}
+                                    </span>
+                                </div>
+                                <div style={{ height: 6, width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
+                                    <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: updates.length > 0 ? '85%' : '20%' }}
+                                        transition={{ duration: 1.5, ease: 'easeOut' }}
+                                        style={{ 
+                                            height: '100%', 
+                                            background: 'linear-gradient(90deg, var(--emerald), var(--jade))',
+                                            boxShadow: '0 0 10px rgba(34,197,94,0.3)'
+                                        }} 
+                                    />
+                                </div>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', fontSize: 13, marginBottom: 16 }}>
@@ -245,9 +411,27 @@ export default function PlantDetail() {
                                 </div>
 
                                 {u.observations && (
-                                    <p style={{ fontSize: 13, color: 'rgba(240,253,244,0.55)', lineHeight: 1.75, marginBottom: 10 }}>
+                                    <p style={{ fontSize: 13, color: 'rgba(240,253,244,0.55)', lineHeight: 1.75, marginBottom: 12 }}>
                                         {u.observations}
                                     </p>
+                                )}
+
+                                {u.drivePhotos && u.drivePhotos.length > 0 && (
+                                    <div className="photo-grid" style={{ marginBottom: 14 }}>
+                                        {u.drivePhotos.map((photo, idx) => (
+                                            <motion.div 
+                                                key={idx}
+                                                whileHover={{ scale: 1.02 }}
+                                                style={{ height: 120, borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}
+                                            >
+                                                <img 
+                                                    src={photo.displayUrl} 
+                                                    alt={photo.originalFilename} 
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                                />
+                                            </motion.div>
+                                        ))}
+                                    </div>
                                 )}
 
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18, fontSize: 12 }}>

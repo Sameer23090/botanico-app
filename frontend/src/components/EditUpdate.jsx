@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud } from 'lucide-react';
-import api, { updatesAPI } from '../api';
+import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud, Camera } from 'lucide-react';
+import api, { updatesAPI, plantsAPI } from '../api';
 import { useTranslation } from 'react-i18next';
+import ImageUpload from './ImageUpload';
 
 export default function EditUpdate() {
     const { plantId, updateId } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    const [plant, setPlant] = useState(null);
+    const [photos, setPhotos] = useState([]);
+
     const [form, setForm] = useState({
         entryDate: '',
         title: '',
@@ -35,10 +40,17 @@ export default function EditUpdate() {
     const [capturedCoords, setCapturedCoords] = useState(null);
 
     useEffect(() => {
-        const fetchUpdate = async () => {
+        const fetchData = async () => {
             try {
-                const res = await updatesAPI.getById(updateId);
-                const data = res.data.update;
+                const [updateRes, plantRes] = await Promise.all([
+                    updatesAPI.getById(updateId),
+                    plantsAPI.getById(plantId)
+                ]);
+                
+                const data = updateRes.data.update;
+                setPlant(plantRes.data.plant);
+                setPhotos(data.drivePhotos || []);
+
                 setForm({
                     entryDate: data.entryDate ? data.entryDate.split('T')[0] : '',
                     title: data.title || '',
@@ -68,8 +80,18 @@ export default function EditUpdate() {
                 setLoading(false);
             }
         };
-        fetchUpdate();
-    }, [updateId]);
+        fetchData();
+    }, [updateId, plantId]);
+
+    const handleUploadComplete = (uploadData) => {
+        setPhotos(prev => [...prev, {
+            driveFileId: uploadData.driveFileId,
+            displayUrl: uploadData.displayUrl,
+            originalFilename: uploadData.originalFilename,
+            takenAt: new Date(),
+            imageType: uploadData.imageType
+        }]);
+    };
 
     const captureGPS = () => {
         setGpsText('Locating...');
@@ -107,6 +129,10 @@ export default function EditUpdate() {
         const payload = { ...form };
         if (capturedCoords) {
             payload.coordinates = capturedCoords;
+        }
+
+        if (photos.length > 0) {
+            payload.drivePhotos = photos;
         }
 
         try {
@@ -161,6 +187,16 @@ export default function EditUpdate() {
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div>
+                            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 18, color: 'var(--pearl)', marginBottom: 14 }}>{t('care_log.visual_evidence') || 'Visual Progress'}</h3>
+                            <ImageUpload 
+                                plantId={plantId} 
+                                commonName={plant?.commonName} 
+                                scientificName={plant?.scientificName}
+                                onUploadComplete={handleUploadComplete} 
+                            />
                         </div>
 
                         <div>

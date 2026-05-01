@@ -21,6 +21,8 @@ export default function Dashboard({ user, onLogout }) {
     const [plants, setPlants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
         const fetchPlants = async () => {
@@ -35,6 +37,13 @@ export default function Dashboard({ user, onLogout }) {
         };
         fetchPlants();
     }, [t]);
+
+    const filteredPlants = plants.filter(p => {
+        const matchesSearch = p.commonName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             p.scientificName?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
 
     const handleLogout = () => { onLogout(); navigate('/'); };
 
@@ -60,6 +69,9 @@ export default function Dashboard({ user, onLogout }) {
                     <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.45)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
                         {user?.name || t('dashboard.botanists')} 👋
                     </span>
+                    <Link to="/marketplace" className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--gold)' }}>
+                        <ShoppingBag size={14} /> Marketplace
+                    </Link>
                     <button onClick={handleLogout} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
                         <LogOut size={14} /> {t('navigation.logout')}
                     </button>
@@ -113,10 +125,37 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                 )}
 
+                {/* Search & Filter */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 28 }}>
+                    <div style={{ flex: 1, minWidth: 260, position: 'relative' }}>
+                        <input 
+                            type="text" 
+                            className="input-field" 
+                            placeholder={t('dashboard.search_placeholder') || 'Search your botanical collection...'}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{ paddingLeft: 44 }}
+                        />
+                        <Leaf size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', opacity: 0.3, color: 'var(--jade)' }} />
+                    </div>
+                    <select 
+                        className="select-field" 
+                        style={{ width: 'auto', minWidth: 160 }}
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="dormant">Dormant</option>
+                        <option value="harvested">Harvested</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                </div>
+
                 {/* Plants Grid */}
                 {loading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}><div className="spinner" /></div>
-                ) : plants.length === 0 ? (
+                ) : filteredPlants.length === 0 ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '80px 0' }}>
                         <div style={{
                             width: 80, height: 80,
@@ -128,15 +167,17 @@ export default function Dashboard({ user, onLogout }) {
                         }}>
                             <Leaf size={36} style={{ color: 'rgba(34,197,94,0.3)' }} />
                         </div>
-                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>{t('dashboard.no_plants')}</h2>
-                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>{t('dashboard.start_journey')}</p>
-                        <Link to="/add-plant" className="btn-primary">
-                            <Plus size={15} style={{ marginRight: 8 }} /> {t('dashboard.add_first_plant')}
-                        </Link>
+                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>{searchTerm || statusFilter !== 'all' ? 'No results found' : t('dashboard.no_plants')}</h2>
+                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : t('dashboard.start_journey')}</p>
+                        {!(searchTerm || statusFilter !== 'all') && (
+                            <Link to="/add-plant" className="btn-primary">
+                                <Plus size={15} style={{ marginRight: 8 }} /> {t('dashboard.add_first_plant')}
+                            </Link>
+                        )}
                     </motion.div>
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 18 }}>
-                        {plants.map((plant, i) => (
+                        {filteredPlants.map((plant, i) => (
                             <motion.div
                                 key={plant.id}
                                 initial={{ opacity: 0, y: 24 }}
@@ -144,6 +185,27 @@ export default function Dashboard({ user, onLogout }) {
                                 transition={{ delay: i * 0.06, type: 'spring', stiffness: 140 }}
                             >
                                 <Link to={`/plant/${plant.id}`} className="card-botanical" style={{ display: 'block', textDecoration: 'none' }}>
+                                    {/* Image Preview */}
+                                    <div style={{ height: 160, width: '100%', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden' }}>
+                                        {plant.firstPhotoUrl ? (
+                                            <img 
+                                                src={plant.firstPhotoUrl} 
+                                                alt={plant.commonName} 
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+                                                className="hover-scale"
+                                            />
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.15 }}>
+                                                <Leaf size={48} />
+                                            </div>
+                                        )}
+                                        <div style={{ position: 'absolute', bottom: 10, right: 10 }}>
+                                            <span className="badge badge-success" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+                                                Day {plant.daysSincePlanting || 0}
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     {/* Info */}
                                     <div style={{ padding: '16px 18px' }}>
                                         <h3 style={{
@@ -165,9 +227,6 @@ export default function Dashboard({ user, onLogout }) {
                                             }}>{plant.scientificName}</p>
                                         )}
                                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                                            <span className="badge badge-botanical">
-                                                {new Date(plant.plantingDate).toLocaleDateString()}
-                                            </span>
                                             {plant.plantType && <span className="badge badge-info">{plant.plantType}</span>}
                                             <span className="badge badge-success">{t(`status.${plant.status}`, plant.status)}</span>
                                         </div>
