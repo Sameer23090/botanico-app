@@ -152,7 +152,7 @@ export default function EditUpdate() {
                                 </div>
                                 <div>
                                     <label className="label-text">Health Status *</label>
-                                    <select className="select-field" required {...f('healthStatus')}>
+                                    <select className="select-field" required value={String(form['healthStatus'] || 'good')} onChange={(e) => setForm({ ...form, healthStatus: e.target.value })}>
                                         <option value="excellent">Excellent</option>
                                         <option value="good">Good</option>
                                         <option value="fair">Fair</option>
@@ -183,7 +183,7 @@ export default function EditUpdate() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div>
                                     <label className="label-text">Flowering Stage</label>
-                                    <select className="select-field" {...f('floweringStage')}>
+                                    <select className="select-field" value={String(form['floweringStage'] || '')} onChange={(e) => setForm({ ...form, floweringStage: e.target.value })}>
                                         <option value="">— Select stage —</option>
                                         <option>Germination</option>
                                         <option>Seedling</option>
@@ -195,7 +195,7 @@ export default function EditUpdate() {
                                 </div>
                                 <div>
                                     <label className="label-text">Fruiting Stage</label>
-                                    <select className="select-field" {...f('fruitingStage')}>
+                                    <select className="select-field" value={String(form['fruitingStage'] || '')} onChange={(e) => setForm({ ...form, fruitingStage: e.target.value })}>
                                         <option value="">— Not applicable —</option>
                                         <option>Fruit Set</option>
                                         <option>Development</option>
@@ -213,7 +213,7 @@ export default function EditUpdate() {
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                 <div className="md:col-span-2">
                                     <label className="label-text">{t('add_plant.environment_condition')}</label>
-                                    <select className="select-field" {...f('environmentCondition')}>
+                                    <select className="select-field" value={String(form['environmentCondition'] || 'Other')} onChange={(e) => setForm({ ...form, environmentCondition: e.target.value })}>
                                         {['full_sun', 'partial_sun', 'partial_shade', 'full_shade', 'indoor_bright', 'indoor_low', 'greenhouse', 'humid', 'arid', 'coastal', 'other'].map(c => (
                                             <option key={c} value={c}>{t(`env_conditions.${c}`)}</option>
                                         ))}
@@ -225,7 +225,7 @@ export default function EditUpdate() {
                                 </div>
                                 <div>
                                     <label className="label-text">Moisture</label>
-                                    <select className="select-field" {...f('soilMoisture')}>
+                                    <select className="select-field" value={String(form['soilMoisture'] || '')} onChange={(e) => setForm({ ...form, soilMoisture: e.target.value })}>
                                         <option value="">— Select —</option>
                                         <option value="dry">Dry</option>
                                         <option value="moist">Moist</option>
@@ -253,7 +253,7 @@ export default function EditUpdate() {
                                         </div>
                                         <div>
                                             <label className="label-text">{t('care_log.fert_type')}</label>
-                                            <select className="select-field" {...f('fertilizerType')}>
+                                            <select className="select-field" value={String(form['fertilizerType'] || 'Other')} onChange={(e) => setForm({ ...form, fertilizerType: e.target.value })}>
                                                 {['Organic', 'Chemical', 'Bio-fertilizer', 'NPK', 'Compost', 'Liquid', 'Other'].map(v => (
                                                     <option key={v} value={v}>{t(`care_log.types.${v}`)}</option>
                                                 ))}
@@ -265,7 +265,7 @@ export default function EditUpdate() {
                                         </div>
                                         <div>
                                             <label className="label-text">{t('care_log.method')}</label>
-                                            <select className="select-field" {...f('applicationMethod')}>
+                                            <select className="select-field" value={String(form['applicationMethod'] || 'Other')} onChange={(e) => setForm({ ...form, applicationMethod: e.target.value })}>
                                                 {['Soil drench', 'Foliar spray', 'Side dressing', 'Other'].map(v => (
                                                     <option key={v} value={v}>{t(`care_log.methods.${v}`)}</option>
                                                 ))}

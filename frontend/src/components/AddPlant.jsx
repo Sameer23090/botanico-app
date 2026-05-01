@@ -150,7 +150,7 @@ export default function AddPlant() {
                                 </div>
                                 <div>
                                     <label className="label-text">{t('add_plant.planting_season')}</label>
-                                    <select className="select-field" {...f('plantingSeason')}>
+                                    <select className="select-field" value={String(form['plantingSeason'] || '')} onChange={(e) => updateField('plantingSeason', e.target.value)}>
                                         {['Spring', 'Summer', 'Monsoon', 'Autumn', 'Winter', 'Year-round', 'Unknown'].map(s => (
                                             <option key={s} value={s}>{t(`add_plant.seasons.${s}`)}</option>
                                         ))}
@@ -166,7 +166,7 @@ export default function AddPlant() {
                                 </div>
                                  <div>
                                     <label className="label-text">{t('add_plant.habitat')}</label>
-                                    <select className="select-field" {...f('habitat')}>
+                                    <select className="select-field" value={String(form['habitat'] || '')} onChange={(e) => updateField('habitat', e.target.value)}>
                                         <option value="">{t('add_plant.select_habitat')}</option>
                                         {['Terrestrial', 'Aquatic', 'Wetland', 'Desert/Arid', 'Epiphytic', 'Parasitic', 'Mangrove', 'Alpine'].map(h => (
                                             <option key={h} value={h}>{t(`add_plant.habitats.${h}`)}</option>

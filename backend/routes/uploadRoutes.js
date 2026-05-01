@@ -53,8 +53,8 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
     // {plant_common_name}_{scientific_name}_{user_id}_{YYYY-MM-DD}_{timestamp}.webp
     const dateStr = new Date().toISOString().split('T')[0];
     const timestamp = Math.floor(Date.now() / 1000);
-    const cleanCommon = (commonName || plant.commonName || 'plant').toLowerCase().replace(/\s+/g, '-');
-    const cleanScientific = (scientificName || plant.scientificName || 'unknown').toLowerCase().replace(/\s+/g, '-');
+    const cleanCommon = String(String(commonName) || plant.commonName || 'plant').toLowerCase().replace(/\s+/g, '-');
+    const cleanScientific = String(String(scientificName) || plant.scientificName || 'unknown').toLowerCase().replace(/\s+/g, '-');
     const userIdShort = user.displayId.split('_')[1].substring(0, 8);
     
     const filename = `${cleanCommon}_${cleanScientific}_usr_${userIdShort}_${dateStr}_${timestamp}.webp`;

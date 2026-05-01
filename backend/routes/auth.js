@@ -9,6 +9,13 @@ const { sendEmail } = require('../services/emailService');
 
 const router = express.Router();
 
+const rateLimit = require('express-rate-limit');
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many authentication attempts, please try again later.' }
+});
+
 // ─── Validation Rules ────────────────────────────────────────────────────────
 
 const registerValidation = [
@@ -35,7 +42,7 @@ const signToken = (user) => {
 // These will be used for one-click authentication
 
 // Google Auth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', authLimiter, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed` }), (req, res) => {
   const token = signToken(req.user);
@@ -43,7 +50,7 @@ router.get('/google/callback', passport.authenticate('google', { session: false,
 });
 
 // Microsoft Auth
-router.get('/microsoft', passport.authenticate('microsoft', { prompt: 'select_account' }));
+router.get('/microsoft', authLimiter, passport.authenticate('microsoft', { prompt: 'select_account' }));
 
 router.get('/microsoft/callback', passport.authenticate('microsoft', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=auth_failed` }), (req, res) => {
   const token = signToken(req.user);
@@ -52,7 +59,7 @@ router.get('/microsoft/callback', passport.authenticate('microsoft', { session: 
 
 // ─── Local Auth Routes ───────────────────────────────────────────────────────
 
-router.post('/register', registerValidation, async (req, res) => {
+router.post('/register', authLimiter, registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -87,7 +94,7 @@ router.post('/register', registerValidation, async (req, res) => {
   }
 });
 
-router.post('/login', loginValidation, async (req, res) => {
+router.post('/login', authLimiter, loginValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

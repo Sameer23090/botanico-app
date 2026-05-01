@@ -14,7 +14,11 @@ router.get('/', async (req, res) => {
 
     if (category) query.category = category;
     if (listingType) query.listingType = listingType;
-    if (city) query['location.city'] = new RegExp(city, 'i');
+    if (city) {
+      const cityStr = String(city);
+      const escapedCity = cityStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query['location.city'] = new RegExp(escapedCity, 'i');
+    }
     if (minPrice || maxPrice) {
       query['price.amount'] = {};
       if (minPrice) query['price.amount'].$gte = Number(minPrice);

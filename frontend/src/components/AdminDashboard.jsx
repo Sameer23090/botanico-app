@@ -484,7 +484,7 @@ export default function AdminDashboard() {
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>{plantUpdates.updates?.length || 0} {t('admin.entries_recorded')}</p>
                 <div>
                   {selectedPlant.coordinates?.lat && selectedPlant.coordinates?.lng ? (
-                    <a href={`https://maps.google.com/?q=${selectedPlant.coordinates.lat},${selectedPlant.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
+                    <a href={`https://maps.google.com/?q=${Number(selectedPlant.coordinates.lat)},${Number(selectedPlant.coordinates.lng)}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 8, padding: '4px 10px', background: 'rgba(34,197,94,0.1)', color: 'var(--jade)', fontSize: 12, borderRadius: 6, textDecoration: 'none', border: '1px solid rgba(34,197,94,0.2)', cursor: 'pointer' }}>
                       📍 View Plant Exact Location on Maps
                     </a>
                   ) : (
@@ -517,7 +517,7 @@ export default function AdminDashboard() {
                         {u.floweringStage && <span>{u.floweringStage}</span>}
                         {u.pestIssues && <span style={{ color: '#ef4444' }}>⚠️ {u.pestIssues}</span>}
                         {u.coordinates?.lat && u.coordinates?.lng && (
-                          <a href={`https://maps.google.com/?q=${u.coordinates.lat},${u.coordinates.lng}`} target="_blank" rel="noreferrer" style={{ color: 'var(--jade)', textDecoration: 'none', borderBottom: '1px solid var(--jade)' }}>
+                          <a href={`https://maps.google.com/?q=${Number(u.coordinates.lat)},${Number(u.coordinates.lng)}`} target="_blank" rel="noreferrer" style={{ color: 'var(--jade)', textDecoration: 'none', borderBottom: '1px solid var(--jade)' }}>
                              📍 {t('admin.view_log_loc')}
                           </a>
                         )}

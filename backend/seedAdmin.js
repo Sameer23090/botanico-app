@@ -31,8 +31,10 @@ async function seedAdmin() {
     const admin = await User.create({
       name: ADMIN_CREDENTIALS.name,
       email: ADMIN_CREDENTIALS.email,
-      passwordHash: ADMIN_CREDENTIALS.password, // hashed by pre-save hook
+      passwordHash: ADMIN_CREDENTIALS.password,
       role: 'admin',
+      provider: 'local',
+      displayId: 'USR_ADMIN_001',
       location: 'Admin Office',
     });
 

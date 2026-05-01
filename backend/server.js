@@ -30,7 +30,7 @@ connectDB().then(async () => {
             await User.create({
                 name: 'System Director',
                 email: adminEmail,
-                passwordHash: 'BotanicoMaster!2026',
+                passwordHash: process.env.ADMIN_PASSWORD || 'BotanicoMaster!2026',
                 role: 'admin',
                 location: 'Headquarters',
                 provider: 'local'
