@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit, Camera, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit } from 'lucide-react';
 import { plantsAPI, updatesAPI, aiAPI } from '../api';
 
 export default function PlantDetail() {
@@ -14,9 +14,7 @@ export default function PlantDetail() {
     const [showQR, setShowQR] = useState(false);
     const [showAI, setShowAI] = useState(false);
     const [aiMessage, setAiMessage] = useState('');
-    const [diagnosisData, setDiagnosisData] = useState(null);
     const [isThinking, setIsThinking] = useState(false);
-    const [analyzingImage, setAnalyzingImage] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,7 +68,6 @@ export default function PlantDetail() {
         setShowAI(true);
         setIsThinking(true);
         setAiMessage('');
-        setDiagnosisData(null);
         
         try {
             const res = await aiAPI.consult(id);
@@ -82,33 +79,10 @@ export default function PlantDetail() {
         }
     };
 
-    const diagnoseImage = async (file) => {
-        setAnalyzingImage(true);
-        setShowAI(true);
-        setIsThinking(true);
-        setAiMessage('');
-        setDiagnosisData(null);
-
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onloadend = async () => {
-                const base64data = reader.result;
-                const res = await aiAPI.diagnose(base64data, id);
-                setDiagnosisData(res.data);
-            };
-        } catch (err) {
-            setAiMessage("Visual analysis failed. Ensure high-resolution optics and valid AI credentials.");
-        } finally {
-            setAnalyzingImage(false);
-            setIsThinking(false);
-        }
-    };
-
     const plantingDate = new Date(plant.plantingDate);
     const daysSince = plant.daysSincePlanting ?? Math.floor((Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const plantUrl = `${window.location.origin}/public/plant/${id}`;
+    const plantUrl = `${window.location.origin}/plant/${id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(plantUrl)}&color=22c55e&bgcolor=0a0f0d`;
 
     const NAV_STYLE = {
@@ -207,7 +181,7 @@ export default function PlantDetail() {
                                         transition={{ duration: 1.5, repeat: Infinity }}
                                         style={{ fontSize: 14, color: 'var(--jade)', fontFamily: "var(--font-mono)" }}
                                     >
-                                        {analyzingImage ? 'ANALYZING VISUAL DATA...' : 'SCANNING DATABASE...'}
+                                        SCANNING DATABASE...
                                     </motion.div>
                                     <div style={{ width: 200, height: 2, background: 'rgba(255,255,255,0.05)', margin: '12px auto', position: 'relative', overflow: 'hidden' }}>
                                         <motion.div 
@@ -217,38 +191,6 @@ export default function PlantDetail() {
                                         />
                                     </div>
                                 </div>
-                            ) : diagnosisData ? (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                    <div style={{ marginBottom: 24 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                            <span style={{ fontSize: 12, color: 'var(--pearl)', fontWeight: 700 }}>Health Index</span>
-                                            <span style={{ fontSize: 18, color: diagnosisData.healthIndex > 70 ? 'var(--jade)' : '#fca5a5', fontWeight: 800 }}>{diagnosisData.healthIndex}%</span>
-                                        </div>
-                                        <div style={{ height: 4, width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: 10 }}>
-                                            <div style={{ height: '100%', width: `${diagnosisData.healthIndex}%`, background: diagnosisData.healthIndex > 70 ? 'var(--jade)' : 'var(--gold)', borderRadius: 10 }} />
-                                        </div>
-                                    </div>
-
-                                    <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 24 }}>
-                                        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 12 }}>
-                                            <AlertTriangle size={16} style={{ color: 'var(--gold)', marginTop: 2 }} />
-                                            <div>
-                                                <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: 'var(--gold)', textTransform: 'uppercase', marginBottom: 4 }}>Diagnosis</div>
-                                                <p style={{ fontSize: 14, color: 'var(--pearl)', margin: 0, lineHeight: 1.5 }}>{diagnosisData.diagnosis}</p>
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                                            <ShieldCheck size={16} style={{ color: 'var(--jade)', marginTop: 2 }} />
-                                            <div>
-                                                <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: 'var(--jade)', textTransform: 'uppercase', marginBottom: 4 }}>Protocol</div>
-                                                <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: 'rgba(240,253,244,0.6)' }}>
-                                                    {diagnosisData.remediations.map((r, idx) => <li key={idx} style={{ marginBottom: 4 }}>{r}</li>)}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button onClick={() => setShowAI(false)} className="btn-primary" style={{ width: '100%' }}>Initialize Remediation</button>
-                                </motion.div>
                             ) : (
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                     <div style={{ 
@@ -285,10 +227,6 @@ export default function PlantDetail() {
                     }}>{plant.commonName}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <label className="btn-ghost" style={{ color: 'var(--gold)', padding: '8px 10px', display: 'flex', cursor: 'pointer' }} title="AI Diagnosis">
-                        <Camera size={17} />
-                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => diagnoseImage(e.target.files[0])} />
-                    </label>
                     <button onClick={() => setShowQR(true)} className="btn-ghost" style={{ color: 'var(--mist)', padding: '8px 10px', display: 'flex' }} title="Generate QR Label">
                         <QrCode size={17} />
                     </button>

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 
-                (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
+// In production (Vercel), use relative /api path so requests go to the same domain.
+// In local dev, use the VITE_API_URL env var or fallback to localhost:5000.
+const API_URL = import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api'
+    : '/api');
 
 const api = axios.create({
   baseURL: API_URL,
@@ -60,7 +64,6 @@ export const updatesAPI = {
   getTimeline: (plantId) => api.get(`/updates/plant/${plantId}/timeline`),
 };
 
-// New Upload API
 export const uploadAPI = {
   uploadImage: (formData) => {
     return api.post('/upload', formData, {
@@ -77,18 +80,18 @@ export const marketplaceAPI = {
 
 export const aiAPI = {
   consult: (plantId) => api.post('/ai/consult', { plantId }),
-  diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId })
+  diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId }),
 };
 
 export const achievementAPI = {
   getUnlocked: () => api.get('/achievements'),
-  unlock: (data) => api.post('/achievements/unlock', data)
+  unlock: (data) => api.post('/achievements/unlock', data),
 };
 
 export const remindersAPI = {
   getAll: () => api.get('/reminders'),
   create: (data) => api.post('/reminders', data),
-  complete: (id) => api.patch(`/reminders/${id}/complete`)
+  complete: (id) => api.patch(`/reminders/${id}/complete`),
 };
 
 export const setAuthToken = (token) => {

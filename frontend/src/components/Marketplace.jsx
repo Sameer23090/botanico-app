@@ -17,8 +17,6 @@ export default function Marketplace() {
         maxPrice: ''
     });
     const [searchTerm, setSearchTerm] = useState('');
-    const [viewMode, setViewMode] = useState('all'); // 'all' or 'my'
-    const [contactModal, setContactModal] = useState(null);
 
     useEffect(() => {
         fetchListings();
@@ -40,12 +38,10 @@ export default function Marketplace() {
         }
     };
 
-    const filteredListings = listings.filter(l => {
-        const matchesSearch = l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             l.plantId?.commonName.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesMode = viewMode === 'all' || l.userId?._id === l.currentUserId || l.userId === l.currentUserId; // Note: currentUserId should be injected from props or auth context
-        return matchesSearch && matchesMode;
-    });
+    const filteredListings = listings.filter(l => 
+        l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.plantId?.commonName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div style={{ minHeight: '100vh', padding: '40px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -60,31 +56,9 @@ export default function Marketplace() {
                         Discover seeds, saplings, and rare specimens
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                    <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', padding: 4, borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <button 
-                            onClick={() => setViewMode('all')}
-                            style={{ 
-                                padding: '8px 16px', fontSize: 12, borderRadius: 10, fontWeight: 700,
-                                background: viewMode === 'all' ? 'var(--jade)' : 'transparent',
-                                color: viewMode === 'all' ? '#000' : 'var(--mist)',
-                                transition: 'all 0.3s'
-                            }}
-                        >Global</button>
-                        <button 
-                            onClick={() => setViewMode('my')}
-                            style={{ 
-                                padding: '8px 16px', fontSize: 12, borderRadius: 10, fontWeight: 700,
-                                background: viewMode === 'my' ? 'var(--jade)' : 'transparent',
-                                color: viewMode === 'my' ? '#000' : 'var(--mist)',
-                                transition: 'all 0.3s'
-                            }}
-                        >My Depot</button>
-                    </div>
-                    <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Plus size={18} /> {t('marketplace.create_listing') || 'Create Listing'}
-                    </button>
-                </div>
+                <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Plus size={18} /> {t('marketplace.create_listing') || 'Create Listing'}
+                </button>
             </div>
 
             {/* Search & Filters Bar */}
@@ -208,12 +182,8 @@ export default function Marketplace() {
                                             </div>
                                             <span style={{ fontSize: 12, color: 'var(--pearl)', fontWeight: 500 }}>{l.userId?.name}</span>
                                         </div>
-                                        <button 
-                                            onClick={() => setContactModal(l)}
-                                            className="btn-primary" 
-                                            style={{ padding: '8px 16px', fontSize: 12 }}
-                                        >
-                                            Inquire <ExternalLink size={12} style={{ marginLeft: 4 }} />
+                                        <button className="btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
+                                            View Details <ExternalLink size={12} style={{ marginLeft: 4 }} />
                                         </button>
                                     </div>
                                 </div>
@@ -222,45 +192,6 @@ export default function Marketplace() {
                     ))}
                 </div>
             )}
-
-            {/* Contact Modal */}
-            <AnimatePresence>
-                {contactModal && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
-                    >
-                        <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="card"
-                            style={{ maxWidth: 450, width: '100%', padding: 40 }}
-                        >
-                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 28, color: 'var(--pearl)', marginBottom: 12 }}>Contact <span className="text-jade">Provider</span></h2>
-                            <p style={{ color: 'var(--mist)', fontSize: 14, marginBottom: 32 }}>Express interest in <span className="text-white font-bold">{contactModal.title}</span>. A direct channel will be opened with {contactModal.userId?.name}.</p>
-                            
-                            <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 32 }}>
-                                <div style={{ fontSize: 12, color: 'var(--mist)', opacity: 0.5, marginBottom: 4 }}>Subject Specimen</div>
-                                <div style={{ fontSize: 18, color: 'var(--pearl)', fontWeight: 700 }}>{contactModal.plantId?.commonName || 'Rare Specimen'}</div>
-                                <div style={{ fontSize: 24, color: 'var(--gold)', fontWeight: 800, marginTop: 8 }}>{contactModal.price?.currency === 'INR' ? '₹' : '$'}{contactModal.price?.amount}</div>
-                            </div>
-
-                            <div style={{ display: 'flex', gap: 12 }}>
-                                <button onClick={() => setContactModal(null)} className="btn-ghost" style={{ flex: 1 }}>Cancel</button>
-                                <a 
-                                    href={`mailto:${contactModal.userId?.email}?subject=Botanico Inquiry: ${contactModal.title}`}
-                                    className="btn-primary" 
-                                    style={{ flex: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                >
-                                    Open Comm-Link
-                                </a>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

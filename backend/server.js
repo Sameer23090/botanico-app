@@ -52,8 +52,28 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// CORS: allow localhost for dev and any vercel.app / custom domain for production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  /\.vercel\.app$/,
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    // Check if origin matches any allowed origin
+    const isAllowed = allowedOrigins.some((o) =>
+      typeof o === 'string' ? o === origin : o.test(origin)
+    );
+    if (isAllowed) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
 }));
 
@@ -62,12 +82,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Initialise passport
 app.use(passport.initialize());
-
-// Static file serving for feature demo
-const path = require('path');
-app.get('/demo', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', 'feature_demo.html'));
-});
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -85,7 +99,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Botanico API is running',
-    database: 'MongoDB',
+    database: 'MongoDB Atlas',
     timestamp: new Date().toISOString(),
   });
 });
@@ -93,13 +107,17 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     message: 'Botanico Plant Tracking API',
-    version: '2.5.0',
-    database: 'MongoDB',
+    version: '2.6.0',
+    database: 'MongoDB Atlas',
     endpoints: {
       auth: '/api/auth',
       plants: '/api/plants',
       updates: '/api/updates',
-      upload: '/api/upload'
+      upload: '/api/upload',
+      ai: '/api/ai',
+      achievements: '/api/achievements',
+      reminders: '/api/reminders',
+      marketplace: '/api/marketplace',
     },
   });
 });

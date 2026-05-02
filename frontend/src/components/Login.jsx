@@ -36,7 +36,9 @@ export default function Login({ onLogin }) {
   };
 
   const handleOAuth = (provider) => {
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/${provider}`;
+    const apiBase = import.meta.env.VITE_API_URL ||
+      (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
+    window.location.href = `${apiBase}/auth/${provider}`;
   };
 
   return (
