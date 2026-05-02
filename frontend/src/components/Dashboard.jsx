@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar, ShoppingBag, Bell } from 'lucide-react';
+import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar, ShoppingBag, Bell, CheckCircle, Clock, Sparkles, Wand2, BrainCircuit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { plantsAPI, aiAPI } from '../api';
-import { Sparkles, Wand2, BrainCircuit } from 'lucide-react';
+import { plantsAPI, remindersAPI, aiAPI } from '../api';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -20,6 +19,7 @@ export default function Dashboard({ user, onLogout }) {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [plants, setPlants] = useState([]);
+    const [reminders, setReminders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,22 +28,25 @@ export default function Dashboard({ user, onLogout }) {
     const [loadingInsight, setLoadingInsight] = useState(false);
 
     useEffect(() => {
-        const fetchPlants = async () => {
+        const fetchData = async () => {
             try {
-                const res = await plantsAPI.getAll();
-                setPlants(res.data.plants || []);
+                const [plantsRes, remindersRes] = await Promise.all([
+                    plantsAPI.getAll(),
+                    remindersAPI.getAll()
+                ]);
+                setPlants(plantsRes.data.plants || []);
+                setReminders(remindersRes.data.reminders || []);
             } catch (err) {
                 setError(t('dashboard.failed_load'));
             } finally {
                 setLoading(false);
             }
         };
-        fetchPlants();
+        fetchData();
         fetchInsight();
     }, [t]);
 
     const fetchInsight = async () => {
-        // Check if we have a fresh insight in session storage
         const cached = sessionStorage.getItem('botanico_insight');
         const cachedDate = sessionStorage.getItem('botanico_insight_date');
         const today = new Date().toDateString();
@@ -68,6 +71,17 @@ export default function Dashboard({ user, onLogout }) {
         }
     };
 
+    const handleCompleteTask = async (id) => {
+        try {
+            await remindersAPI.complete(id);
+            setReminders(prev => prev.filter(r => r._id !== id));
+        } catch (err) {
+            alert('Failed to complete task.');
+        }
+    };
+
+    const handleLogout = () => { onLogout(); navigate('/'); };
+
     const filteredPlants = (plants || []).filter(p => {
         const name = (p.commonName || '').toLowerCase();
         const sci = (p.scientificName || '').toLowerCase();
@@ -76,12 +90,10 @@ export default function Dashboard({ user, onLogout }) {
         return matchesSearch && matchesStatus;
     });
 
-    const handleLogout = () => { onLogout(); navigate('/'); };
-
     const STATS = [
-        { icon: <Sprout size={20} />, label: t('dashboard.total_plants'), value: (plants || []).length },
-        { icon: <TrendingUp size={20} />, label: t('dashboard.active'), value: (plants || []).filter(p => p.status === 'active').length },
-        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: (plants || []).length > 0 ? Math.max(...(plants || []).map(p => p.daysSincePlanting || 0)) : 0 },
+        { icon: <Sprout size={20} />, label: t('dashboard.total_plants'), value: filteredPlants.length },
+        { icon: <TrendingUp size={20} />, label: t('dashboard.active'), value: filteredPlants.filter(p => p.status === 'active').length },
+        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: filteredPlants.length > 0 ? Math.max(...filteredPlants.map(p => p.daysSincePlanting || 0)) : 0 },
     ];
 
     return (
@@ -133,7 +145,7 @@ export default function Dashboard({ user, onLogout }) {
                             textTransform: 'uppercase',
                             opacity: 0.7,
                         }}>
-                            {t('dashboard.tracked_count', { count: plants.length })}
+                            {t('dashboard.tracked_count', { count: filteredPlants.length })}
                         </p>
                     </div>
 
@@ -214,6 +226,34 @@ export default function Dashboard({ user, onLogout }) {
                         <option value="archived">Archived</option>
                     </select>
                 </div>
+
+                {/* Reminders Section */}
+                {!loading && reminders.length > 0 && (
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ marginBottom: 44 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+                            <Clock size={18} style={{ color: 'var(--gold)' }} />
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 22, color: 'var(--pearl)', margin: 0 }}>{t('tasks.title')}</h2>
+                        </div>
+                        <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 10 }}>
+                            {reminders.map(r => (
+                                <div key={r._id} className="card" style={{ minWidth: 260, padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: 'var(--jade)', textTransform: 'uppercase' }}>
+                                            {r.plantId?.commonName || t('dashboard.botanists')}
+                                        </div>
+                                        <button onClick={() => handleCompleteTask(r._id)} className="btn-ghost" title={t('tasks.complete_task')} style={{ padding: 4, borderRadius: '50%', color: 'var(--jade)' }}>
+                                            <CheckCircle size={18} />
+                                        </button>
+                                    </div>
+                                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--pearl)' }}>{r.task}</div>
+                                    <div style={{ fontSize: 12, color: 'rgba(240,253,244,0.4)' }}>
+                                        {new Date(r.dueDate).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
 
                 {/* Plants Grid */}
                 {loading ? (

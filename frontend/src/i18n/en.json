@@ -112,7 +112,8 @@
     "tracked_count": "{{count}} plant tracked",
     "tracked_count_plural": "{{count}} plants tracked",
     "botanists": "Botanist",
-    "failed_load": "Failed to load plants. Please refresh."
+    "failed_load": "Failed to load plants. Please refresh.",
+    "search_placeholder": "Search your botanical collection..."
   },
   "register": {
     "title": "Create Account",
@@ -204,7 +205,8 @@
     "active": "Active",
     "harvested": "Harvested",
     "dormant": "Dormant",
-    "completed": "Completed"
+    "completed": "Completed",
+    "archived": "Archived"
   },
   "care_log": {
     "title": "Add Care Log",
@@ -309,5 +311,17 @@
     "overdue": "Overdue",
     "active_tasks": "Active Tasks",
     "complete": "Complete"
+  },
+  "ai_assistant": {
+    "title": "Botanico AI",
+    "description": "I can help you analyze {{name}}'s growth or provide care tips based on your logs.",
+    "placeholder": "Ask about fertilizer, watering, or pests...",
+    "thinking": "Thinking...",
+    "error": "Sorry, I'm having trouble connecting to the botanical database right now."
+  },
+  "tasks": {
+    "title": "Pending Tasks",
+    "complete_task": "Mark Task Complete",
+    "no_tasks": "All caught up! No pending tasks."
   }
 }

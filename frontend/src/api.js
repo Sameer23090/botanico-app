@@ -64,6 +64,20 @@ export const updatesAPI = {
   getTimeline: (plantId) => api.get(`/updates/plant/${plantId}/timeline`),
 };
 
+export const aiAPI = {
+  getAdvice: (plantId, question) => api.post(`/plants/${plantId}/ai`, { question }),
+  consult: (plantId) => api.post('/ai/consult', { plantId }),
+  diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId }),
+  chat: (message, history) => api.post('/ai/chat', { message, history }),
+};
+
+export const remindersAPI = {
+  getAll: () => api.get('/reminders'),
+  create: (data) => api.post('/reminders', data),
+  complete: (id) => api.patch(`/reminders/${id}/complete`),
+};
+
+// New Upload API
 export const uploadAPI = {
   uploadImage: (formData) => {
     return api.post('/upload', formData, {
@@ -78,21 +92,9 @@ export const marketplaceAPI = {
   getMyListings: () => api.get('/marketplace/my-listings'),
 };
 
-export const aiAPI = {
-  consult: (plantId) => api.post('/ai/consult', { plantId }),
-  diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId }),
-  chat: (message, history) => api.post('/ai/chat', { message, history }),
-};
-
 export const achievementAPI = {
   getUnlocked: () => api.get('/achievements'),
   unlock: (data) => api.post('/achievements/unlock', data),
-};
-
-export const remindersAPI = {
-  getAll: () => api.get('/reminders'),
-  create: (data) => api.post('/reminders', data),
-  complete: (id) => api.patch(`/reminders/${id}/complete`),
 };
 
 export const setAuthToken = (token) => {

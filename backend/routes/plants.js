@@ -5,6 +5,7 @@ const Update = require('../models/Update');
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
 const { translateFields } = require('../services/translateService');
+const aiAssistant = require('../services/aiAssistant');
 
 const router = express.Router();
 
@@ -210,6 +211,39 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     res.json({ message: 'Plant deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete plant' });
+  }
+});
+
+// ─── POST /api/plants/:id/ai ───────────────────────────────────────────────
+/**
+ * @route   POST /api/plants/:id/ai
+ * @desc    Get AI-powered advice for a specific plant
+ * @access  Private
+ */
+router.post('/:id/ai', authMiddleware, async (req, res) => {
+  try {
+    const { question } = req.body;
+    if (!question) return res.status(400).json({ error: 'Question is required' });
+
+    const plant = await Plant.findOne({ _id: req.params.id, userId: req.user.id }).lean();
+    if (!plant) return res.status(404).json({ error: 'Plant not found' });
+
+    // Fetch recent updates to give context to AI
+    const updates = await Update.find({ plantId: plant._id })
+      .sort({ entryDate: -1 })
+      .limit(5)
+      .lean();
+
+    const plantContext = {
+      ...plant,
+      recentUpdates: updates
+    };
+
+    const advice = await aiAssistant.getPersonalizedAdvice(plantContext, question);
+    res.json({ advice });
+  } catch (error) {
+    console.error('AI Route Error:', error);
+    res.status(500).json({ error: 'Failed to get AI advice' });
   }
 });
 

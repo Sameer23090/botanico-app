@@ -1,20 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit } from 'lucide-react';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit, Bot, Send } from 'lucide-react';
 import { plantsAPI, updatesAPI, aiAPI } from '../api';
+import { useTranslation } from 'react-i18next';
 
 export default function PlantDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [plant, setPlant] = useState(null);
     const [updates, setUpdates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    
+    // Remote Feature States
     const [showQR, setShowQR] = useState(false);
     const [showAI, setShowAI] = useState(false);
     const [aiMessage, setAiMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
+
+    // My AI Assistant State
+    const [isAiOpen, setIsAiOpen] = useState(false);
+    const [aiQuestion, setAiQuestion] = useState('');
+    const [aiResponse, setAiResponse] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +58,37 @@ export default function PlantDetail() {
         }
     };
 
+    const handleAiAsk = async (e) => {
+        if (e) e.preventDefault();
+        if (!aiQuestion.trim()) return;
+
+        setAiLoading(true);
+        setAiResponse('');
+        try {
+            const res = await aiAPI.getAdvice(id, aiQuestion);
+            setAiResponse(res.data.advice);
+        } catch (err) {
+            setAiResponse(t('ai_assistant.error'));
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
+    const consultAI = async () => {
+        setShowAI(true);
+        setIsThinking(true);
+        setAiMessage('');
+        
+        try {
+            const res = await aiAPI.consult(id);
+            setAiMessage(res.data.advice);
+        } catch (err) {
+            setAiMessage(err.response?.data?.error || "Metabolic scanning failed. Ensure the AI Service Key is properly configured.");
+        } finally {
+            setIsThinking(false);
+        }
+    };
+
     if (loading) return (
         <div style={{ minHeight: '100vh', background: 'var(--night)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div className="spinner" />
@@ -63,21 +104,6 @@ export default function PlantDetail() {
     );
 
     if (!plant) return null;
-
-    const consultAI = async () => {
-        setShowAI(true);
-        setIsThinking(true);
-        setAiMessage('');
-        
-        try {
-            const res = await aiAPI.consult(id);
-            setAiMessage(res.data.advice);
-        } catch (err) {
-            setAiMessage(err.response?.data?.error || "Metabolic scanning failed. Ensure the AI Service Key (GEMINI_API_KEY) is properly configured in the environment.");
-        } finally {
-            setIsThinking(false);
-        }
-    };
 
     const plantingDate = new Date(plant.plantingDate);
     const daysSince = plant.daysSincePlanting ?? Math.floor((Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -448,6 +474,104 @@ export default function PlantDetail() {
                     </div>
                 )}
             </div>
+
+            {/* AI Floating Toggle */}
+            <button 
+                onClick={() => setIsAiOpen(true)}
+                style={{
+                    position: 'fixed', bottom: 32, right: 32,
+                    width: 64, height: 64, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--jade), var(--emerald))',
+                    color: 'white', border: 'none', cursor: 'pointer',
+                    boxShadow: '0 8px 32px rgba(34,197,94,0.4)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 100, transition: 'transform 0.2s',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+                <Bot size={28} />
+            </button>
+
+            {/* AI Assistant Sidebar/Modal */}
+            {isAiOpen && (
+                <motion.div
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    style={{
+                        position: 'fixed', top: 0, right: 0, bottom: 0, width: 400,
+                        background: 'rgba(10,15,13,0.95)',
+                        backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)',
+                        borderLeft: '1px solid rgba(255,255,255,0.1)',
+                        zIndex: 200, padding: 32, display: 'flex', flexDirection: 'column',
+                    }}
+                >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <Sparkles size={20} style={{ color: 'var(--jade)' }} />
+                            <h2 style={{ fontFamily: 'var(--font-serif)', color: 'var(--pearl)', fontSize: 22, margin: 0 }}>{t('ai_assistant.title')}</h2>
+                        </div>
+                        <button onClick={() => setIsAiOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--mist)', cursor: 'pointer' }}>
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <p style={{ color: 'var(--mist)', fontSize: 14, lineHeight: 1.6, marginBottom: 24, opacity: 0.7 }}>
+                        {t('ai_assistant.description', { name: plant.commonName })}
+                    </p>
+
+                    <div style={{ flex: 1, overflowY: 'auto', marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        {aiResponse && (
+                            <div style={{ 
+                                background: 'rgba(255,255,255,0.03)', 
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                borderRadius: 16, padding: 20,
+                                color: 'var(--pearl)', fontSize: 14, lineHeight: 1.7,
+                                whiteSpace: 'pre-wrap'
+                            }}>
+                                {aiResponse}
+                            </div>
+                        )}
+                        {aiLoading && (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, margin: '20px auto' }}>
+                                <div className="spinner" />
+                                <span style={{ fontSize: 12, color: 'var(--jade)', fontFamily: 'var(--font-mono)' }}>{t('ai_assistant.thinking')}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <form onSubmit={handleAiAsk} style={{ position: 'relative' }}>
+                        <textarea
+                            value={aiQuestion}
+                            onChange={(e) => setAiQuestion(e.target.value)}
+                            placeholder={t('ai_assistant.placeholder')}
+                            style={{
+                                width: '100%', minHeight: 100,
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: 14, padding: '16px 48px 16px 16px',
+                                color: 'var(--pearl)', fontSize: 14,
+                                resize: 'none', outline: 'none',
+                                fontFamily: 'inherit'
+                            }}
+                        />
+                        <button 
+                            type="submit"
+                            disabled={aiLoading}
+                            style={{
+                                position: 'absolute', right: 12, bottom: 12,
+                                background: 'var(--jade)', color: 'white',
+                                border: 'none', width: 32, height: 32,
+                                borderRadius: 10, display: 'flex', 
+                                alignItems: 'center', justifyContent: 'center',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <Send size={14} />
+                        </button>
+                    </form>
+                </motion.div>
+            )}
         </div>
     );
 }
