@@ -81,6 +81,7 @@ export const marketplaceAPI = {
 export const aiAPI = {
   consult: (plantId) => api.post('/ai/consult', { plantId }),
   diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId }),
+  chat: (message, history) => api.post('/ai/chat', { message, history }),
 };
 
 export const achievementAPI = {

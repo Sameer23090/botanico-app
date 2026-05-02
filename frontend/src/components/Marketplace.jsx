@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Search, Tag, MapPin, Plus, ExternalLink, Leaf, Loader2, X, ArrowLeft } from 'lucide-react';
-import api, { marketplaceAPI, plantsAPI } from '../api';
+import { ShoppingBag, Search, Tag, MapPin, Plus, ExternalLink, Leaf, Loader2, X, ArrowLeft, Sparkles, Wand2 } from 'lucide-react';
+import api, { marketplaceAPI, plantsAPI, aiAPI } from '../api';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -24,6 +24,7 @@ export default function Marketplace() {
         category: '', listingType: '', city: '', minPrice: '', maxPrice: ''
     });
     const [searchTerm, setSearchTerm] = useState('');
+    const [generating, setGenerating] = useState(false);
 
     useEffect(() => {
         fetchListings();
@@ -60,6 +61,32 @@ export default function Marketplace() {
             setCreateError(err.response?.data?.error || 'Failed to create listing');
         } finally {
             setCreating(false);
+        }
+    };
+
+    const generateAiDescription = async () => {
+        if (!newListing.title) {
+            setCreateError('Please enter a title first to generate a description.');
+            return;
+        }
+        setGenerating(true);
+        setCreateError('');
+        try {
+            const plant = myPlants.find(p => p.id === newListing.plantId);
+            const prompt = `Act as an expert botanist and marketplace seller. Generate a short, compelling listing description (max 60 words) for:
+            Item: ${newListing.title}
+            Category: ${newListing.category}
+            Type: ${newListing.listingType}
+            ${plant ? `Plant Details: ${plant.commonName} (${plant.scientificName || ''})` : ''}
+            
+            Focus on plant health, rarity, and care tips.`;
+            
+            const res = await aiAPI.chat(prompt, []);
+            setNewListing(prev => ({ ...prev, description: res.data.reply }));
+        } catch (err) {
+            setCreateError('AI generation failed. Please write manually.');
+        } finally {
+            setGenerating(false);
         }
     };
 
@@ -294,7 +321,18 @@ export default function Marketplace() {
                                     </div>
 
                                     <div>
-                                        <label className="label-text">Description</label>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                            <label className="label-text" style={{ marginBottom: 0 }}>Description</label>
+                                            <button 
+                                                type="button"
+                                                onClick={generateAiDescription}
+                                                disabled={generating}
+                                                style={{ background: 'none', border: 'none', color: 'var(--jade)', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', opacity: generating ? 0.6 : 1 }}
+                                            >
+                                                {generating ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
+                                                {generating ? 'Generating...' : 'AI Generate'}
+                                            </button>
+                                        </div>
                                         <textarea className="input-field" placeholder="Describe condition, age, care tips..." rows={3}
                                             style={{ resize: 'vertical', minHeight: 80 }}
                                             value={newListing.description} onChange={(e) => setNewListing({ ...newListing, description: e.target.value })} />

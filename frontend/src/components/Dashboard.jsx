@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar, ShoppingBag, Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { plantsAPI } from '../api';
+import { plantsAPI, aiAPI } from '../api';
+import { Sparkles, Wand2, BrainCircuit } from 'lucide-react';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -23,6 +24,8 @@ export default function Dashboard({ user, onLogout }) {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [insight, setInsight] = useState('');
+    const [loadingInsight, setLoadingInsight] = useState(false);
 
     useEffect(() => {
         const fetchPlants = async () => {
@@ -36,7 +39,34 @@ export default function Dashboard({ user, onLogout }) {
             }
         };
         fetchPlants();
+        fetchInsight();
     }, [t]);
+
+    const fetchInsight = async () => {
+        // Check if we have a fresh insight in session storage
+        const cached = sessionStorage.getItem('botanico_insight');
+        const cachedDate = sessionStorage.getItem('botanico_insight_date');
+        const today = new Date().toDateString();
+
+        if (cached && cachedDate === today) {
+            setInsight(cached);
+            return;
+        }
+
+        setLoadingInsight(true);
+        try {
+            const prompt = "Generate a one-sentence, fascinating botanical fact or advanced plant care tip for an elite biotech platform. Be specific, scientific, and professional. Max 25 words.";
+            const res = await aiAPI.chat(prompt, []);
+            const text = res.data.reply;
+            setInsight(text);
+            sessionStorage.setItem('botanico_insight', text);
+            sessionStorage.setItem('botanico_insight_date', today);
+        } catch (err) {
+            setInsight("Photosynthesis converts light energy into chemical energy to fuel plant growth.");
+        } finally {
+            setLoadingInsight(false);
+        }
+    };
 
     const filteredPlants = (plants || []).filter(p => {
         const name = (p.commonName || '').toLowerCase();
@@ -102,9 +132,38 @@ export default function Dashboard({ user, onLogout }) {
                             color: 'var(--mist)',
                             textTransform: 'uppercase',
                             opacity: 0.7,
-                        }}>{t('dashboard.tracked_count', { count: plants.length })}</p>
+                        }}>
+                            {t('dashboard.tracked_count', { count: plants.length })}
+                        </p>
                     </div>
-                    <Link to="/add-plant" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+
+                    {/* AI Insight Card */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{
+                            maxWidth: 350,
+                            padding: '16px 20px',
+                            background: 'rgba(34,197,94,0.04)',
+                            border: '1px solid rgba(34,197,94,0.1)',
+                            borderRadius: 16,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 8,
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <BrainCircuit size={14} style={{ color: 'var(--jade)' }} />
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--jade)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Botanical Insight</span>
+                            {loadingInsight && <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}><Sparkles size={10} style={{ color: 'var(--gold)', marginLeft: 'auto' }} /></motion.div>}
+                        </div>
+                        <p style={{ fontSize: 13, color: 'rgba(240,253,244,0.7)', lineHeight: 1.5, margin: 0, fontStyle: 'italic' }}>
+                            {loadingInsight ? 'Synchronizing botanical data...' : `"${insight}"`}
+                        </p>
+                    </motion.div>
+
+                    <Link to="/add-plant" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 10, borderRadius: 50, padding: '14px 28px' }}>
                         <Plus size={15} /> {t('dashboard.add_plant')}
                     </Link>
                 </div>

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud, Camera } from 'lucide-react';
-import api, { plantsAPI } from '../api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Leaf, ArrowLeft, CheckCircle, FlaskConical, Cloud, Camera, Sparkles, BrainCircuit, X, Loader2 } from 'lucide-react';
+import api, { plantsAPI, aiAPI } from '../api';
 import { useTranslation } from 'react-i18next';
 import ImageUpload from './ImageUpload';
 
@@ -57,6 +57,9 @@ export default function AddUpdate() {
     const [error, setError] = useState('');
     const [gpsCoords, setGpsCoords] = useState('TAP');
     const [capturedCoords, setCapturedCoords] = useState(null);
+    const [diagnosing, setDiagnosing] = useState(false);
+    const [aiDiagnosis, setAiDiagnosis] = useState('');
+    const [showAiModal, setShowAiModal] = useState(false);
 
     const captureGPS = () => {
         if (navigator.geolocation) {
@@ -93,6 +96,29 @@ export default function AddUpdate() {
             takenAt: new Date(),
             imageType: uploadData.imageType
         }]);
+    };
+
+    const runAiDiagnosis = async (photoUrl) => {
+        setDiagnosing(true);
+        setShowAiModal(true);
+        setAiDiagnosis('');
+        try {
+            const res = await aiAPI.diagnose(photoUrl, id);
+            setAiDiagnosis(res.data.diagnosis);
+            
+            // Extract health status if present in AI response (e.g., "Health Status: Poor")
+            const match = res.data.diagnosis.match(/Health Status:\s*(\w+)/i);
+            if (match && match[1]) {
+                const status = match[1].toLowerCase();
+                if (['excellent', 'good', 'fair', 'poor', 'critical'].includes(status)) {
+                    setForm(prev => ({ ...prev, healthStatus: status }));
+                }
+            }
+        } catch (err) {
+            setAiDiagnosis(err.response?.data?.error || "Metabolic scanning failed.");
+        } finally {
+            setDiagnosing(false);
+        }
     };
 
     const f = (k) => ({ value: form[k], onChange: e => setForm({ ...form, [k]: e.target.value }) });
@@ -173,6 +199,23 @@ export default function AddUpdate() {
                                 scientificName={plant?.scientificName}
                                 onUploadComplete={handleUploadComplete} 
                             />
+                            {photos.length > 0 && (
+                                <div style={{ marginTop: 16, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                                    {photos.map((p, idx) => (
+                                        <div key={idx} style={{ position: 'relative', width: 100, height: 100 }}>
+                                            <img src={p.displayUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }} />
+                                            <button 
+                                                type="button"
+                                                onClick={() => runAiDiagnosis(p.displayUrl)}
+                                                style={{ position: 'absolute', bottom: -10, right: -10, width: 32, height: 32, borderRadius: '50%', background: 'var(--jade)', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+                                                title="AI Diagnosis"
+                                            >
+                                                <BrainCircuit size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -335,6 +378,51 @@ export default function AddUpdate() {
                     </form>
                 </motion.div>
             </div>
+
+            {/* AI Diagnosis Modal */}
+            <AnimatePresence>
+                {showAiModal && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)' }}
+                    >
+                        <motion.div 
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            className="card"
+                            style={{ maxWidth: 500, width: '100%', padding: '40px', border: '1px solid var(--jade)', position: 'relative' }}
+                        >
+                            <button onClick={() => setShowAiModal(false)} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'var(--mist)', cursor: 'pointer' }}><X size={20} /></button>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+                                <div className="stat-icon" style={{ width: 48, height: 48, background: 'rgba(34,197,94,0.1)', color: 'var(--jade)' }}>
+                                    <BrainCircuit size={24} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 22, color: 'var(--pearl)', margin: 0 }}>AI Health Scan</h2>
+                                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: 'var(--jade)', opacity: 0.7, letterSpacing: '0.15em', margin: 0 }}>BIOMETRIC DIAGNOSIS</p>
+                                </div>
+                            </div>
+
+                            {diagnosing ? (
+                                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                                    <Loader2 size={40} className="animate-spin" style={{ color: 'var(--jade)', margin: '0 auto 16px' }} />
+                                    <p style={{ fontSize: 13, color: 'var(--jade)', fontFamily: "var(--font-mono)" }}>ANALYZING SPECIMEN...</p>
+                                </div>
+                            ) : (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                    <div style={{ padding: 20, background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 24, fontSize: 14, lineHeight: 1.6, color: 'rgba(240,253,244,0.8)' }}>
+                                        {aiDiagnosis}
+                                    </div>
+                                    <button onClick={() => setShowAiModal(false)} className="btn-primary" style={{ width: '100%' }}>Sync Data to Entry</button>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

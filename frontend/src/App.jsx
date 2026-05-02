@@ -24,6 +24,7 @@ import ResetPassword from './components/ResetPassword';
 import Marketplace from './components/Marketplace';
 import Reminders from './components/Reminders';
 import PublicPlantDetail from './components/PublicPlantDetail';
+import BotaniChat from './components/BotaniChat';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -79,6 +80,8 @@ function App() {
         <div style={{ minHeight: '100vh', background: 'var(--night)', position: 'relative' }}>
           
           <AmbientAnimations />
+          {/* Global floating AI chat — visible on all authenticated pages */}
+          <BotaniChat isAuthenticated={isAuthenticated()} />
           <Routes>
             {/* Public routes */}
             <Route path="/" element={
