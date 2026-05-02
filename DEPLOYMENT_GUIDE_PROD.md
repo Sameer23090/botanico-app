@@ -1,67 +1,63 @@
-# 🚀 Botanico Production Deployment Guide
+# 🚀 Production Deployment Guide: Botanico
 
-This guide describes how to deploy the **Botanico** stack (Frontend: React/Vite/Vercel, Backend: Node/Express/Render).
+Follow these steps to deploy the Botanico platform to Vercel with MongoDB Atlas and Groq AI.
+
+## 1. Database Setup (MongoDB Atlas)
+1. Log in to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Create a new Cluster (Shared Tier is sufficient).
+3. Under **Network Access**, add `0.0.0.0/0` (required for Vercel Serverless Functions).
+4. Under **Database Access**, create a user with `Read and Write to any database` permissions.
+5. Copy your **SRV Connection String**.
+
+## 2. AI Infrastructure (Groq)
+1. Log in to [Groq Console](https://console.groq.com).
+2. Generate an **API Key** (`gsk_...`).
+3. Ensure you have access to `llama-3.1-70b-versatile` and `llama-3.2-11b-vision-preview`.
+
+## 3. Storage Infrastructure (Google Drive)
+1. Create a project in [Google Cloud Console](https://console.cloud.google.com).
+2. Enable the **Google Drive API**.
+3. Create a **Service Account** and download the **JSON Key file**.
+4. Create a folder in your Google Drive and copy its **Folder ID** from the URL.
+5. **Share** that folder with the Service Account email (give "Editor" access).
+
+## 4. Vercel Deployment
+
+### Step 1: Connect GitHub
+1. Push your latest code to your GitHub repository.
+2. Log in to [Vercel](https://vercel.com) and click **"New Project"**.
+3. Import the `botanico-app` repository.
+
+### Step 2: Configure Build Settings
+- **Framework Preset**: Vite
+- **Root Directory**: `frontend` (Note: We usually deploy as a monorepo or separate projects, but for this specific structure, ensure the root is configured correctly).
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+
+### Step 3: Environment Variables
+Add these variables in the Vercel Dashboard under **Project Settings > Environment Variables**:
+
+| Variable | Value |
+| :--- | :--- |
+| `MONGODB_URI` | Your MongoDB SRV String |
+| `JWT_SECRET` | A strong random string |
+| `GROQ_API_KEY` | Your Groq API Key |
+| `GOOGLE_SERVICE_ACCOUNT_KEY_JSON` | The entire content of your Service Account JSON file |
+| `DRIVE_ROOT_FOLDER_ID` | Your Google Drive Folder ID |
+| `ADMIN_PASSWORD` | Set a secure password for the Admin Dashboard |
+| `NODE_ENV` | `production` |
+
+## 5. Post-Deployment Verification
+1. Navigate to your Vercel URL.
+2. Verify **Register** works (check MongoDB for new user).
+3. Verify **AI Chat** (click the BotaniBot widget).
+4. Verify **Image Upload** (upload a plant photo, it should appear in Google Drive).
+5. Verify **AI Diagnosis** (click the brain icon on an uploaded photo).
+
+## ⚠️ Common Production Issues
+- **CORS Error**: Ensure your Vercel URL is added to the backend allowed origins if you are deploying them as separate entities.
+- **Drive 403**: Ensure the Service Account email has been shared into the target Drive folder.
+- **AI Timeout**: Groq is very fast, but Vercel Hobby tier has a 10s timeout. If using heavy vision models, ensure they complete within this window or upgrade to Pro.
 
 ---
-
-## 🏗️ 1. Backend: Hosting on Render.com
-
-[Render](https://render.com) is recommended for its simplicity and built-in Node.js support.
-
-### Setup Step:
-1.  Push your code to **GitHub**.
-2.  Log in to [Render.com](https://render.com) and create **New +** → **Web Service**.
-3.  Connect your GitHub repository.
-4.  Configure:
-    - **Build Command**: `npm install` (Root directory: `backend`)
-    - **Start Command**: `npm start`
-    - **Environment Type**: `Node`
-
-### 🔑 Set Backend Variables:
-In your Render **Environment Variables** dashboard, add:
-- `MONGODB_URI`: *[Your Atlas connection string]*
-- `JWT_SECRET`: *[A long random string]*
-- `FRONTEND_URL`: `https://your-app.vercel.app`
-- `GOOGLE_CALLBACK_URL`: `https://your-render-name.onrender.com/api/auth/google/callback`
-- `MICROSOFT_CALLBACK_URL`: `https://your-render-name.onrender.com/api/auth/microsoft/callback`
-- `DRIVE_ROOT_FOLDER_ID`: *[The ID from your Drive folder URL]*
-- `GOOGLE_SERVICE_ACCOUNT_KEY_JSON`: *[The full JSON string from your Service Account key]*
-- `GOOGLE_TRANSLATE_API_KEY`: *[From Google Console]*
-
----
-
-## 🎨 2. Frontend: Hosting on Vercel
-
-[Vercel](https://vercel.com) provides seamless hosting for Vite/React apps.
-
-### Setup Step:
-1.  New Project on Vercel → **Import** your GitHub repo.
-2.  Set **Framework Preset** to `Vite`.
-3.  Set **Root Directory** to `frontend`.
-
-### 🔑 Set Frontend Variables:
-Add this in the Vercel **Environment Variables** settings:
-- `VITE_API_URL`: `https://your-backend-render-url.com/api`
-
----
-
-## 🛠️ 3. Google Console Configuration (CRITICAL)
-
-Go to [Google Cloud Console](https://console.cloud.google.com/):
-
-1.  **Authorized Redirect URIs**: 
-    - `https://your-backend-render-url.com/api/auth/google/callback`
-    - `http://localhost:5000/api/auth/google/callback` (for local tests)
-2.  **API Keys**: 
-    - Enable **Cloud Translation API**.
-    - Enable **Google Drive API**.
-3.  **Drive Folder**: 
-    - Create a folder `Botanico_Uploads`.
-    - **Share** it with the service account email as **Editor**.
-
----
-
-## 🔍 4. Verification Check
-- Visit `https://your-app.vercel.app/login`. 
-- Try "Continue with Google".
-- Upload a plant photo and check your Google Drive folder.
+**Botanico Deployment Suite v2.0**
