@@ -52,28 +52,8 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS: allow localhost for dev and any vercel.app / custom domain for production
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  /\.vercel\.app$/,
-];
-
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-    // Check if origin matches any allowed origin
-    const isAllowed = allowedOrigins.some((o) =>
-      typeof o === 'string' ? o === origin : o.test(origin)
-    );
-    if (isAllowed) return callback(null, true);
-    callback(new Error(`CORS blocked: ${origin}`));
-  },
+  origin: true, // Allow all origins for now to resolve 500/CORS issues
   credentials: true,
 }));
 

@@ -31,7 +31,8 @@ export default function Login({ onLogin }) {
       onLogin(res.data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || t('login.login_failed'));
+      const errorData = err.response?.data?.error;
+      setError(typeof errorData === 'object' ? (errorData.message || JSON.stringify(errorData)) : (errorData || t('login.login_failed')));
     } finally { setLoading(false); }
   };
 

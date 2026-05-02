@@ -33,7 +33,8 @@ export default function Register({ onRegister }) {
             if (onRegister) onRegister(data.user);
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.error || err.message || t('register.error_failed'));
+            const errorData = err.response?.data?.error;
+            setError(typeof errorData === 'object' ? (errorData.message || JSON.stringify(errorData)) : (errorData || err.message || t('register.error_failed')));
         } finally {
             setLoading(false);
         }
