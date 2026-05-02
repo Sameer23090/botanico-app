@@ -15,6 +15,66 @@
   ],
   "routes": [
     {
+      "src": "/api/health",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/plants/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/plants",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/updates/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/updates",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/admin/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/marketplace/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/marketplace",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/reminders/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/reminders",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/ai/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/achievements/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/api/achievements",
+      "dest": "backend/server.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "backend/server.js"
     },
