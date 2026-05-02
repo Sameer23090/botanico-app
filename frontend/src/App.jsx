@@ -22,6 +22,8 @@ import EditUpdate from './components/EditUpdate';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import Marketplace from './components/Marketplace';
+import Reminders from './components/Reminders';
+import PublicPlantDetail from './components/PublicPlantDetail';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -125,6 +127,12 @@ function App() {
                 <Marketplace />
               </ProtectedRoute>
             } />
+            <Route path="/reminders" element={
+              <ProtectedRoute>
+                <Reminders />
+              </ProtectedRoute>
+            } />
+            <Route path="/public/plant/:id" element={<PublicPlantDetail />} />
 
             {/* Admin routes */}
             <Route path="/admin" element={<AdminLogin />} />

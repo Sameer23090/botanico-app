@@ -19,10 +19,27 @@ const calcDayNumber = (plantingDate, entryDate) => {
 };
 
 // ─── GET /api/updates/plant/:plantId ─────────────────────────────────────────
-router.get('/plant/:plantId', authMiddleware, async (req, res) => {
+router.get('/plant/:plantId', async (req, res) => {
   try {
-    const plant = await Plant.findOne({ _id: req.params.plantId, userId: req.user.id });
+    const plant = await Plant.findById(req.params.plantId);
     if (!plant) return res.status(404).json({ error: 'Plant not found' });
+
+    // Access Control: Public plants visible to all
+    if (!plant.isPublic) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      const jwt = require('jsonwebtoken');
+      try {
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+        if (plant.userId.toString() !== decoded.id) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+      } catch (e) {
+        return res.status(403).json({ error: 'Invalid token' });
+      }
+    }
 
     const updates = await Update.find({ plantId: req.params.plantId })
       .sort({ entryDate: -1, createdAt: -1 })

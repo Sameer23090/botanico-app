@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar } from 'lucide-react';
+import { Plus, LogOut, TrendingUp, Leaf, Sprout, Calendar, Bell, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { plantsAPI } from '../api';
+import { plantsAPI, remindersAPI, achievementAPI } from '../api';
 
 const DARK_NAV = {
     position: 'sticky', top: 0, zIndex: 50,
@@ -23,24 +23,58 @@ export default function Dashboard({ user, onLogout }) {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [reminders, setReminders] = useState([]);
+    const [achievements, setAchievements] = useState([]);
 
     useEffect(() => {
-        const fetchPlants = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const res = await plantsAPI.getAll();
-                setPlants(res.data.plants || []);
+                const [plantRes, remRes, achRes] = await Promise.all([
+                    plantsAPI.getAll().catch(() => ({ data: { plants: [] } })),
+                    remindersAPI.getAll().catch(() => ({ data: { reminders: [] } })),
+                    achievementAPI.getUnlocked().catch(() => ({ data: { achievements: [] } }))
+                ]);
+                
+                const plantsData = plantRes?.data?.plants || [];
+                const remindersData = remRes?.data?.reminders || [];
+                const achievementsData = achRes?.data?.achievements || [];
+
+                setPlants(plantsData);
+                setReminders(remindersData);
+                setAchievements(achievementsData);
+
+                // Auto-unlock logic for new users
+                if (achievementsData.length === 0 && plantsData.length > 0) {
+                    try {
+                        await achievementAPI.unlock({
+                            title: 'First Contact',
+                            description: 'Established the first digital link with a botanical subject.',
+                            category: 'Consistency',
+                            rarity: 'Common',
+                            points: 50,
+                            icon: 'ShieldCheck'
+                        });
+                        const newAchRes = await achievementAPI.getUnlocked();
+                        setAchievements(newAchRes?.data?.achievements || []);
+                    } catch (e) {
+                        console.warn('Achievement unlock failed', e);
+                    }
+                }
             } catch (err) {
-                setError(t('dashboard.failed_load'));
+                console.error('Dashboard load error', err);
+                setError(t('dashboard.failed_load') || 'Critical system error detected.');
             } finally {
                 setLoading(false);
             }
         };
-        fetchPlants();
+        fetchDashboardData();
     }, [t]);
 
-    const filteredPlants = plants.filter(p => {
-        const matchesSearch = p.commonName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                             p.scientificName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredPlants = (plants || []).filter(p => {
+        const name = p.commonName || '';
+        const scientific = p.scientificName || '';
+        const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             scientific.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -48,9 +82,9 @@ export default function Dashboard({ user, onLogout }) {
     const handleLogout = () => { onLogout(); navigate('/'); };
 
     const STATS = [
-        { icon: <Sprout size={20} />, label: t('dashboard.total_plants'), value: plants.length },
-        { icon: <TrendingUp size={20} />, label: t('dashboard.active'), value: plants.filter(p => p.status === 'active').length },
-        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: plants.length > 0 ? Math.max(...plants.map(p => p.daysSincePlanting || 0)) : 0 },
+        { icon: <Sprout size={20} />, label: t('dashboard.total_plants') || 'Total Plants', value: (plants || []).length },
+        { icon: <TrendingUp size={20} />, label: t('dashboard.active') || 'Active', value: (plants || []).filter(p => p.status === 'active').length },
+        { icon: <Calendar size={20} />, label: t('dashboard.days_growing') || 'Days Growing', value: (plants || []).length > 0 ? Math.max(...(plants || []).map(p => p.daysSincePlanting || 0)) : 0 },
     ];
 
     return (
@@ -64,16 +98,20 @@ export default function Dashboard({ user, onLogout }) {
                     background: 'linear-gradient(135deg, var(--pearl) 0%, var(--sage) 60%, var(--gold) 100%)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     letterSpacing: '-0.02em',
-                }}>{t('app_title')}</div>
+                }}>{t('app_title') || 'Botanico'}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.45)', fontFamily: "var(--font-body)", fontWeight: 400 }}>
-                        {user?.name || t('dashboard.botanists')} 👋
+                        {user?.name || t('dashboard.botanists') || 'Botanist'} 👋
                     </span>
                     <Link to="/marketplace" className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--gold)' }}>
                         <ShoppingBag size={14} /> Marketplace
                     </Link>
+                    <Link to="/reminders" className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--jade)' }}>
+                        <Bell size={14} /> Reminders
+                        {(reminders || []).length > 0 && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)', display: 'inline-block' }} />}
+                    </Link>
                     <button onClick={handleLogout} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-                        <LogOut size={14} /> {t('navigation.logout')}
+                        <LogOut size={14} /> {t('navigation.logout') || 'Logout'}
                     </button>
                 </div>
             </nav>
@@ -90,7 +128,7 @@ export default function Dashboard({ user, onLogout }) {
                             color: 'var(--pearl)',
                             marginBottom: 6,
                             lineHeight: 1.1,
-                        }}>{t('dashboard.title')}</h1>
+                        }}>{t('dashboard.title') || 'Command Center'}</h1>
                         <p style={{
                             fontFamily: "var(--font-mono)",
                             fontSize: 10,
@@ -98,10 +136,10 @@ export default function Dashboard({ user, onLogout }) {
                             color: 'var(--mist)',
                             textTransform: 'uppercase',
                             opacity: 0.7,
-                        }}>{t('dashboard.tracked_count', { count: plants.length })}</p>
+                        }}>{t('dashboard.tracked_count', { count: (plants || []).length }) || `${(plants || []).length} Specimens Logged`}</p>
                     </div>
                     <Link to="/add-plant" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                        <Plus size={15} /> {t('dashboard.add_plant')}
+                        <Plus size={15} /> {t('dashboard.add_plant') || 'Add Specimen'}
                     </Link>
                 </div>
 
@@ -116,6 +154,58 @@ export default function Dashboard({ user, onLogout }) {
                             </div>
                         </motion.div>
                     ))}
+                </div>
+
+                {/* Mission Briefing & Achievements */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14, marginBottom: 44 }}>
+                    {/* Mission Briefing */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }} 
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{ background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: 24, padding: 24 }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <Bell size={18} style={{ color: 'var(--jade)' }} />
+                                <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, color: 'var(--pearl)' }}>Mission Briefing</h2>
+                            </div>
+                            <Link to="/reminders" style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: 'var(--jade)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>View All</Link>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            {(reminders || []).length > 0 ? reminders.slice(0, 3).map((r, i) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 8 }}>
+                                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: r.priority === 'High' ? 'var(--gold)' : 'var(--jade)' }} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--pearl)' }}>{r.taskName}</div>
+                                        <div style={{ fontSize: 11, color: 'var(--mist)', opacity: 0.6 }}>{r.plantId?.commonName} • {r.dueDate ? new Date(r.dueDate).toLocaleDateString() : 'N/A'}</div>
+                                    </div>
+                                </div>
+                            )) : (
+                                <div style={{ textAlign: 'center', padding: '20px 0', opacity: 0.4, fontSize: 13 }}>No critical tasks scheduled.</div>
+                            )}
+                        </div>
+                    </motion.div>
+
+                    {/* Achievements */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20 }} 
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{ background: 'rgba(255,215,0,0.02)', border: '1px solid rgba(255,215,0,0.1)', borderRadius: 24, padding: 24 }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                            <ShieldCheck size={18} style={{ color: 'var(--gold)' }} />
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 18, fontWeight: 700, color: 'var(--pearl)' }}>Milestones</h2>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                            {(achievements || []).length > 0 ? achievements.map((a, i) => (
+                                <div key={i} title={a.description} style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>
+                                    <ShieldCheck size={20} />
+                                </div>
+                            )) : (
+                                <div style={{ textAlign: 'center', padding: '20px 0', opacity: 0.4, fontSize: 13, width: '100%' }}>Complete tasks to unlock milestones.</div>
+                            )}
+                        </div>
+                    </motion.div>
                 </div>
 
                 {/* Error */}
@@ -167,11 +257,11 @@ export default function Dashboard({ user, onLogout }) {
                         }}>
                             <Leaf size={36} style={{ color: 'rgba(34,197,94,0.3)' }} />
                         </div>
-                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>{searchTerm || statusFilter !== 'all' ? 'No results found' : t('dashboard.no_plants')}</h2>
-                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : t('dashboard.start_journey')}</p>
+                        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 30, color: 'var(--pearl)', marginBottom: 8 }}>{searchTerm || statusFilter !== 'all' ? 'No results found' : (t('dashboard.no_plants') || 'No specimens tracked yet.')}</h2>
+                        <p style={{ color: 'rgba(240,253,244,0.35)', marginBottom: 28, fontSize: 14 }}>{searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : (t('dashboard.start_journey') || 'Start your scientific journey today.')}</p>
                         {!(searchTerm || statusFilter !== 'all') && (
                             <Link to="/add-plant" className="btn-primary">
-                                <Plus size={15} style={{ marginRight: 8 }} /> {t('dashboard.add_first_plant')}
+                                <Plus size={15} style={{ marginRight: 8 }} /> {t('dashboard.add_first_plant') || 'Initialize First Specimen'}
                             </Link>
                         )}
                     </motion.div>
@@ -179,7 +269,7 @@ export default function Dashboard({ user, onLogout }) {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 18 }}>
                         {filteredPlants.map((plant, i) => (
                             <motion.div
-                                key={plant.id}
+                                key={plant.id || i}
                                 initial={{ opacity: 0, y: 24 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.06, type: 'spring', stiffness: 140 }}
@@ -215,7 +305,7 @@ export default function Dashboard({ user, onLogout }) {
                                             color: 'var(--pearl)',
                                             marginBottom: 2,
                                             letterSpacing: '-0.01em',
-                                        }}>{t(`plants.${plant.commonName.split(' (')[0]}`, plant.commonName)}</h3>
+                                        }}>{t(`plants.${(plant.commonName || '').split(' (')[0]}`, plant.commonName)}</h3>
                                         {plant.scientificName && (
                                             <p style={{
                                                 fontSize: 12,

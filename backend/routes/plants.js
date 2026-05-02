@@ -39,15 +39,32 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // ─── GET /api/plants/:id ─────────────────────────────────────────────────────
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const plant = await Plant.findOne({
-      _id: req.params.id,
-      userId: req.user.id,
-    }).lean();
+    const plant = await Plant.findById(req.params.id).lean();
 
     if (!plant) {
       return res.status(404).json({ error: 'Plant not found' });
+    }
+
+    // Access Control: Public plants are visible to everyone. 
+    // Private plants require the owner's auth token.
+    if (!plant.isPublic) {
+      // If not public, we need a valid token and the user must be the owner
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      const jwt = require('jsonwebtoken');
+      try {
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+        if (plant.userId.toString() !== decoded.id) {
+          return res.status(403).json({ error: 'Access denied' });
+        }
+      } catch (e) {
+        return res.status(403).json({ error: 'Invalid token' });
+      }
     }
 
     const stats = await Update.aggregate([
@@ -74,7 +91,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
         ...plant,
         stats: stats[0] || { updateCount: 0, lastUpdateDate: null, avgHeight: null },
       },
-      user_id: req.user.id,
       plant_id: plant.displayId
     });
   } catch (error) {

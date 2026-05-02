@@ -76,7 +76,19 @@ export const marketplaceAPI = {
 };
 
 export const aiAPI = {
-  consult: (plantId) => api.post('/ai/consult', { plantId })
+  consult: (plantId) => api.post('/ai/consult', { plantId }),
+  diagnose: (imageUrl, plantId) => api.post('/ai/diagnose', { imageUrl, plantId })
+};
+
+export const achievementAPI = {
+  getUnlocked: () => api.get('/achievements'),
+  unlock: (data) => api.post('/achievements/unlock', data)
+};
+
+export const remindersAPI = {
+  getAll: () => api.get('/reminders'),
+  create: (data) => api.post('/reminders', data),
+  complete: (id) => api.patch(`/reminders/${id}/complete`)
 };
 
 export const setAuthToken = (token) => {
