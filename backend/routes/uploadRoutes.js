@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const sharp = require('sharp');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
 const Plant = require('../models/Plant');

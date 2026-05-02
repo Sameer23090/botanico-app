@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const plantSchema = new mongoose.Schema(
     {
@@ -12,7 +12,7 @@ const plantSchema = new mongoose.Schema(
         displayId: {
             type: String,
             unique: true,
-            default: () => `plt_${uuidv4()}`
+            default: () => `plt_${crypto.randomUUID()}`
         },
         commonName: {
             type: String,
