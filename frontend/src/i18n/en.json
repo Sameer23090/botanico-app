@@ -289,5 +289,25 @@
     "Pine apple": "Pine apple",
     "Pomegranate": "Pomegranate",
     "Tulsi": "Tulsi (Holy Basil)"
+  },
+  "marketplace": {
+    "title": "Botanical Exchange",
+    "create_listing": "Create Listing",
+    "search_placeholder": "Search plants, seeds, equipment...",
+    "all_categories": "All Categories",
+    "all_types": "All Types",
+    "price_min": "Min ₹",
+    "price_max": "Max ₹",
+    "no_listings": "No listings found",
+    "create_first": "Create First Listing",
+    "generate_desc": "AI Generate"
+  },
+  "reminders": {
+    "title": "Mission Control",
+    "create_reminder": "Create Reminder",
+    "high_priority": "High Priority",
+    "overdue": "Overdue",
+    "active_tasks": "Active Tasks",
+    "complete": "Complete"
   }
 }

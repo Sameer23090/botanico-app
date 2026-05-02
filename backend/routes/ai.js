@@ -8,8 +8,11 @@ const router = express.Router();
 
 // ─── Groq API helper ─────────────────────────────────────────────────────────
 const groqChat = async (messages, model = 'llama-3.1-70b-versatile') => {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) throw new Error('GROQ_API_KEY not configured');
+    const apiKey = process.env.GROQ_API_KEY?.trim();
+    if (!apiKey) {
+        console.error('❌ GROQ_API_KEY is missing in process.env');
+        throw new Error('GROQ_API_KEY not configured');
+    }
 
     const response = await axios.post(
         'https://api.groq.com/openai/v1/chat/completions',
@@ -183,6 +186,7 @@ Keep total response under 130 words. Be precise and scientific.`
 // General botanical Q&A chatbot
 router.post('/chat', authMiddleware, async (req, res) => {
     const { message, history = [] } = req.body;
+    console.log(`💬 Chat request from ${req.user.email}: "${message.substring(0, 30)}..."`);
 
     if (!process.env.GROQ_API_KEY) {
         return res.status(503).json({ error: 'AI Service currently unavailable.' });
@@ -192,25 +196,34 @@ router.post('/chat', authMiddleware, async (req, res) => {
     }
 
     try {
-        const messages = [
-            {
-                role: 'system',
-                content: `You are BotaniBot, an expert AI botanist for the Botanico platform. 
+        const systemMessage = {
+            role: 'system',
+            content: `You are BotaniBot, an expert AI botanist for the Botanico platform. 
 You specialize in plant care, disease identification, growing conditions, soil science, and horticulture.
 Answer questions concisely (under 100 words). Be scientific yet approachable.
 If the question is completely unrelated to plants or nature, politely redirect.`
-            },
-            // Include last 6 messages for context
-            ...history.slice(-6).map(h => ({ role: h.role, content: h.content })),
+        };
+
+        // Filter and sanitize history to ensure it's OpenAI-compatible
+        const sanitizedHistory = (history || [])
+            .filter(h => h && h.role && h.content)
+            .slice(-6)
+            .map(h => ({ role: h.role, content: h.content }));
+
+        const messages = [
+            systemMessage,
+            ...sanitizedHistory,
             { role: 'user', content: message }
         ];
 
         const reply = await groqChat(messages, 'llama-3.1-8b-instant');
+        console.log('✅ Groq reply success');
         res.json({ reply, model: 'LLaMA 3.1 8B Instant (via Groq)' });
 
     } catch (error) {
-        console.error('Groq chat error:', error.response?.data || error.message);
-        res.status(500).json({ error: 'Chat service failed. Please try again.' });
+        console.error('❌ Groq chat error:', error.response?.data || error.message);
+        const errorMsg = error.response?.data?.error?.message || error.message || 'Chat service failed.';
+        res.status(500).json({ error: `AI Error: ${errorMsg}` });
     }
 });
 

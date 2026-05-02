@@ -33,9 +33,11 @@ export default function BotaniChat({ isAuthenticated }) {
             const res = await aiAPI.chat(msg, history);
             setMessages(prev => [...prev, { role: 'assistant', content: res.data.reply }]);
         } catch (err) {
+            console.error('Chat error:', err);
+            const errorMsg = err.response?.data?.error || 'Connection failed. Please check your internet or configuration.';
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: err.response?.data?.error || 'Connection failed. Please try again.'
+                content: `⚠️ ${errorMsg}`
             }]);
         } finally {
             setLoading(false);
