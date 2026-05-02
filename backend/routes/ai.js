@@ -227,4 +227,15 @@ If the question is completely unrelated to plants or nature, politely redirect.`
     }
 });
 
+// ─── GET /api/ai/debug ───────────────────────────────────────────────────────
+// System diagnostic for AI environment
+router.get('/debug', (req, res) => {
+    res.json({
+        groq_configured: !!process.env.GROQ_API_KEY,
+        groq_key_prefix: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 7) : 'NONE',
+        node_env: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    });
+});
+
 module.exports = router;
