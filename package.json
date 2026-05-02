@@ -4,7 +4,6 @@
   "description": "Botanico Plant Tracking System - Backend API (MongoDB)",
   "main": "server.js",
   "scripts": {
-    "build": "npm run build --prefix frontend",
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
