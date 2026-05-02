@@ -4,8 +4,7 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { authAPI } from '../api';
 
 export default function Register({ onRegister }) {
     const navigate = useNavigate();
@@ -20,34 +19,21 @@ export default function Register({ onRegister }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        
-        const emailLower = form.email.trim().toLowerCase();
-        if (!emailLower.endsWith('@gmail.com') && !emailLower.endsWith('@outlook.com') && !emailLower.endsWith('@yahoo.com')) {
-            setError(t('register.error_trusted_email'));
-            return;
-        }
-
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: form.name.trim(),
-                    email: form.email.trim(),
-                    password: form.password,
-                    location: form.location || (gpsCoords !== 'TAP' ? gpsCoords : undefined),
-                }),
+            const res = await authAPI.register({
+                name: form.name.trim(),
+                email: form.email.trim(),
+                password: form.password,
+                location: form.location || (gpsCoords !== 'TAP' ? gpsCoords : undefined),
             });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || t('register.error_failed'));
-
+            const data = res.data;
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             if (onRegister) onRegister(data.user);
             navigate('/dashboard');
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.error || err.message || t('register.error_failed'));
         } finally {
             setLoading(false);
         }

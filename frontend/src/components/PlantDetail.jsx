@@ -82,7 +82,7 @@ export default function PlantDetail() {
     const plantingDate = new Date(plant.plantingDate);
     const daysSince = plant.daysSincePlanting ?? Math.floor((Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const plantUrl = `${window.location.origin}/plant/${id}`;
+    const plantUrl = `${window.location.origin}/public/plant/${id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(plantUrl)}&color=22c55e&bgcolor=0a0f0d`;
 
     const NAV_STYLE = {
