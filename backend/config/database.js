@@ -1,21 +1,30 @@
 const mongoose = require('mongoose');
 
+let isConnected;
+
 const connectDB = async () => {
+  if (isConnected) {
+    console.log('=> using existing database connection');
+    return;
+  }
+
   try {
     const uri = process.env.MONGODB_URI;
     if (!uri) {
       console.error('❌ MONGODB_URI is not defined in environment variables.');
-      console.error('👉 Please set MONGODB_URI in your Render settings.');
-      return; // Return instead of exiting to allow server to bind to port
+      return; 
     }
 
-    const conn = await mongoose.connect(uri, {});
-
-    console.log(`🍃 MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📂 Database: ${conn.connection.name}`);
+    const db = await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+    });
+    
+    isConnected = db.connections[0].readyState;
+    console.log(`🍃 MongoDB Connected: ${db.connection.host}`);
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    // Removed process.exit(1) to allow Render port binding
   }
 };
 

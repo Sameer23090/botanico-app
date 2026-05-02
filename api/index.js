@@ -19,7 +19,10 @@ const achievementRoutes = require('../backend/routes/achievements');
 
 const app = express();
 
-connectDB();
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
@@ -39,6 +42,14 @@ app.use('/api/achievements', achievementRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Botanico API is running' });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+  });
 });
 
 module.exports = app;
