@@ -60,7 +60,7 @@ router.get('/:id', async (req, res) => {
       const jwt = require('jsonwebtoken');
       try {
         const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-        if (plant.userId.toString() !== decoded.id) {
+        if (plant.userId.toString() !== decoded.userId) {
           return res.status(403).json({ error: 'Access denied' });
         }
       } catch (e) {

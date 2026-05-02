@@ -95,22 +95,6 @@ export default function Login({ onLogin }) {
             </button>
           </form>
 
-          <div style={{ margin: '24px 0', display: 'flex', alignItems: 'center', color: 'rgba(240,253,244,0.2)' }}>
-            <div style={{ flex: 1, height: 1, background: 'currentColor' }} />
-            <span style={{ padding: '0 12px', fontSize: 12, fontWeight: 600, textTransform: 'uppercase' }}>{t('login.or')}</span>
-            <div style={{ flex: 1, height: 1, background: 'currentColor' }} />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <button onClick={() => handleOAuth('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', fontSize: 13, borderRadius: 12 }}>
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="G" />
-              {t('login.google')}
-            </button>
-            <button onClick={() => handleOAuth('microsoft')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', fontSize: 13, borderRadius: 12 }}>
-              <img src="https://authjs.dev/img/providers/microsoft.svg" width="18" alt="M" />
-              {t('login.microsoft')}
-            </button>
-          </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, flexWrap: 'wrap', gap: 8 }}>
             <span style={{ fontSize: 13, color: 'rgba(240,253,244,0.3)' }}>{t('login.no_account')}</span>
