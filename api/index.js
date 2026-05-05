@@ -57,7 +57,11 @@ try {
 
 app.get('/api/health', (req, res) => {
   if (initError) {
-    return res.status(500).json({ error: `Initialization Error: ${initError.message}` });
+    const maskedUri = process.env.MONGODB_URI ? process.env.MONGODB_URI.replace(/:[^@]+@/, ':****@') : 'NOT DEFINED';
+    return res.status(500).json({ 
+      error: `Initialization Error: ${initError.message}`,
+      uri: maskedUri 
+    });
   }
   res.json({ status: 'ok', message: 'Botanico API is running' });
 });
