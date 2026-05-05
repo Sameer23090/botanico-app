@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+// Deployment trigger: Updated database credentials
+
 
 let authRoutes, plantRoutes, updateRoutes, adminRoutes, uploadRoutes, marketplaceRoutes, reminderRoutes, aiRoutes, achievementRoutes;
 let connectDB;
