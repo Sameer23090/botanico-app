@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const Reminder = require('../models/Reminder');
+const dbQueries = require('../db/dbQueries');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,13 +9,10 @@ const router = express.Router();
 // Get all pending reminders for the user
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const reminders = await Reminder.find({ 
-      userId: req.user.id,
-      isCompleted: false 
-    }).populate('plantId', 'commonName displayId');
-
+    const reminders = await dbQueries.reminders.findActiveByUserId(req.user.id);
     res.json({ reminders });
   } catch (error) {
+    console.error('Fetch reminders error:', error);
     res.status(500).json({ error: 'Failed to fetch reminders' });
   }
 });
@@ -23,12 +20,13 @@ router.get('/', authMiddleware, async (req, res) => {
 // ─── POST /api/reminders ────────────────────────────────────────────────────
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const reminder = await Reminder.create({
+    const reminder = await dbQueries.reminders.create({
       ...req.body,
       userId: req.user.id
     });
     res.status(201).json({ message: 'Reminder set successfully', reminder });
   } catch (error) {
+    console.error('Create reminder error:', error);
     res.status(500).json({ error: 'Failed to create reminder' });
   }
 });
@@ -36,14 +34,19 @@ router.post('/', authMiddleware, async (req, res) => {
 // ─── PATCH /api/reminders/:id/complete ──────────────────────────────────────
 router.patch('/:id/complete', authMiddleware, async (req, res) => {
   try {
-    const reminder = await Reminder.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      { isCompleted: true, completedAt: new Date() },
-      { new: true }
-    );
-    if (!reminder) return res.status(404).json({ error: 'Reminder not found' });
-    res.json({ message: 'Task marked as completed', reminder });
+    const reminder = await dbQueries.reminders.findById(req.params.id);
+    if (!reminder || reminder.userId !== req.user.id) {
+      return res.status(404).json({ error: 'Reminder not found' });
+    }
+
+    const updated = await dbQueries.reminders.update(req.params.id, {
+      isCompleted: true,
+      completedAt: new Date()
+    });
+
+    res.json({ message: 'Task marked as completed', reminder: updated });
   } catch (error) {
+    console.error('Complete reminder error:', error);
     res.status(500).json({ error: 'Failed to update reminder' });
   }
 });

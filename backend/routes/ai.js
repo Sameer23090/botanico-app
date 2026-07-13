@@ -1,17 +1,18 @@
 const express = require('express');
 const axios = require('axios');
 const authMiddleware = require('../middleware/auth');
-const Plant = require('../models/Plant');
-const Update = require('../models/Update');
+const dbQueries = require('../db/dbQueries');
 
 const router = express.Router();
 
 // ─── Groq API helper ─────────────────────────────────────────────────────────
 const groqChat = async (messages, model = 'llama-3.1-70b-versatile') => {
     const apiKey = process.env.GROQ_API_KEY?.trim();
-    if (!apiKey) {
-        console.error('❌ GROQ_API_KEY is missing in process.env');
-        throw new Error('GROQ_API_KEY not configured');
+    
+    // DEMO MODE: If key is missing or is the placeholder, return a simulated response
+    if (!apiKey || apiKey === 'your_groq_api_key_here') {
+        console.warn('⚠️ AI is in DEMO MODE. No valid GROQ_API_KEY found.');
+        return "[DEMO MODE] This is a simulated response from Llama 3. To see real AI advice, please add a valid GROQ_API_KEY to your .env file. Based on your plant's data, it seems to be growing well! Keep monitoring the soil moisture.";
     }
 
     const response = await axios.post(
@@ -37,22 +38,18 @@ const groqChat = async (messages, model = 'llama-3.1-70b-versatile') => {
 router.post('/consult', authMiddleware, async (req, res) => {
     const { plantId } = req.body;
 
-    if (!process.env.GROQ_API_KEY) {
-        return res.status(503).json({ error: 'AI Service currently unavailable. Configure GROQ_API_KEY in environment.' });
-    }
-
     try {
-        const [plant, updates] = await Promise.all([
-            Plant.findById(plantId),
-            Update.find({ plantId }).sort({ entryDate: -1 }).limit(5)
-        ]);
-
+        const plant = await dbQueries.plants.findById(plantId);
         if (!plant) return res.status(404).json({ error: 'Plant not found' });
 
+        const list = await dbQueries.updates.findByPlantId(plantId);
+        const updates = list.slice(0, 5);
+
         const history = updates.length > 0
-            ? updates.map(u =>
-                `• ${u.entryDate.toDateString()} — Health: ${u.healthStatus || 'N/A'}, Observations: ${u.observations || 'None'}, Temp: ${u.temperatureCelsius ? u.temperatureCelsius + '°C' : 'N/A'}, Moisture: ${u.soilMoisture || 'N/A'}`
-            ).join('\n')
+            ? updates.map(u => {
+                const entryDateStr = u.entryDate instanceof Date ? u.entryDate.toDateString() : new Date(u.entryDate).toDateString();
+                return `• ${entryDateStr} — Health: ${u.healthStatus || 'N/A'}, Observations: ${u.observations || 'None'}, Temp: ${u.temperatureCelsius ? u.temperatureCelsius + '°C' : 'N/A'}, Moisture: ${u.soilMoisture || 'N/A'}`;
+              }).join('\n')
             : 'No care logs recorded yet.';
 
         const messages = [
@@ -65,7 +62,7 @@ Be concise (under 130 words). Use specific botanical terminology when relevant.`
             {
                 role: 'user',
                 content: `Analyze this plant and provide care recommendations:
-
+ 
 PLANT PROFILE:
 • Name: ${plant.commonName}${plant.scientificName ? ` (${plant.scientificName})` : ''}
 • Type: ${plant.plantType || 'Unknown'}
@@ -95,10 +92,6 @@ Provide: 1) A 2-sentence vitality assessment, 2) Two specific optimization recom
 router.post('/diagnose', authMiddleware, async (req, res) => {
     const { imageUrl, plantId } = req.body;
 
-    if (!process.env.GROQ_API_KEY) {
-        return res.status(503).json({ error: 'AI Service currently unavailable. Configure GROQ_API_KEY in environment.' });
-    }
-
     if (!imageUrl) {
         return res.status(400).json({ error: 'imageUrl is required for diagnosis' });
     }
@@ -125,7 +118,7 @@ router.post('/diagnose', authMiddleware, async (req, res) => {
     try {
         let plantContext = '';
         if (plantId) {
-            const plant = await Plant.findById(plantId);
+            const plant = await dbQueries.plants.findById(plantId);
             if (plant) {
                 plantContext = `Plant species: ${plant.commonName}${plant.scientificName ? ` (${plant.scientificName})` : ''}`;
             }
@@ -188,9 +181,6 @@ router.post('/chat', authMiddleware, async (req, res) => {
     const { message, history = [] } = req.body;
     console.log(`💬 Chat request from ${req.user.email}: "${message.substring(0, 30)}..."`);
 
-    if (!process.env.GROQ_API_KEY) {
-        return res.status(503).json({ error: 'AI Service currently unavailable.' });
-    }
     if (!message || message.trim().length === 0) {
         return res.status(400).json({ error: 'Message is required' });
     }

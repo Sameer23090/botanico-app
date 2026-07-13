@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const passport = require('passport');
 const crypto = require('crypto');
-const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const dbQueries = require('../db/dbQueries');
 const authMiddleware = require('../middleware/auth');
 const { sendEmail } = require('../services/emailService');
 
@@ -15,6 +16,14 @@ const authLimiter = rateLimit({
   max: 10,
   message: { error: 'Too many authentication attempts, please try again later.' }
 });
+
+// Helper to sanitize user object for client response
+const toPublicUser = (user) => {
+  if (!user) return null;
+  const clone = { ...user };
+  delete clone.passwordHash;
+  return clone;
+};
 
 // ─── Validation Rules ────────────────────────────────────────────────────────
 
@@ -32,14 +41,13 @@ const loginValidation = [
 // Helper to sign JWT
 const signToken = (user) => {
   return jwt.sign(
-    { userId: user._id, email: user.email, role: user.role },
+    { userId: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
 };
 
 // ─── OAuth Routes ───────────────────────────────────────────────────────────
-// These will be used for one-click authentication
 
 // Google Auth
 router.get('/google', authLimiter, passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -68,15 +76,18 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
 
     const { name, email, password, location } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await dbQueries.users.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const user = await User.create({
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const user = await dbQueries.users.create({
       name,
       email,
-      passwordHash: password,
+      passwordHash,
       location: location || null,
       provider: 'local'
     });
@@ -86,7 +97,7 @@ router.post('/register', authLimiter, registerValidation, async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: user.toJSON(),
+      user: toPublicUser(user),
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -103,7 +114,7 @@ router.post('/login', authLimiter, loginValidation, async (req, res) => {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('+passwordHash');
+    const user = await dbQueries.users.findByEmail(email);
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -112,7 +123,7 @@ router.post('/login', authLimiter, loginValidation, async (req, res) => {
       return res.status(400).json({ error: `Please log in using ${user.provider}` });
     }
 
-    const isValidPassword = await user.comparePassword(password);
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -122,7 +133,7 @@ router.post('/login', authLimiter, loginValidation, async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      user: user.toJSON(),
+      user: toPublicUser(user),
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -132,11 +143,11 @@ router.post('/login', authLimiter, loginValidation, async (req, res) => {
 
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await dbQueries.users.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json({ user: user.toJSON() });
+    res.json({ user: toPublicUser(user) });
   } catch (error) {
     console.error('Get user error:', error);
     res.status(500).json({ error: 'Failed to get user' });
@@ -147,15 +158,11 @@ router.put('/profile', authMiddleware, async (req, res) => {
   try {
     const { name, location, preferredLanguage } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        ...(name && { name }),
-        ...(location !== undefined && { location }),
-        ...(preferredLanguage && { preferredLanguage }),
-      },
-      { new: true, runValidators: true }
-    );
+    const user = await dbQueries.users.update(req.user.id, {
+      ...(name && { name }),
+      ...(location !== undefined && { location }),
+      ...(preferredLanguage && { preferredLanguage }),
+    });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -163,7 +170,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
 
     res.json({
       message: 'Profile updated successfully',
-      user: user.toJSON(),
+      user: toPublicUser(user),
     });
   } catch (error) {
     console.error('Update profile error:', error);
@@ -173,11 +180,6 @@ router.put('/profile', authMiddleware, async (req, res) => {
 
 // ─── Password Reset Routes ──────────────────────────────────────────────────
 
-/**
- * @route   POST /api/auth/forgot-password
- * @desc    Send password reset email
- * @access  Public
- */
 router.post('/forgot-password', 
   [body('email').isEmail().normalizeEmail().withMessage('Valid email is required')],
   async (req, res) => {
@@ -188,10 +190,9 @@ router.post('/forgot-password',
       }
 
       const { email } = req.body;
-      const user = await User.findOne({ email });
+      const user = await dbQueries.users.findByEmail(email);
 
       if (!user) {
-        // For security, don't reveal if user exists or not
         return res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
       }
 
@@ -204,9 +205,11 @@ router.post('/forgot-password',
       const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
       // Set token and expiry (1 hour)
-      user.resetPasswordToken = hashedToken;
-      user.resetPasswordExpires = Date.now() + 3600000;
-      await user.save({ validateBeforeSave: false });
+      const resetPasswordExpires = new Date(Date.now() + 3600000);
+      await dbQueries.users.update(user.id, {
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires
+      });
 
       // Create reset URL
       const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
@@ -236,9 +239,10 @@ router.post('/forgot-password',
 
         res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
       } catch (err) {
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save({ validateBeforeSave: false });
+        await dbQueries.users.update(user.id, {
+          resetPasswordToken: null,
+          resetPasswordExpires: null
+        });
 
         console.error('Email send error:', err);
         return res.status(500).json({ error: 'Email could not be sent. Please try again later.' });
@@ -250,11 +254,6 @@ router.post('/forgot-password',
   }
 );
 
-/**
- * @route   POST /api/auth/reset-password/:token
- * @desc    Reset password
- * @access  Public
- */
 router.post('/reset-password/:token',
   [body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')],
   async (req, res) => {
@@ -267,20 +266,20 @@ router.post('/reset-password/:token',
       // Hash token from URL to match hashed token in DB
       const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
-      const user = await User.findOne({
-        resetPasswordToken: hashedToken,
-        resetPasswordExpires: { $gt: Date.now() }
-      });
-
+      const user = await dbQueries.users.findByResetToken(hashedToken);
       if (!user) {
         return res.status(400).json({ error: 'Invalid or expired password reset token' });
       }
 
       // Set new password
-      user.passwordHash = req.body.password;
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(req.body.password, salt);
+
+      await dbQueries.users.update(user.id, {
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null
+      });
 
       res.json({ message: 'Password reset successful! You can now log in with your new password.' });
     } catch (error) {
@@ -291,4 +290,3 @@ router.post('/reset-password/:token',
 );
 
 module.exports = router;
-

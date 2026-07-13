@@ -66,7 +66,16 @@ export default function Dashboard({ user, onLogout }) {
     const STATS = [
         { icon: <Sprout size={20} />, label: t('dashboard.total_plants'), value: filteredPlants.length },
         { icon: <TrendingUp size={20} />, label: t('dashboard.active'), value: filteredPlants.filter(p => p.status === 'active').length },
-        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: filteredPlants.length > 0 ? Math.max(...filteredPlants.map(p => p.daysSincePlanting || 0)) : 0 },
+        { icon: <Calendar size={20} />, label: t('dashboard.days_growing'), value: filteredPlants.length > 0
+            ? Math.max(...filteredPlants.map(p => {
+                if (p.plantingDate) {
+                    const d = Math.floor((Date.now() - new Date(p.plantingDate).getTime()) / (1000 * 60 * 60 * 24));
+                    return d > 0 ? d : 0;
+                }
+                return p.daysSincePlanting || 0;
+            }))
+            : 0
+        },
     ];
 
     return (
@@ -252,7 +261,9 @@ export default function Dashboard({ user, onLogout }) {
                                         )}
                                         <div style={{ position: 'absolute', bottom: 10, right: 10 }}>
                                             <span className="badge badge-success" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-                                                Day {plant.daysSincePlanting || 0}
+                                                Day {plant.plantingDate
+                                                    ? Math.max(0, Math.floor((Date.now() - new Date(plant.plantingDate).getTime()) / (1000 * 60 * 60 * 24)))
+                                                    : (plant.daysSincePlanting || 0)}
                                             </span>
                                         </div>
                                     </div>

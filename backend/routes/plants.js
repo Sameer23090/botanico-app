@@ -1,9 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const Plant = require('../models/Plant');
-const Update = require('../models/Update');
+const dbQueries = require('../db/dbQueries');
 const authMiddleware = require('../middleware/auth');
-const User = require('../models/User');
 const { translateFields } = require('../services/translateService');
 const aiAssistant = require('../services/aiAssistant');
 
@@ -15,24 +13,11 @@ const plantValidation = [
   body('plantingDate').isISO8601().withMessage('Valid planting date is required'),
 ];
 
-// Helper for UUID mapping in lean results
-const mapDisplayId = (docs) => {
-  return docs.map((d) => {
-    d.id = d._id;
-    delete d._id;
-    delete d.__v;
-    return d;
-  });
-};
-
 // ─── GET /api/plants ─────────────────────────────────────────────────────────
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const plants = await Plant.find({ userId: req.user.id, status: 'active' })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    res.json({ plants: mapDisplayId(plants) });
+    const plants = await dbQueries.plants.findActiveByUserId(req.user.id);
+    res.json({ plants });
   } catch (error) {
     console.error('Get plants error:', error);
     res.status(500).json({ error: 'Failed to fetch plants' });
@@ -42,7 +27,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // ─── GET /api/plants/:id ─────────────────────────────────────────────────────
 router.get('/:id', async (req, res) => {
   try {
-    const plant = await Plant.findById(req.params.id).lean();
+    const plant = await dbQueries.plants.findById(req.params.id);
 
     if (!plant) {
       return res.status(404).json({ error: 'Plant not found' });
@@ -60,7 +45,7 @@ router.get('/:id', async (req, res) => {
       const jwt = require('jsonwebtoken');
       try {
         const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-        if (plant.userId.toString() !== decoded.userId) {
+        if (plant.userId !== decoded.userId) {
           return res.status(403).json({ error: 'Access denied' });
         }
       } catch (e) {
@@ -68,34 +53,17 @@ router.get('/:id', async (req, res) => {
       }
     }
 
-    const stats = await Update.aggregate([
-      { $match: { plantId: plant._id } },
-      {
-        $group: {
-          _id: null,
-          updateCount: { $sum: 1 },
-          lastUpdateDate: { $max: '$entryDate' },
-          avgHeight: { $avg: '$heightCm' },
-          maxHeight: { $max: '$heightCm' },
-          photoCount: {
-            $sum: { $cond: [{ $gt: [{ $size: { $ifNull: ['$drivePhotos', []] } }, 0] }, 1, 0] },
-          },
-        },
-      },
-    ]);
-
-    plant.id = plant._id;
-    delete plant._id;
+    const stats = await dbQueries.plants.getStats(plant.id);
 
     res.json({
       plant: {
         ...plant,
-        stats: stats[0] || { updateCount: 0, lastUpdateDate: null, avgHeight: null },
+        stats
       },
       plant_id: plant.displayId
     });
   } catch (error) {
-    if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid plant ID' });
+    console.error('Get plant detail error:', error);
     res.status(500).json({ error: 'Failed to fetch plant' });
   }
 });
@@ -106,7 +74,7 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const user = await User.findById(req.user.id);
+    const user = await dbQueries.users.findById(req.user.id);
     const sourceLang = user.preferredLanguage || 'en';
 
     // Auto-Translate detailed plant info before saving to DB as English
@@ -122,7 +90,7 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
       habitat, classificationGroup, locationText, coordinates
     } = translatedBody;
 
-    const plant = await Plant.create({
+    const plant = await dbQueries.plants.create({
       userId: req.user.id,
       commonName, scientificName, family, genus, species, variety,
       plantType, growthHabit, nativeRegion, description,
@@ -137,7 +105,7 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
 
     res.status(201).json({
       message: 'Plant created successfully',
-      plant: plant.toJSON(),
+      plant,
       user_id: req.user.id,
       plant_id: plant.displayId 
     });
@@ -150,10 +118,12 @@ router.post('/', authMiddleware, plantValidation, async (req, res) => {
 // ─── PUT /api/plants/:id ─────────────────────────────────────────────────────
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const plant = await Plant.findOne({ _id: req.params.id, userId: req.user.id });
-    if (!plant) return res.status(404).json({ error: 'Plant not found' });
+    const plant = await dbQueries.plants.findById(req.params.id);
+    if (!plant || plant.userId !== req.user.id) {
+      return res.status(404).json({ error: 'Plant not found' });
+    }
 
-    const user = await User.findById(req.user.id);
+    const user = await dbQueries.users.findById(req.user.id);
     const sourceLang = user.preferredLanguage || 'en';
 
     const fieldsToTranslate = ['commonName', 'scientificName', 'description', 'variety', 'plantType', 'growthHabit', 'nativeRegion', 'soilType', 'plantingMethod'];
@@ -166,73 +136,53 @@ router.put('/:id', authMiddleware, async (req, res) => {
       expectedHarvestDays, status, plantingSeason, environmentCondition, isPublic
     } = translatedBody;
 
-    if (commonName !== undefined) plant.commonName = commonName;
-    if (scientificName !== undefined) plant.scientificName = scientificName;
-    if (family !== undefined) plant.family = family;
-    if (genus !== undefined) plant.genus = genus;
-    if (species !== undefined) plant.species = species;
-    if (variety !== undefined) plant.variety = variety;
-    if (plantType !== undefined) plant.plantType = plantType;
-    if (growthHabit !== undefined) plant.growthHabit = growthHabit;
-    if (nativeRegion !== undefined) plant.nativeRegion = nativeRegion;
-    if (description !== undefined) plant.description = description;
-    if (location !== undefined) plant.location = location;
-    if (soilType !== undefined) plant.soilType = soilType;
-    if (sunlightExposure !== undefined) plant.sunlightExposure = sunlightExposure;
-    if (plantingMethod !== undefined) plant.plantingMethod = plantingMethod;
-    if (expectedHarvestDays !== undefined) plant.expectedHarvestDays = Number(expectedHarvestDays);
-    if (status !== undefined) plant.status = status;
-    if (plantingSeason !== undefined) plant.plantingSeason = plantingSeason;
-    if (environmentCondition !== undefined) plant.environmentCondition = environmentCondition;
-    if (isPublic !== undefined) plant.isPublic = isPublic;
-
-    await plant.save();
+    const updated = await dbQueries.plants.update(req.params.id, {
+      commonName, scientificName, family, genus, species, variety,
+      plantType, growthHabit, nativeRegion, description,
+      location, soilType, sunlightExposure, plantingMethod,
+      expectedHarvestDays: expectedHarvestDays !== undefined ? Number(expectedHarvestDays) : undefined,
+      status, plantingSeason, environmentCondition,
+      isPublic: isPublic !== undefined ? (isPublic === 'true' || isPublic === true) : undefined
+    });
 
     res.json({
       message: 'Plant updated successfully',
-      plant: plant.toJSON(),
+      plant: updated,
       user_id: req.user.id,
-      plant_id: plant.displayId
+      plant_id: updated.displayId
     });
   } catch (error) {
-    if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid plant ID' });
+    console.error('Update plant error:', error);
     res.status(500).json({ error: 'Failed to update plant' });
   }
 });
 
+// ─── DELETE /api/plants/:id ──────────────────────────────────────────────────
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const plant = await Plant.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      { status: 'deleted' },
-      { new: true }
-    );
+    const plant = await dbQueries.plants.delete(req.params.id, req.user.id);
     if (!plant) return res.status(404).json({ error: 'Plant not found' });
     res.json({ message: 'Plant deleted successfully' });
   } catch (error) {
+    console.error('Delete plant error:', error);
     res.status(500).json({ error: 'Failed to delete plant' });
   }
 });
 
 // ─── POST /api/plants/:id/ai ───────────────────────────────────────────────
-/**
- * @route   POST /api/plants/:id/ai
- * @desc    Get AI-powered advice for a specific plant
- * @access  Private
- */
 router.post('/:id/ai', authMiddleware, async (req, res) => {
   try {
     const { question } = req.body;
     if (!question) return res.status(400).json({ error: 'Question is required' });
 
-    const plant = await Plant.findOne({ _id: req.params.id, userId: req.user.id }).lean();
-    if (!plant) return res.status(404).json({ error: 'Plant not found' });
+    const plant = await dbQueries.plants.findById(req.params.id);
+    if (!plant || plant.userId !== req.user.id) {
+      return res.status(404).json({ error: 'Plant not found' });
+    }
 
     // Fetch recent updates to give context to AI
-    const updates = await Update.find({ plantId: plant._id })
-      .sort({ entryDate: -1 })
-      .limit(5)
-      .lean();
+    const list = await dbQueries.updates.findByPlantId(plant.id);
+    const updates = list.slice(0, 5);
 
     const plantContext = {
       ...plant,

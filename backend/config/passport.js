@@ -1,7 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const MicrosoftStrategy = require('passport-microsoft').Strategy;
-const User = require('../models/User');
+const dbQueries = require('../db/dbQueries');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -9,7 +9,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await dbQueries.users.findById(id);
     done(null, user);
   } catch (err) {
     done(err, null);
@@ -26,21 +26,22 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        const email = profile.emails[0].value;
+        let user = await dbQueries.users.findByEmail(email);
         
         if (user) {
-          // Update user if they were local or from another provider
-          user.name = user.name || profile.displayName;
-          user.avatarUrl = user.avatarUrl || (profile.photos && profile.photos[0].value);
-          user.provider = 'google';
-          await user.save();
+          user = await dbQueries.users.update(user.id, {
+            name: user.name || profile.displayName,
+            avatarUrl: user.avatarUrl || (profile.photos && profile.photos[0].value),
+            provider: 'google'
+          });
           return done(null, user);
         }
 
         // Create new user if not exists
-        user = await User.create({
+        user = await dbQueries.users.create({
           name: profile.displayName,
-          email: profile.emails[0].value,
+          email: email,
           avatarUrl: profile.photos && profile.photos[0].value,
           provider: 'google',
           role: 'student' // Default role
@@ -65,15 +66,14 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-        let user = await User.findOne({ email });
+        let user = await dbQueries.users.findByEmail(email);
 
         if (user) {
-          user.provider = 'microsoft';
-          await user.save();
+          user = await dbQueries.users.update(user.id, { provider: 'microsoft' });
           return done(null, user);
         }
 
-        user = await User.create({
+        user = await dbQueries.users.create({
           name: profile.displayName,
           email: email,
           provider: 'microsoft',

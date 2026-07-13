@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit, Bot, Send } from 'lucide-react';
+import { Leaf, ArrowLeft, Plus, Trash2, TrendingUp, Edit2, QrCode, X, Download, Sparkles, BrainCircuit, Bot, Send, Settings } from 'lucide-react';
 import { plantsAPI, updatesAPI, aiAPI } from '../api';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +16,15 @@ export default function PlantDetail() {
     
     // Remote Feature States
     const [showQR, setShowQR] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState({
+        commonName: '',
+        scientificName: '',
+        plantType: '',
+        location: '',
+        isPublic: false
+    });
+    const [saving, setSaving] = useState(false);
     const [showAI, setShowAI] = useState(false);
     const [aiMessage, setAiMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
@@ -27,26 +36,44 @@ export default function PlantDetail() {
     const [aiLoading, setAiLoading] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const loadData = async () => {
             try {
-                const [plantRes, updatesRes] = await Promise.all([
+                const [pRes, uRes] = await Promise.all([
                     plantsAPI.getById(id),
-                    updatesAPI.getByPlantId(id),
+                    updatesAPI.getByPlantId(id)
                 ]);
-                setPlant(plantRes.data.plant);
-                setUpdates(updatesRes.data.updates || []);
+                setPlant(pRes.data.plant);
+                setUpdates(uRes.data.updates);
+                
+                // Initialize edit form
+                setEditForm({
+                    commonName: pRes.data.plant.commonName,
+                    scientificName: pRes.data.plant.scientificName,
+                    plantType: pRes.data.plant.plantType,
+                    location: pRes.data.plant.location,
+                    isPublic: pRes.data.plant.isPublic
+                });
             } catch (err) {
-                if (err.response?.status === 404) {
-                    setError('Plant not found.');
-                } else {
-                    setError('Failed to load plant data.');
-                }
+                setError('Failed to load plant data.');
             } finally {
                 setLoading(false);
             }
         };
-        fetchData();
+        loadData();
     }, [id]);
+
+    const handleSaveEdit = async () => {
+        setSaving(true);
+        try {
+            const res = await plantsAPI.update(id, editForm);
+            setPlant(res.data.plant);
+            setIsEditing(false);
+        } catch (err) {
+            alert('Failed to update plant: ' + (err.response?.data?.error || err.message));
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleDelete = async () => {
         if (!confirm('Delete this plant and all its data?')) return;
@@ -108,6 +135,83 @@ export default function PlantDetail() {
     const plantingDate = new Date(plant.plantingDate);
     const daysSince = plant.daysSincePlanting ?? Math.floor((Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
 
+    // ─── Vitality Algorithm (Hardened) ──────────────────────────────────────────────
+    const calculateVitality = (updates) => {
+        if (updates.length === 0) return {
+            score: 15, label: 'Establishing...', color: '#6b7280',
+            breakdown: { health: 0, activity: 0, growth: 0, care: 0 }
+        };
+
+        const healthMap = { excellent: 100, good: 80, fair: 55, poor: 25, critical: 10 };
+
+        // 1. HEALTH SCORE (40%) — average of last 3 logs
+        const last3 = updates.slice(0, 3);
+        const last3WithStatus = last3.filter(u => u.healthStatus && healthMap[u.healthStatus] !== undefined);
+        const healthScore = last3WithStatus.length > 0
+            ? last3WithStatus.reduce((a, u) => a + healthMap[u.healthStatus], 0) / last3WithStatus.length
+            : 50; 
+
+        let trendBonus = 0;
+        if (last3WithStatus.length >= 2) {
+            const newest = healthMap[last3WithStatus[0].healthStatus];
+            const older  = healthMap[last3WithStatus[last3WithStatus.length - 1].healthStatus];
+            trendBonus = newest > older ? 5 : newest < older ? -5 : 0;
+        }
+
+        // 2. ACTIVITY SCORE (30%)
+        const rawDaysSinceLast = (Date.now() - new Date(updates[0].entryDate).getTime()) / (1000 * 60 * 60 * 24);
+        const daysSinceLastLog = Math.max(0, rawDaysSinceLast);
+        let activityScore;
+        if      (daysSinceLastLog <= 7)  activityScore = 100;
+        else if (daysSinceLastLog <= 14) activityScore = 85;
+        else if (daysSinceLastLog <= 30) activityScore = 65;
+        else if (daysSinceLastLog <= 60) activityScore = 40;
+        else                             activityScore = 20;
+
+        // 3. GROWTH SCORE (20%)
+        const logsWithHeight = updates.filter(u => u.heightCm != null && u.heightCm > 0.01);
+        let growthScore = 60;
+        if (logsWithHeight.length >= 2) {
+            const newest = logsWithHeight[0].heightCm;
+            const oldest = logsWithHeight[logsWithHeight.length - 1].heightCm;
+            const growthRate = (newest - oldest) / oldest;
+            if      (growthRate > 0.15)  growthScore = 100;
+            else if (growthRate > 0.05)  growthScore = 85;
+            else if (growthRate >= 0)    growthScore = 70;
+            else if (growthRate > -0.10) growthScore = 45;
+            else                         growthScore = 20;
+        }
+
+        // 4. CARE SCORE (10%)
+        let careScore = 50;
+        if (updates.length >= 3) {
+            const window = updates.slice(0, 5);
+            const caredCount = window.filter(u => u.fertilizerUsed || u.manureUsed).length;
+            careScore = (caredCount / window.length) * 100;
+        }
+
+        const raw = (healthScore * 0.40) + (activityScore * 0.30) + (growthScore * 0.20) + (careScore * 0.10) + trendBonus;
+        const score = Math.max(0, Math.min(100, Math.round(raw)));
+
+        let label, color;
+        if      (score >= 85) { label = 'Peak Performance'; color = '#22c55e'; }
+        else if (score >= 70) { label = 'Thriving';         color = '#4ade80'; }
+        else if (score >= 55) { label = 'Stable';           color = '#84cc16'; }
+        else if (score >= 40) { label = 'Needs Attention';  color = '#eab308'; }
+        else if (score >= 25) { label = 'Struggling';       color = '#f97316'; }
+        else                  { label = 'Critical';         color = '#ef4444'; }
+
+        return { score, label, color, breakdown: {
+            health:   Math.round(healthScore),
+            activity: Math.round(activityScore),
+            growth:   Math.round(growthScore),
+            care:     Math.round(careScore),
+        }};
+    };
+
+    const vitality = calculateVitality(updates);
+
+    const growerName = plant.growerName || JSON.parse(localStorage.getItem('user') || '{}')?.name || 'Botanico Grower';
     const plantUrl = `${window.location.origin}/public/plant/${id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(plantUrl)}&color=22c55e&bgcolor=0a0f0d`;
 
@@ -148,7 +252,15 @@ export default function PlantDetail() {
                             </button>
 
                             <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: 'var(--pearl)', marginBottom: 8 }}>Plant ID Tag</h2>
-                            <p style={{ color: 'rgba(240,253,244,0.4)', fontSize: 13, marginBottom: 28 }}>Print this QR and attach it to your physical plant to bridge it to the digital record.</p>
+                            <p style={{ color: 'rgba(240,253,244,0.4)', fontSize: 13, marginBottom: 16 }}>Scan to view this plant's full digital record on Botanico.</p>
+
+                            <div style={{ marginBottom: 20, padding: '10px 16px', background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: 10, textAlign: 'left' }}>
+                                <div style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--jade)', letterSpacing: '0.12em', marginBottom: 4 }}>GROWER</div>
+                                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--pearl)' }}>{growerName}</div>
+                                <div style={{ fontSize: 11, color: 'rgba(240,253,244,0.4)', fontStyle: 'italic', marginTop: 2 }}>
+                                    {plant.commonName}{plant.scientificName ? ` · ${plant.scientificName}` : ''}
+                                </div>
+                            </div>
                             
                             <div style={{ 
                                 background: '#0a0f0d', 
@@ -256,6 +368,9 @@ export default function PlantDetail() {
                     <button onClick={() => setShowQR(true)} className="btn-ghost" style={{ color: 'var(--mist)', padding: '8px 10px', display: 'flex' }} title="Generate QR Label">
                         <QrCode size={17} />
                     </button>
+                    <button onClick={() => setIsEditing(true)} className="btn-ghost" style={{ color: 'var(--mist)', padding: '8px 10px', display: 'flex' }} title="Edit Plant">
+                        <Settings size={17} />
+                    </button>
                     <Link to={`/plant/${id}/add-update`} className="btn-primary" style={{ padding: '9px 18px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Plus size={13} /> Log Entry
                     </Link>
@@ -304,26 +419,69 @@ export default function PlantDetail() {
                                 </button>
                             </div>
 
-                            {/* Vitality Trend */}
+                            {/* Vitality Trend — Real Algorithm */}
                             <div style={{ marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                    <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: 'var(--mist)', opacity: 0.6, letterSpacing: '0.1em' }}>VITALITY TREND</span>
-                                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jade)' }}>
-                                        {updates.length > 0 ? (updates[0].healthStatus === 'excellent' ? 'Peak Performance' : 'Stable') : 'Establishing...'}
-                                    </span>
+                                {/* Header */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <span style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--mist)', opacity: 0.6, letterSpacing: '0.1em' }}>VITALITY SCORE</span>
+                                        <div title="Authentic logic: Health (40%), Activity (30%), Growth (20%), Care Consistency (10%)" style={{ cursor: 'help', opacity: 0.4 }}>
+                                            <Sparkles size={12} color="var(--jade)" />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ fontSize: 22, fontWeight: 800, color: vitality.color, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>{vitality.score}</span>
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: vitality.color }}>{vitality.label}</span>
+                                    </div>
                                 </div>
-                                <div style={{ height: 6, width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
-                                    <motion.div 
+
+                                {/* Main progress bar */}
+                                <div style={{ height: 8, width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden', marginBottom: 12 }}>
+                                    <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: updates.length > 0 ? '85%' : '20%' }}
-                                        transition={{ duration: 1.5, ease: 'easeOut' }}
-                                        style={{ 
-                                            height: '100%', 
-                                            background: 'linear-gradient(90deg, var(--emerald), var(--jade))',
-                                            boxShadow: '0 0 10px rgba(34,197,94,0.3)'
-                                        }} 
+                                        animate={{ width: `${vitality.score}%` }}
+                                        transition={{ duration: 1.2, ease: 'easeOut' }}
+                                        style={{
+                                            height: '100%',
+                                            background: vitality.score >= 55
+                                                ? `linear-gradient(90deg, #16a34a, ${vitality.color})`
+                                                : `linear-gradient(90deg, #b45309, ${vitality.color})`,
+                                            boxShadow: `0 0 10px ${vitality.color}55`,
+                                            borderRadius: 10,
+                                        }}
                                     />
                                 </div>
+
+                                {/* Breakdown mini-bars */}
+                                {updates.length > 0 && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+                                        {[
+                                            { key: 'health',   label: 'Health',   val: vitality.breakdown.health,   weight: '40%' },
+                                            { key: 'activity', label: 'Activity', val: vitality.breakdown.activity, weight: '30%' },
+                                            { key: 'growth',   label: 'Growth',   val: vitality.breakdown.growth,   weight: '20%' },
+                                            { key: 'care',     label: 'Care',     val: vitality.breakdown.care,     weight: '10%' },
+                                        ].map(({ key, label, val, weight }) => (
+                                            <div key={key}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                                                    <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'rgba(240,253,244,0.35)', letterSpacing: '0.08em' }}>{label} <span style={{ opacity: 0.5 }}>({weight})</span></span>
+                                                    <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'rgba(240,253,244,0.5)' }}>{val}</span>
+                                                </div>
+                                                <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 4, overflow: 'hidden' }}>
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${val}%` }}
+                                                        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+                                                        style={{
+                                                            height: '100%',
+                                                            background: val >= 70 ? 'var(--jade)' : val >= 45 ? '#eab308' : '#f97316',
+                                                            borderRadius: 4
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', fontSize: 13, marginBottom: 16 }}>
@@ -572,6 +730,79 @@ export default function PlantDetail() {
                     </form>
                 </motion.div>
             )}
+            {/* Edit Modal */}
+            <AnimatePresence>
+                {isEditing && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, zIndex: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+                            className="card"
+                            style={{ maxWidth: 500, width: '100%', padding: '32px' }}
+                        >
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: 24, color: 'var(--pearl)', marginBottom: 24 }}>Edit Plant Details</h2>
+                            
+                            <div style={{ display: 'grid', gap: 16 }}>
+                                <div>
+                                    <label style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--mist)', opacity: 0.6, display: 'block', marginBottom: 6 }}>COMMON NAME</label>
+                                    <input 
+                                        className="input-field" 
+                                        value={editForm.commonName} 
+                                        onChange={e => setEditForm({...editForm, commonName: e.target.value})}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--mist)', opacity: 0.6, display: 'block', marginBottom: 6 }}>SCIENTIFIC NAME</label>
+                                    <input 
+                                        className="input-field" 
+                                        value={editForm.scientificName} 
+                                        onChange={e => setEditForm({...editForm, scientificName: e.target.value})}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                    <div>
+                                        <label style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--mist)', opacity: 0.6, display: 'block', marginBottom: 6 }}>PLANT TYPE</label>
+                                        <input 
+                                            className="input-field" 
+                                            value={editForm.plantType} 
+                                            onChange={e => setEditForm({...editForm, plantType: e.target.value})}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--mist)', opacity: 0.6, display: 'block', marginBottom: 6 }}>LOCATION</label>
+                                        <input 
+                                            className="input-field" 
+                                            value={editForm.location} 
+                                            onChange={e => setEditForm({...editForm, location: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
+                                <button 
+                                    onClick={() => setIsEditing(false)} 
+                                    className="btn-ghost" 
+                                    style={{ flex: 1 }}
+                                    disabled={saving}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleSaveEdit} 
+                                    className="btn-primary" 
+                                    style={{ flex: 2 }}
+                                    disabled={saving}
+                                >
+                                    {saving ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

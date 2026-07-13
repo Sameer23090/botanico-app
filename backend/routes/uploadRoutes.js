@@ -3,9 +3,10 @@ const multer = require('multer');
 const sharp = require('sharp');
 const crypto = require('crypto');
 const authMiddleware = require('../middleware/auth');
-const User = require('../models/User');
-const Plant = require('../models/Plant');
+const dbQueries = require('../db/dbQueries');
 const { getOrCreateFolder, uploadToDrive } = require('../services/driveService');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -29,10 +30,10 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
       return res.status(400).json({ error: 'plantId is required' });
     }
 
-    const user = await User.findById(req.user.id);
-    const plant = await Plant.findOne({ _id: plantId, userId: req.user.id });
+    const user = await dbQueries.users.findById(req.user.id);
+    const plant = await dbQueries.plants.findById(plantId);
 
-    if (!plant) {
+    if (!plant || plant.userId !== req.user.id) {
       return res.status(404).json({ error: 'Plant not found' });
     }
 
@@ -59,27 +60,47 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
     
     const filename = `${cleanCommon}_${cleanScientific}_usr_${userIdShort}_${dateStr}_${timestamp}.webp`;
 
-    // 3. Handle Drive Folder Structure
-    // Botanico_Uploads/ -> {user_id}/ -> {plant_id}/
-    const rootFolderId = process.env.DRIVE_ROOT_FOLDER_ID;
-    const userFolderId = await getOrCreateFolder(user.displayId, rootFolderId);
-    const plantFolderId = await getOrCreateFolder(plant.displayId, userFolderId);
+    // 3. Try Google Drive first
+    try {
+      const rootFolderId = process.env.DRIVE_ROOT_FOLDER_ID;
+      if (!rootFolderId) throw new Error('DRIVE_ROOT_FOLDER_ID not set');
+      
+      const userFolderId = await getOrCreateFolder(user.displayId, rootFolderId);
+      const plantFolderId = await getOrCreateFolder(plant.displayId, userFolderId);
+      const driveResult = await uploadToDrive(processedBuffer, filename, plantFolderId, 'image/webp');
 
-    // 4. Upload to Drive
-    const driveResult = await uploadToDrive(processedBuffer, filename, plantFolderId, 'image/webp');
+      return res.json({
+        message: 'Image uploaded successfully to Google Drive',
+        driveFileId: driveResult.fileId,
+        displayUrl: driveResult.displayUrl,
+        originalFilename: req.file.originalname,
+        filename: filename,
+        imageType: imageType || 'timeline'
+      });
+    } catch (driveError) {
+      console.warn('⚠️ Google Drive fallback triggered:', driveError.message);
+      
+      // 4. Local Fallback
+      const uploadPath = path.join(__dirname, '../uploads', filename);
+      console.log('📂 Saving locally to:', uploadPath);
+      fs.writeFileSync(uploadPath, processedBuffer);
+      
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const localUrl = `${protocol}://${host}/uploads/${filename}`;
 
-    res.json({
-      message: 'Image uploaded successfully to Google Drive',
-      driveFileId: driveResult.fileId,
-      displayUrl: driveResult.displayUrl,
-      originalFilename: req.file.originalname,
-      filename: filename,
-      imageType: imageType || 'timeline'
-    });
-
+      res.json({
+        message: 'Image uploaded successfully to local storage (Fallback)',
+        displayUrl: localUrl,
+        originalFilename: req.file.originalname,
+        filename: filename,
+        imageType: imageType || 'timeline',
+        isLocal: true
+      });
+    }
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ error: 'Failed to upload image to Google Drive' });
+    res.status(500).json({ error: 'Failed to upload image. Please try again.' });
   }
 });
 

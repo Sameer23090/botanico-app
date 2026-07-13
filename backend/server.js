@@ -22,17 +22,20 @@ const achievementRoutes = require('./routes/achievements');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+// Connect to PostgreSQL and Auto-Seed Admin
+const dbQueries = require('./db/dbQueries');
 connectDB().then(async () => {
     try {
-        const User = require('./models/User');
         const adminEmail = 'master@botanico.live';
-        const existing = await User.findOne({ email: adminEmail });
+        const existing = await dbQueries.users.findByEmail(adminEmail);
         if (!existing) {
-            await User.create({
+            const bcrypt = require('bcryptjs');
+            const salt = await bcrypt.genSalt(10);
+            const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'BotanicoMaster!2026', salt);
+            await dbQueries.users.create({
                 name: 'System Director',
                 email: adminEmail,
-                passwordHash: process.env.ADMIN_PASSWORD || 'BotanicoMaster!2026',
+                passwordHash: passwordHash,
                 role: 'admin',
                 location: 'Headquarters',
                 provider: 'local'
@@ -48,7 +51,8 @@ app.use(helmet());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: process.env.NODE_ENV === 'production' ? 100 : 5000,
+  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1',
 });
 app.use('/api/', limiter);
 
@@ -62,6 +66,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Initialise passport
 app.use(passport.initialize());
+
+// Serve static files from uploads
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -79,7 +87,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Botanico API is running',
-    database: 'MongoDB Atlas',
+    database: 'PostgreSQL',
     timestamp: new Date().toISOString(),
   });
 });
@@ -88,7 +96,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Botanico Plant Tracking API',
     version: '2.6.0',
-    database: 'MongoDB Atlas',
+    database: 'PostgreSQL',
     endpoints: {
       auth: '/api/auth',
       plants: '/api/plants',

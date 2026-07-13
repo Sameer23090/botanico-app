@@ -1,52 +1,48 @@
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
+require('dotenv').config();
 
-let isConnected;
+// Create connection config from environment variables
+const poolConfig = {
+  host: process.env.PGHOST || 'localhost',
+  user: process.env.PGUSER || 'postgres',
+  password: process.env.PGPASSWORD || 'postgres',
+  database: process.env.PGDATABASE || 'botanico',
+  port: parseInt(process.env.PGPORT || '5432', 10),
+};
+
+// Use DATABASE_URL if available (e.g. Supabase, Neon)
+const connectionString = process.env.DATABASE_URL;
+const isProd = process.env.NODE_ENV === 'production';
+
+const pool = new Pool(
+  connectionString 
+    ? { 
+        connectionString, 
+        ssl: isProd ? { rejectUnauthorized: false } : false 
+      }
+    : { 
+        ...poolConfig,
+        ssl: isProd ? { rejectUnauthorized: false } : false 
+      }
+);
+
+// Helper function for quick queries
+const query = (text, params) => pool.query(text, params);
 
 const connectDB = async () => {
-  if (isConnected) {
-    console.log('=> using existing database connection');
-    return;
-  }
-
   try {
-    const uri = process.env.MONGODB_URI;
-    if (!uri) {
-      console.error('❌ MONGODB_URI is not defined in environment variables.');
-      return; 
-    }
-
-    const db = await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 3000,
-      bufferCommands: false, // Don't hang if connection fails
-    });
-    
-    // Also disable buffering on the global mongoose object for existing models
-    mongoose.set('bufferCommands', false);
-
-    isConnected = db.connections[0].readyState;
-    console.log(`🍃 MongoDB Connected: ${db.connection.host}`);
+    const client = await pool.connect();
+    console.log(`🐘 PostgreSQL Connected: ${connectionString ? 'via Connection URL' : `${poolConfig.host}:${poolConfig.port}/${poolConfig.database}`}`);
+    client.release();
+    return pool;
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
+    console.error('❌ PostgreSQL connection error:', error.message);
     throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 
-// Handle connection events
-mongoose.connection.on('disconnected', () => {
-  console.warn('⚠️  MongoDB disconnected');
-});
-
-mongoose.connection.on('reconnected', () => {
-  console.log('🔄 MongoDB reconnected');
-});
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  console.log('🔌 MongoDB connection closed due to app termination');
-  process.exit(0);
-});
+// Attach helpers to connectDB function for easy imports
+connectDB.query = query;
+connectDB.pool = pool;
 
 module.exports = connectDB;
