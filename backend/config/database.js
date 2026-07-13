@@ -36,8 +36,9 @@ const connectDB = async () => {
     client.release();
     return pool;
   } catch (error) {
-    console.error('❌ PostgreSQL connection error:', error.message);
-    throw new Error(`Database connection failed: ${error.message}`);
+    const attemptedTarget = connectionString ? 'Neon Cloud URL' : `${poolConfig.host}:${poolConfig.port} (Localhost)`;
+    console.error(`❌ PostgreSQL connection error (attempted ${attemptedTarget}):`, error.message);
+    throw new Error(`Database connection failed: ${error.message} (attempted ${attemptedTarget}). Please verify your environment variables.`);
   }
 };
 
